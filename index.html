@@ -8,6 +8,9 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- mp4-muxer CDN for universal H.264 MP4 export (Instagram, TikTok, WhatsApp, Socials) -->
+  <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.4/build/mp4-muxer.min.js"></script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -369,7 +372,7 @@
       <!-- RECORD 9:16 VIDEO -->
       <button id="recVideoBtn" class="tap-btn px-3 py-1.5 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink font-bold text-xs flex items-center space-x-1.5 shadow-[0_0_12px_rgba(255,0,85,0.25)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
         <span id="recBtnDot" class="w-2 h-2 rounded-full bg-cyber-pink"></span>
-        <span id="recBtnLabel">REC 9:16</span>
+        <span id="recBtnLabel">REC MP4</span>
       </button>
     </div>
   </div>
@@ -415,7 +418,7 @@
             <span>TEXT EDIT (MULTI-LINE)</span>
             <span class="text-cyber-cyan">Touch canvas to drag / rotate 3D</span>
           </div>
-          <textarea id="textInput" rows="2" class="w-full bg-cyber-black border border-cyber-border rounded px-2.5 py-1.5 text-white font-mono text-xs outline-none focus:border-cyber-cyan resize-none">VIBE//MOSH
+          <textarea id="textInput" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-cyber-black border border-cyber-border rounded px-2.5 py-1.5 text-white font-mono text-xs outline-none focus:border-cyber-cyan resize-none">VIBE//MOSH
 RAW SIGNAL</textarea>
         </div>
 
@@ -887,7 +890,7 @@ RAW SIGNAL</textarea>
       </div>
 
       <p class="text-[10px] text-slate-400 text-center">
-        On mobile Safari or Chrome: <strong class="text-cyber-cyan">Tap Download</strong> or long-press the preview to <strong class="text-white">"Save to Photos"</strong>.
+        On mobile Safari or Chrome: <strong class="text-cyber-cyan">Tap Save File</strong> or long-press the preview to <strong class="text-white">"Save to Photos"</strong>. Ready for Instagram, TikTok, Reels & WhatsApp!
       </p>
 
       <div class="flex space-x-2">
@@ -992,11 +995,19 @@ RAW SIGNAL</textarea>
       // Video Recording State
       recording: {
         isRecording: false,
+        useWebCodecs: false,
+        muxer: null,
+        videoEncoder: null,
         recorder: null,
         chunks: [],
         startTime: 0,
+        lastFrameTime: 0,
+        frameIndex: 0,
         timerInterval: null
-      }
+      },
+
+      // Mobile Typing Throttle (for 0ms keyboard latency)
+      isTyping: false
     };
 
     // DOM References
@@ -1164,12 +1175,19 @@ RAW SIGNAL</textarea>
     }
 
     // Helper: dynamic fill styles (solid, dual gradient, rainbow cycle)
+    let cachedTextGrad = null;
+    let cachedTextGradKey = '';
+
     function getTextFillStyle(tCtx, t, tick, x, y, size, charIdx = 0) {
       if (t.fillMode === 'gradient') {
-        const grad = tCtx.createLinearGradient(x - size, y - size, x + size, y + size);
-        grad.addColorStop(0, t.fillColor);
-        grad.addColorStop(1, t.fillColor2 || '#ffe600');
-        return grad;
+        const key = `${t.fillColor}_${t.fillColor2 || '#ffe600'}`;
+        if (!cachedTextGrad || cachedTextGradKey !== key) {
+          cachedTextGradKey = key;
+          cachedTextGrad = tCtx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+          cachedTextGrad.addColorStop(0, t.fillColor);
+          cachedTextGrad.addColorStop(1, t.fillColor2 || '#ffe600');
+        }
+        return cachedTextGrad;
       } else if (t.fillMode === 'rainbow') {
         const hue = (tick * 60 + charIdx * 25) % 360;
         return `hsl(${hue}, 100%, 65%)`;
@@ -1256,7 +1274,7 @@ RAW SIGNAL</textarea>
         tCtx.font = `900 ${fontSize}px ${t.fontFamily}`;
         tCtx.globalAlpha = alpha;
 
-        if (t.glowRadius > 0 && alpha > 0.5) {
+        if (t.glowRadius > 0 && alpha > 0.5 && !state.isTyping) {
           tCtx.shadowColor = t.glowColor;
           tCtx.shadowBlur = t.glowRadius * scale;
         } else {
@@ -1369,7 +1387,7 @@ RAW SIGNAL</textarea>
         tCtx.font = `900 ${fontSize}px ${t.fontFamily}`;
         tCtx.globalAlpha = alpha;
 
-        if (t.glowRadius > 0 && face.facingCamera) {
+        if (t.glowRadius > 0 && face.facingCamera && !state.isTyping) {
           tCtx.shadowColor = t.glowColor;
           tCtx.shadowBlur = t.glowRadius * face.avgScale;
         } else {
@@ -1459,7 +1477,7 @@ RAW SIGNAL</textarea>
         tCtx.font = `900 ${fontSize}px ${t.fontFamily}`;
         tCtx.globalAlpha = alpha;
 
-        if (t.glowRadius > 0 && alpha > 0.55) {
+        if (t.glowRadius > 0 && alpha > 0.55 && !state.isTyping) {
           tCtx.shadowColor = t.glowColor;
           tCtx.shadowBlur = t.glowRadius * scale;
         } else {
@@ -1775,15 +1793,26 @@ RAW SIGNAL</textarea>
   </script>
 
   <script>
+    // Pre-allocated static buffers for ZERO garbage collection churn
+    const sortMaxLen = Math.max(WIDTH, HEIGHT);
+    const sortVals = new Float32Array(sortMaxLen);
+    const sortPixels = new Uint32Array(sortMaxLen);
+    const sortIndices = new Int32Array(sortMaxLen);
+    let crtCopyBuffer = null;
+
     function pixelSortPass(targetCtx, opt) {
       const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
-      const d = img.data;
+      const data32 = new Uint32Array(img.data.buffer);
 
       const low = opt.thresholdLow / 100;
       const high = opt.thresholdHigh / 100;
-      const maxSpan = opt.maxLength;
+      const maxSpan = Math.min(opt.maxLength, sortMaxLen);
 
-      const getMetric = (r, g, b) => {
+      const getMetric = (pixel) => {
+        const r = pixel & 0xff;
+        const g = (pixel >> 8) & 0xff;
+        const b = (pixel >> 16) & 0xff;
+
         if (opt.criterion === 'brightness') return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
         if (opt.criterion === 'red') return r / 255;
         if (opt.criterion === 'blue') return b / 255;
@@ -1795,88 +1824,84 @@ RAW SIGNAL</textarea>
       };
 
       const isVertical = opt.direction === 'vertical';
-      const isHorizontal = opt.direction === 'horizontal';
 
       if (isVertical) {
         // Vertical sorting (dripping down)
         for (let x = 0; x < WIDTH; x += 2) {
           let startY = -1;
-          let span = [];
+          let len = 0;
 
           for (let y = 0; y < HEIGHT; y++) {
-            const idx = (y * WIDTH + x) * 4;
-            const val = getMetric(d[idx], d[idx + 1], d[idx + 2]);
+            const idx = y * WIDTH + x;
+            const p = data32[idx];
+            const val = getMetric(p);
 
             if (val >= low && val <= high) {
               if (startY === -1) startY = y;
-              span.push({ r: d[idx], g: d[idx + 1], b: d[idx + 2], a: d[idx + 3], val });
+              sortVals[len] = val;
+              sortPixels[len] = p;
+              sortIndices[len] = len;
+              len++;
 
-              if (span.length >= maxSpan || y === HEIGHT - 1) {
-                span.sort((a, b) => a.val - b.val);
-                for (let k = 0; k < span.length; k++) {
-                  const sIdx = ((startY + k) * WIDTH + x) * 4;
-                  d[sIdx] = span[k].r;
-                  d[sIdx + 1] = span[k].g;
-                  d[sIdx + 2] = span[k].b;
-                  d[sIdx + 3] = span[k].a;
+              if (len >= maxSpan || y === HEIGHT - 1) {
+                const sub = sortIndices.subarray(0, len);
+                sub.sort((a, b) => sortVals[a] - sortVals[b]);
+                for (let k = 0; k < len; k++) {
+                  data32[(startY + k) * WIDTH + x] = sortPixels[sub[k]];
                 }
                 startY = -1;
-                span = [];
+                len = 0;
               }
-            } else if (span.length > 0) {
-              span.sort((a, b) => a.val - b.val);
-              for (let k = 0; k < span.length; k++) {
-                const sIdx = ((startY + k) * WIDTH + x) * 4;
-                d[sIdx] = span[k].r;
-                d[sIdx + 1] = span[k].g;
-                d[sIdx + 2] = span[k].b;
-                d[sIdx + 3] = span[k].a;
+            } else if (len > 0) {
+              const sub = sortIndices.subarray(0, len);
+              sub.sort((a, b) => sortVals[a] - sortVals[b]);
+              for (let k = 0; k < len; k++) {
+                data32[(startY + k) * WIDTH + x] = sortPixels[sub[k]];
               }
               startY = -1;
-              span = [];
+              len = 0;
             }
           }
         }
       } else {
         // Horizontal / Diagonal sorting
+        const isDiag = opt.direction === 'diagonal';
         for (let y = 0; y < HEIGHT; y += 2) {
           let startX = -1;
-          let span = [];
+          let len = 0;
 
           for (let x = 0; x < WIDTH; x++) {
-            const px = opt.direction === 'diagonal' ? (x + y) % WIDTH : x;
-            const idx = (y * WIDTH + px) * 4;
-            const val = getMetric(d[idx], d[idx + 1], d[idx + 2]);
+            const px = isDiag ? (x + y) % WIDTH : x;
+            const idx = y * WIDTH + px;
+            const p = data32[idx];
+            const val = getMetric(p);
 
             if (val >= low && val <= high) {
               if (startX === -1) startX = x;
-              span.push({ r: d[idx], g: d[idx + 1], b: d[idx + 2], a: d[idx + 3], val, px });
+              sortVals[len] = val;
+              sortPixels[len] = p;
+              sortIndices[len] = len;
+              len++;
 
-              if (span.length >= maxSpan || x === WIDTH - 1) {
-                span.sort((a, b) => a.val - b.val);
-                for (let k = 0; k < span.length; k++) {
-                  const writeX = opt.direction === 'diagonal' ? (startX + k + y) % WIDTH : (startX + k);
-                  const sIdx = (y * WIDTH + writeX) * 4;
-                  d[sIdx] = span[k].r;
-                  d[sIdx + 1] = span[k].g;
-                  d[sIdx + 2] = span[k].b;
-                  d[sIdx + 3] = span[k].a;
+              if (len >= maxSpan || x === WIDTH - 1) {
+                const sub = sortIndices.subarray(0, len);
+                sub.sort((a, b) => sortVals[a] - sortVals[b]);
+                for (let k = 0; k < len; k++) {
+                  const writeX = isDiag ? (startX + k + y) % WIDTH : (startX + k);
+                  data32[y * WIDTH + writeX] = sortPixels[sub[k]];
                 }
                 startX = -1;
-                span = [];
+                len = 0;
               }
-            } else if (span.length > 0) {
-              span.sort((a, b) => a.val - b.val);
-              for (let k = 0; k < span.length; k++) {
-                const writeX = opt.direction === 'diagonal' ? (startX + k + y) % WIDTH : (startX + k);
-                const sIdx = (y * WIDTH + writeX) * 4;
-                d[sIdx] = span[k].r;
-                d[sIdx + 1] = span[k].g;
-                d[sIdx + 2] = span[k].b;
-                d[sIdx + 3] = span[k].a;
+            } else if (len > 0) {
+              const sub = sortIndices.subarray(0, len);
+              sub.sort((a, b) => sortVals[a] - sortVals[b]);
+              for (let k = 0; k < len; k++) {
+                const writeX = isDiag ? (startX + k + y) % WIDTH : (startX + k);
+                data32[y * WIDTH + writeX] = sortPixels[sub[k]];
               }
               startX = -1;
-              span = [];
+              len = 0;
             }
           }
         }
@@ -1913,10 +1938,22 @@ RAW SIGNAL</textarea>
 
     function applyAnalogAndCrt(targetCtx, fx) {
       if (!fx.active) return;
+      if (fx.rgbSplit === 0 && fx.scanlines === 0 && fx.noise === 0) return;
 
       const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
       const d = img.data;
-      const copy = new Uint8ClampedArray(d);
+
+      const doRgb = fx.rgbSplit > 0;
+      const doScan = fx.scanlines > 0;
+      const doNoise = fx.noise > 0;
+
+      // Reusable buffer: prevents allocating 3.7MB every single frame (zero GC churn!)
+      if (doRgb) {
+        if (!crtCopyBuffer || crtCopyBuffer.length !== d.length) {
+          crtCopyBuffer = new Uint8ClampedArray(d.length);
+        }
+        crtCopyBuffer.set(d);
+      }
 
       const rad = (fx.rgbAngle * Math.PI) / 180;
       const ox = Math.round(Math.cos(rad) * fx.rgbSplit);
@@ -1926,30 +1963,31 @@ RAW SIGNAL</textarea>
       const noiseAmp = (fx.noise / 100) * 70;
 
       for (let y = 0; y < HEIGHT; y++) {
-        const isScan = (y % 2 === 0);
+        const isScan = doScan && (y % 2 === 0);
+        const rowOffset = y * WIDTH;
         for (let x = 0; x < WIDTH; x++) {
-          const idx = (y * WIDTH + x) * 4;
+          const idx = (rowOffset + x) * 4;
 
           // RGB Split
-          if (fx.rgbSplit > 0) {
+          if (doRgb) {
             const rx = Math.min(Math.max(x + ox, 0), WIDTH - 1);
             const ry = Math.min(Math.max(y + oy, 0), HEIGHT - 1);
-            d[idx] = copy[(ry * WIDTH + rx) * 4]; // Red channel
+            d[idx] = crtCopyBuffer[(ry * WIDTH + rx) * 4]; // Red channel
 
             const bx = Math.min(Math.max(x - ox, 0), WIDTH - 1);
             const by = Math.min(Math.max(y - oy, 0), HEIGHT - 1);
-            d[idx + 2] = copy[(by * WIDTH + bx) * 4 + 2]; // Blue channel
+            d[idx + 2] = crtCopyBuffer[(by * WIDTH + bx) * 4 + 2]; // Blue channel
           }
 
           // Scanline Dim
-          if (isScan && fx.scanlines > 0) {
+          if (isScan) {
             d[idx] *= scanFactor;
             d[idx + 1] *= scanFactor;
             d[idx + 2] *= scanFactor;
           }
 
           // VHS Grain
-          if (fx.noise > 0 && Math.random() < 0.25) {
+          if (doNoise && Math.random() < 0.25) {
             const grain = (Math.random() - 0.5) * noiseAmp;
             d[idx] = Math.min(255, Math.max(0, d[idx] + grain));
             d[idx + 1] = Math.min(255, Math.max(0, d[idx + 1] + grain));
@@ -2003,6 +2041,7 @@ RAW SIGNAL</textarea>
       if (state.interaction.holdClean) {
         ctx.clearRect(0, 0, WIDTH, HEIGHT);
         ctx.drawImage(cleanCompositeCanvas, 0, 0);
+        handleVideoFrameCapture();
         requestAnimationFrame(render);
         return;
       }
@@ -2020,8 +2059,8 @@ RAW SIGNAL</textarea>
         ctx.drawImage(cleanCompositeCanvas, 0, 0);
       }
 
-      // 4. Pixel Sort Pass
-      if (state.sort.active) {
+      // 4. Pixel Sort Pass (paused during active typing bursts for instant mobile typing)
+      if (state.sort.active && !state.isTyping) {
         pixelSortPass(ctx, state.sort);
       }
 
@@ -2030,13 +2069,16 @@ RAW SIGNAL</textarea>
         applyDatamoshBlocks(ctx, state.mosh, state.mosh.tick);
       }
 
-      // 6. Analog CRT & Chromatic pass
-      if (state.fx.active) {
+      // 6. Analog CRT & Chromatic pass (paused during active typing bursts for 0ms latency)
+      if (state.fx.active && !state.isTyping) {
         applyAnalogAndCrt(ctx, state.fx);
       }
 
       // Save into feedback canvas for consecutive P-frame smear
       feedbackCtx.drawImage(moshCanvas, 0, 0);
+
+      // WebCodecs 30fps frame capture
+      handleVideoFrameCapture();
 
       requestAnimationFrame(render);
     }
@@ -2063,8 +2105,9 @@ RAW SIGNAL</textarea>
         exportPreviewImg.classList.remove('hidden');
         exportPreviewVid.classList.add('hidden');
       } else {
+        const isMp4 = filename.toLowerCase().endsWith('.mp4');
         exportModalIcon.textContent = '🎥';
-        exportModalTitle.textContent = '9:16 VIDEO READY';
+        exportModalTitle.textContent = isMp4 ? '9:16 MP4 READY (INSTAGRAM / SOCIALS)' : '9:16 VIDEO READY';
         exportPreviewVid.src = url;
         exportPreviewVid.classList.remove('hidden');
         exportPreviewImg.classList.add('hidden');
@@ -2138,31 +2181,144 @@ RAW SIGNAL</textarea>
       }
     });
 
-    // 2. RELIABLE REC VIDEO (MEDIA RECORDER)
+    // 2. RELIABLE REC VIDEO (UNIVERSAL MP4 VIA WEBCODECS + MP4-MUXER, FALLBACK MEDIARECORDER)
     const recVideoBtn = document.getElementById('recVideoBtn');
     const recBtnDot = document.getElementById('recBtnDot');
     const recBtnLabel = document.getElementById('recBtnLabel');
     const recHUD = document.getElementById('recHUD');
     const recTimerText = document.getElementById('recTimerText');
 
+    function handleVideoFrameCapture() {
+      if (!state.recording.isRecording || !state.recording.useWebCodecs || !state.recording.videoEncoder) {
+        return;
+      }
+      const now = performance.now();
+      if (!state.recording.lastFrameTime) {
+        state.recording.lastFrameTime = now;
+      }
+      const delta = now - state.recording.lastFrameTime;
+      // Record at steady 30 FPS (~33.3ms)
+      if (delta >= 31) {
+        state.recording.lastFrameTime = now;
+        if (state.recording.videoEncoder.encodeQueueSize <= 4) {
+          const fIdx = state.recording.frameIndex++;
+          const timestampUs = Math.round(fIdx * (1_000_000 / 30));
+          const keyFrame = (fIdx % 30 === 0);
+
+          try {
+            const frame = new VideoFrame(moshCanvas, {
+              timestamp: timestampUs,
+              duration: 33333
+            });
+            state.recording.videoEncoder.encode(frame, { keyFrame });
+            frame.close();
+          } catch (fErr) {
+            console.warn('Frame encode skipped:', fErr);
+          }
+        }
+      }
+    }
+
+    async function checkWebCodecsSupport() {
+      if (typeof VideoEncoder === 'undefined' || typeof Mp4Muxer === 'undefined') {
+        return null;
+      }
+      const candidateCodecs = [
+        'avc1.42001f', // Baseline Profile, Level 3.1 (universal iOS/Android/Instagram/TikTok)
+        'avc1.4d001f', // Main Profile, Level 3.1
+        'avc1.420020', // Baseline Profile, Level 3.2
+        'avc1.4d0020', // Main Profile, Level 3.2
+        'avc1.640028', // High Profile, Level 4.0
+        'avc1.42e01f'
+      ];
+      for (const c of candidateCodecs) {
+        try {
+          const config = {
+            codec: c,
+            width: WIDTH,
+            height: HEIGHT,
+            bitrate: 4_500_000,
+            framerate: 30
+          };
+          const res = await VideoEncoder.isConfigSupported(config);
+          if (res && res.supported) {
+            return c;
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
     function getSupportedMimeType() {
       const types = [
         'video/mp4;codecs=avc1',
         'video/mp4',
+        'video/webm;codecs=h264',
         'video/webm;codecs=vp9',
         'video/webm;codecs=vp8',
         'video/webm'
       ];
       for (const t of types) {
-        if (MediaRecorder.isTypeSupported(t)) return t;
+        if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) return t;
       }
       return '';
     }
 
-    recVideoBtn.addEventListener('click', () => {
+    recVideoBtn.addEventListener('click', async () => {
       if (!state.recording.isRecording) {
         // Start Recording
         try {
+          // 1. Try Hardware H.264 WebCodecs + Mp4Muxer (Universal MP4 for Instagram/TikTok/Socials)
+          const avcCodec = await checkWebCodecsSupport();
+          if (avcCodec && typeof Mp4Muxer !== 'undefined') {
+            const muxer = new Mp4Muxer.Muxer({
+              target: new Mp4Muxer.ArrayBufferTarget(),
+              video: {
+                codec: 'avc',
+                width: WIDTH,
+                height: HEIGHT
+              },
+              fastStart: 'in-memory',
+              firstTimestampBehavior: 'offset'
+            });
+
+            const videoEncoder = new VideoEncoder({
+              output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+              error: (err) => console.error('VideoEncoder error:', err)
+            });
+
+            videoEncoder.configure({
+              codec: avcCodec,
+              width: WIDTH,
+              height: HEIGHT,
+              bitrate: 4_500_000,
+              framerate: 30
+            });
+
+            state.recording.useWebCodecs = true;
+            state.recording.muxer = muxer;
+            state.recording.videoEncoder = videoEncoder;
+            state.recording.frameIndex = 0;
+            state.recording.lastFrameTime = 0;
+            state.recording.isRecording = true;
+            state.recording.startTime = Date.now();
+
+            recBtnDot.classList.add('rec-pulsing');
+            recBtnLabel.textContent = 'STOP REC';
+            recHUD.classList.remove('hidden');
+
+            state.recording.timerInterval = setInterval(() => {
+              const elapsed = Math.floor((Date.now() - state.recording.startTime) / 1000);
+              const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+              const ss = String(elapsed % 60).padStart(2, '0');
+              recTimerText.textContent = `REC ${mm}:${ss} (MP4)`;
+            }, 500);
+
+            return;
+          }
+
+          // 2. Fallback to MediaRecorder
+          state.recording.useWebCodecs = false;
           const stream = moshCanvas.captureStream(30);
           const mimeType = getSupportedMimeType();
           state.recording.chunks = [];
@@ -2185,8 +2341,6 @@ RAW SIGNAL</textarea>
             const filename = `VIBE_MOSH_9_16_${timestamp}.${ext}`;
 
             await saveFile(filename, blob);
-
-            // Open mobile playback sheet so user can preview or long-press
             openExportModal('video', videoUrl, filename);
           };
 
@@ -2194,7 +2348,6 @@ RAW SIGNAL</textarea>
           state.recording.isRecording = true;
           state.recording.startTime = Date.now();
 
-          // Update UI
           recBtnDot.classList.add('rec-pulsing');
           recBtnLabel.textContent = 'STOP REC';
           recHUD.classList.remove('hidden');
@@ -2203,21 +2356,57 @@ RAW SIGNAL</textarea>
             const elapsed = Math.floor((Date.now() - state.recording.startTime) / 1000);
             const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
             const ss = String(elapsed % 60).padStart(2, '0');
-            recTimerText.textContent = `REC ${mm}:${ss}`;
+            const formatBadge = mimeType.includes('mp4') ? 'MP4' : 'WEBM';
+            recTimerText.textContent = `REC ${mm}:${ss} (${formatBadge})`;
           }, 500);
 
         } catch (err) {
-          console.error('MediaRecorder start failed:', err);
+          console.error('Recording start failed:', err);
+          alert('Could not start recording: ' + err.message);
         }
       } else {
         // Stop Recording
-        state.recording.recorder.stop();
-        state.recording.isRecording = false;
-        clearInterval(state.recording.timerInterval);
+        if (state.recording.useWebCodecs && state.recording.videoEncoder) {
+          recBtnLabel.textContent = 'SAVING MP4...';
+          recBtnDot.classList.remove('rec-pulsing');
+          recHUD.classList.add('hidden');
+          clearInterval(state.recording.timerInterval);
+          state.recording.isRecording = false;
 
-        recBtnDot.classList.remove('rec-pulsing');
-        recBtnLabel.textContent = 'REC 9:16';
-        recHUD.classList.add('hidden');
+          try {
+            await state.recording.videoEncoder.flush();
+            state.recording.muxer.finalize();
+            const buffer = state.recording.muxer.target.buffer;
+            const blob = new Blob([buffer], { type: 'video/mp4' });
+            const videoUrl = URL.createObjectURL(blob);
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `VIBE_MOSH_9_16_${timestamp}.mp4`;
+
+            await saveFile(filename, blob);
+            openExportModal('video', videoUrl, filename);
+          } catch (err) {
+            console.error('Error finalizing MP4:', err);
+            alert('Error exporting MP4: ' + err.message);
+          } finally {
+            try { state.recording.videoEncoder.close(); } catch(e) {}
+            state.recording.videoEncoder = null;
+            state.recording.muxer = null;
+            state.recording.useWebCodecs = false;
+            recBtnLabel.textContent = 'REC MP4';
+          }
+          return;
+        }
+
+        // MediaRecorder stop
+        if (state.recording.recorder) {
+          state.recording.recorder.stop();
+          state.recording.isRecording = false;
+          clearInterval(state.recording.timerInterval);
+
+          recBtnDot.classList.remove('rec-pulsing');
+          recBtnLabel.textContent = 'REC MP4';
+          recHUD.classList.add('hidden');
+        }
       }
     });
   </script>
@@ -2478,7 +2667,18 @@ RAW SIGNAL</textarea>
 
       // Text Input
       const textInput = document.getElementById('textInput');
-      textInput.addEventListener('input', (e) => state.type.text = e.target.value);
+      let typingTimer = null;
+      textInput.addEventListener('input', (e) => {
+        state.type.text = e.target.value;
+        state.isTyping = true;
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+          state.isTyping = false;
+        }, 220);
+      });
+      textInput.addEventListener('blur', () => {
+        state.isTyping = false;
+      });
 
       document.getElementById('fontSelect').addEventListener('change', (e) => state.type.fontFamily = e.target.value);
       document.getElementById('fillColorInput').addEventListener('input', (e) => state.type.fillColor = e.target.value);
@@ -2698,6 +2898,7 @@ RAW SIGNAL</textarea>
         const rand = SLOGANS[Math.floor(Math.random() * SLOGANS.length)];
         state.type.text = rand;
         document.getElementById('textInput').value = rand;
+        state.isTyping = false;
       });
 
       // Chaos Randomizer
