@@ -1,0 +1,2870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>VIBE // MOSH 9:16 — Vertical Kinetic Glitch & Datamosh Studio</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&family=Rubik+Glitch&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@700;800&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              black: '#07080b',
+              dark: '#0e1118',
+              card: '#141824',
+              border: '#1f2738',
+              cyan: '#00ffcc',
+              pink: '#ff0055',
+              yellow: '#ffe600',
+              purple: '#b026ff',
+              lime: '#39ff14'
+            }
+          },
+          fontFamily: {
+            mono: ['Space Mono', 'monospace'],
+            syne: ['Syne', 'sans-serif'],
+            bebas: ['Bebas Neue', 'sans-serif'],
+            orbitron: ['Orbitron', 'sans-serif'],
+            anton: ['Anton', 'sans-serif'],
+            rubikGlitch: ['Rubik Glitch', 'cursive'],
+            cinzel: ['Cinzel', 'serif'],
+            unifraktur: ['UnifrakturCook', 'cursive']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      box-sizing: border-box;
+    }
+    input, textarea {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    /* Prevent mobile bounce / pull down refresh on touch screens */
+    html, body {
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      height: 100%;
+      overflow: hidden;
+      background-color: #06070a;
+    }
+
+    /* Sliders */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 9999px;
+      background: #1e2638;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #00ffcc;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00ffcc;
+      border: 1px solid #ffffff;
+    }
+
+    /* Safe-area aware header/footer */
+    .app-header {
+      padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+    }
+    .app-footer-panels {
+      max-height: 40vh;
+      padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+      transition: max-height 0.28s ease, opacity 0.22s ease;
+      opacity: 1;
+    }
+    #controlSheet.sheet-collapsed .app-footer-panels {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      overflow: hidden;
+    }
+    #sheetHandle { cursor: pointer; }
+
+    /* Knobs integrated directly onto the canvas / text screen - safe inset from borders */
+    #canvasKnobDock {
+      max-width: 90%;
+      pointer-events: auto;
+    }
+    .dock-knob .knob-body { width: 42px; height: 42px; }
+    .dock-knob .knob-dial { inset: 5px; }
+    .dock-knob .knob-indicator { top: 4px; height: 10px; transform-origin: 50% 14px; }
+    .dock-knob-label {
+      font-size: 8px;
+      letter-spacing: 0.06em;
+      color: rgba(226, 232, 240, 0.85);
+      font-weight: 700;
+    }
+
+    /* Jam-mode crosshair: bigger pink performance dot, matches the pad feel */
+    #touchCrosshair.mode-jam {
+      width: 26px;
+      height: 26px;
+      border: 2px solid #fff;
+      background: radial-gradient(circle, rgba(255,0,85,0.55), rgba(255,0,85,0.15) 60%, transparent 75%);
+      box-shadow: 0 0 18px #ff0055, 0 0 4px #fff;
+    }
+    #touchCrosshair.mode-brush {
+      border-color: rgba(0, 255, 204, 0.8);
+      box-shadow: 0 0 12px #00ffcc;
+    }
+
+    /* ===== Synth Knob Component ===== */
+    .synth-knob {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      touch-action: none;
+    }
+    .knob-body {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+    .knob-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(from -135deg, var(--knob-color, #00ffcc) 0deg var(--knob-arc, 0deg), #1c2434 var(--knob-arc, 0deg) 270deg, transparent 270deg 360deg);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));
+      filter: drop-shadow(0 0 4px var(--knob-color, #00ffcc));
+      pointer-events: none;
+    }
+    .knob-dial {
+      position: absolute;
+      inset: 7px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #232b3d, #0b0e15 75%);
+      border: 1px solid #1f2738;
+      cursor: grab;
+      touch-action: none;
+    }
+    /* Expansive invisible touch hit area: prevents slipping on phone screens */
+    .knob-dial::after {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      pointer-events: auto;
+    }
+    .knob-dial.active {
+      box-shadow: 0 0 0 6px rgba(0, 255, 204, 0.12);
+      cursor: grabbing;
+    }
+    .knob-indicator {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      width: 2px;
+      height: 12px;
+      background: var(--knob-color, #00ffcc);
+      border-radius: 2px;
+      transform-origin: 50% 16px;
+      box-shadow: 0 0 5px var(--knob-color, #00ffcc);
+    }
+    .knob-native-input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+    }
+    .knob-value {
+      font-size: 9px;
+      color: var(--knob-color, #00ffcc);
+      font-weight: 700;
+    }
+
+    /* ===== XY Performance Pad ===== */
+    .xy-pad {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 10px;
+      background: radial-gradient(circle at 30% 20%, #171c28, #090b11 70%);
+      border: 1px solid #1f2738;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .xy-pad-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 0, 85, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 204, 0.14) 1px, transparent 1px);
+      background-size: 12.5% 25%;
+      pointer-events: none;
+    }
+    .xy-pad-dot {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      margin: -11px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ff0055, #ff0055 40%, transparent 72%);
+      box-shadow: 0 0 14px #ff0055, 0 0 3px #fff;
+      border: 2px solid #fff;
+      pointer-events: none;
+      transition: box-shadow 0.15s ease;
+    }
+    .xy-pad.active .xy-pad-dot {
+      box-shadow: 0 0 22px #ff0055, 0 0 6px #fff;
+    }
+
+    /* Bigger, thumb-friendly tap targets */
+    .tap-btn {
+      min-height: 44px;
+    }
+
+    /* Custom scrollbar for mobile drawers */
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #0b0e14;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1f2738;
+      border-radius: 4px;
+    }
+
+    /* 9:16 Aspect ratio container */
+    .aspect-9-16 {
+      aspect-ratio: 9 / 16;
+    }
+
+    /* CRT scanline overlay */
+    .crt-overlay::after {
+      content: " ";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+      background-size: 100% 3px;
+      pointer-events: none;
+      border-radius: inherit;
+      z-index: 10;
+    }
+
+    /* Pulsing recording animation */
+    @keyframes pulse-record {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.9); }
+    }
+    .rec-pulsing {
+      animation: pulse-record 1.2s infinite ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="flex flex-col h-full bg-cyber-black text-slate-200 font-mono overflow-hidden select-none">
+
+  <header class="app-header shrink-0 z-30 bg-cyber-dark/95 border-b border-cyber-border px-3 py-2 flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <div class="w-6 h-6 rounded bg-gradient-to-tr from-cyber-pink via-cyber-purple to-cyber-cyan flex items-center justify-center font-bold text-[10px] text-black">
+        9:16
+      </div>
+      <div>
+        <div class="flex items-center space-x-1.5 leading-none">
+          <span class="font-extrabold tracking-wider text-xs sm:text-sm text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-white to-cyber-pink">VIBE//MOSH</span>
+          <span class="text-[8px] bg-cyber-cyan/15 text-cyber-cyan px-1 py-0.2 rounded border border-cyber-cyan/30">MOBILE 9:16</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Action Bar: Random Slogan, Palette & Chaos -->
+    <div class="flex items-center space-x-1.5">
+      <button id="paletteBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs flex items-center space-x-1 hover:border-cyber-cyan active:scale-95 transition text-cyber-cyan" title="Cycle color palette">
+        <span>🎨 Palette</span>
+      </button>
+      <button id="sloganRandomBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs flex items-center space-x-1 hover:border-cyber-yellow active:scale-95 transition text-cyber-yellow" title="Generate viral slogan">
+        <span>⚡ Quote</span>
+      </button>
+      <button id="chaosBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs flex items-center space-x-1 hover:border-cyber-pink active:scale-95 transition text-cyber-pink" title="Randomize glitch">
+        <span>🎲 Chaos</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 relative flex flex-col items-center justify-center p-1 min-h-0 bg-[#040508] overflow-hidden">
+    
+    <!-- 9:16 Canvas Box Container -->
+    <div id="canvasBox" class="relative max-h-full max-w-full aspect-9-16 crt-overlay rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.85)] border border-cyber-border flex items-center justify-center bg-black touch-none">
+      
+      <!-- Primary Canvas (Native 720 x 1280 9:16) -->
+      <canvas id="moshCanvas" width="720" height="1280" class="w-full h-full object-contain cursor-crosshair block"></canvas>
+
+      <!-- Jam Mode grid flash: appears while performing directly on the screen -->
+      <div id="canvasJamGrid" class="xy-pad-grid pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-150 z-10"></div>
+
+      <!-- Visual Touch Drag / Brush / Jam Crosshair Indicator -->
+      <div id="touchCrosshair" class="pointer-events-none absolute w-8 h-8 rounded-full border border-cyber-cyan/80 -translate-x-1/2 -translate-y-1/2 hidden shadow-[0_0_12px_#00ffcc] z-20"></div>
+
+      <!-- Live Recording HUD Overlay -->
+      <div id="recHUD" class="hidden absolute top-3 right-3 z-30 bg-black/85 backdrop-blur border border-cyber-pink/70 px-2 py-1 rounded-full flex items-center space-x-1.5 shadow-lg">
+        <div class="w-2.5 h-2.5 rounded-full bg-cyber-pink rec-pulsing"></div>
+        <span class="text-[10px] font-bold text-cyber-pink tracking-wider" id="recTimerText">REC 00:00</span>
+      </div>
+
+      <!-- Touch Mode Badge -->
+      <div class="absolute top-3 left-3 z-30 pointer-events-none bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] text-slate-400 border border-white/10 flex items-center space-x-1">
+        <span id="touchModeLabel">👆 Touch: Drag Text</span>
+      </div>
+
+      <!-- Integrated Knob Dock: live controls floating safely away from screen edges & gesture zones -->
+      <div id="canvasKnobDock" class="absolute left-4 right-4 sm:left-8 sm:right-8 bottom-4 sm:bottom-6 z-30 max-w-sm mx-auto flex items-center justify-around gap-2 px-3 py-2 rounded-2xl bg-black/70 backdrop-blur-md border border-white/15 shadow-[0_4px_24px_rgba(0,0,0,0.85)]"></div>
+    </div>
+
+  </main>
+
+  <div class="shrink-0 bg-[#090c12] border-t border-cyber-border px-3 py-2 flex items-center justify-between gap-2 z-20">
+    <div class="flex items-center space-x-2">
+      <!-- Touch Interaction Cycle: Drag / Brush / Jam Pad -->
+      <button id="touchModeToggle" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-300 flex items-center space-x-1 active:scale-95 transition">
+        <span id="brushIcon">👆</span>
+        <span id="brushBtnText" class="font-semibold text-[11px]">Mode: Drag</span>
+      </button>
+
+      <!-- Hold Clean Button -->
+      <button id="holdCleanBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-400 active:bg-cyber-cyan/20 active:text-cyber-cyan active:border-cyber-cyan transition">
+        Hold Clean
+      </button>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <!-- SNAP HIGH-RES PNG -->
+      <button id="snapPicBtn" class="tap-btn px-3 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-bold text-xs flex items-center space-x-1.5 shadow-[0_0_12px_rgba(0,255,204,0.25)] active:scale-95 transition hover:bg-cyber-cyan hover:text-black">
+        <span>📸</span>
+        <span>SNAP PNG</span>
+      </button>
+
+      <!-- RECORD 9:16 VIDEO -->
+      <button id="recVideoBtn" class="tap-btn px-3 py-1.5 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink font-bold text-xs flex items-center space-x-1.5 shadow-[0_0_12px_rgba(255,0,85,0.25)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
+        <span id="recBtnDot" class="w-2 h-2 rounded-full bg-cyber-pink"></span>
+        <span id="recBtnLabel">REC 9:16</span>
+      </button>
+    </div>
+  </div>
+
+  <footer id="controlSheet" class="sheet-collapsed shrink-0 bg-cyber-dark border-t border-cyber-border flex flex-col z-20 flex-none">
+
+    <!-- Drag Handle: tap or swipe to expand/collapse the control sheet -->
+    <button id="sheetHandle" class="w-full flex flex-col items-center justify-center py-1 active:bg-white/5 transition" aria-label="Toggle controls">
+      <span class="w-9 h-1 rounded-full bg-cyber-border"></span>
+    </button>
+
+    <!-- Tab Navigation Bar -->
+    <div class="grid grid-cols-6 border-b border-cyber-border text-[10px] sm:text-[11px] font-bold text-center bg-[#07090e]">
+      <button data-tab="text" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-cyber-cyan border-b-2 border-cyber-cyan transition active:scale-95">
+        <span class="text-sm leading-none">🔤</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">TEXT</span>
+      </button>
+      <button data-tab="photo" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
+        <span class="text-sm leading-none">📷</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">PHOTO</span>
+      </button>
+      <button data-tab="glitch" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
+        <span class="text-sm leading-none">🌀</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">GLITCH</span>
+      </button>
+      <button data-tab="mosh" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
+        <span class="text-sm leading-none">📼</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">MOSH</span>
+      </button>
+      <button data-tab="vibe" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
+        <span class="text-sm leading-none">🎛️</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">VIBE</span>
+      </button>
+      <button data-tab="fx" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
+        <span class="text-sm leading-none">📡</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">CRT/FX</span>
+      </button>
+    </div>
+
+    <!-- Panels Container -->
+    <div id="footerPanels" class="app-footer-panels overflow-y-auto p-3 text-xs space-y-3 custom-scroll">
+      
+      <!-- ==================== TAB 1: TEXT ENGINE ==================== -->
+      <div id="tabText" class="tab-content space-y-2.5">
+        
+        <!-- Text Area -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-center text-[10px] text-slate-400">
+            <span>TEXT EDIT (MULTI-LINE)</span>
+            <span class="text-cyber-cyan">Touch canvas to drag / rotate 3D</span>
+          </div>
+          <textarea id="textInput" rows="2" class="w-full bg-cyber-black border border-cyber-border rounded px-2.5 py-1.5 text-white font-mono text-xs outline-none focus:border-cyber-cyan resize-none">VIBE//MOSH
+RAW SIGNAL</textarea>
+        </div>
+
+        <!-- Typography Presets & Font Family -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">FONT</label>
+            <select id="fontSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-xs outline-none focus:border-cyber-cyan">
+              <option value="Syne, sans-serif">Syne Heavy</option>
+              <option value="Rubik Glitch, cursive">Rubik Glitch</option>
+              <option value="Orbitron, sans-serif">Orbitron Sci-Fi</option>
+              <option value="Bebas Neue, sans-serif">Bebas Poster</option>
+              <option value="Anton, sans-serif">Anton Impact</option>
+              <option value="UnifrakturCook, cursive">Unifraktur Gothic</option>
+              <option value="Cinzel, serif">Cinzel Brutal</option>
+              <option value="Space Mono, monospace">Space Monospace</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">LAYOUT MODE</label>
+            <div class="grid grid-cols-3 gap-1 mb-1">
+              <button data-layout="stack" class="layout-btn py-2 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold">STACK</button>
+              <button data-layout="marquee" class="layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px]">ROLL</button>
+              <button data-layout="vertical" class="layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px]">TALL</button>
+            </div>
+            <div class="grid grid-cols-3 gap-1">
+              <button data-layout="spiral" class="layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">🌀 SPIRAL</button>
+              <button data-layout="cube" class="layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">🎲 CUBE</button>
+              <button data-layout="sphere" class="layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">🌐 SPHERE</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Transform Controls (Spiral / Cube / Sphere) -->
+        <div id="controls3D" class="grid grid-cols-2 gap-3 pt-1 border-t border-cyber-border/40">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>3D Depth/Radius</span>
+              <span id="radius3DLabel" class="text-cyber-cyan">260px</span>
+            </div>
+            <input type="range" id="radius3DRange" min="100" max="480" value="260">
+          </div>
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>3D Spin Speed</span>
+              <span id="speed3DLabel" class="text-cyber-cyan">1.0x</span>
+            </div>
+            <input type="range" id="speed3DRange" min="0" max="30" value="10">
+          </div>
+        </div>
+
+        <!-- Font Size & Spacing -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Size</span>
+              <span id="fontSizeLabel" class="text-cyber-cyan">95px</span>
+            </div>
+            <input type="range" id="fontSizeRange" min="30" max="220" value="95">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Tracking</span>
+              <span id="letterSpacingLabel" class="text-cyber-cyan">4px</span>
+            </div>
+            <input type="range" id="letterSpacingRange" min="-5" max="30" value="4">
+          </div>
+        </div>
+
+        <!-- Color & Glow -->
+        <div class="space-y-1.5 pt-1 border-t border-cyber-border/60">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Fill Style</label>
+              <select id="fillModeSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+                <option value="solid">Solid Color</option>
+                <option value="gradient">Dual Gradient (Color 1 ➔ 2)</option>
+                <option value="rainbow">Cyber Rainbow Cycle</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Neon Glow</label>
+              <input type="color" id="glowColorInput" value="#00ffcc" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Fill Color 1</label>
+              <input type="color" id="fillColorInput" value="#ffffff" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Fill Color 2</label>
+              <input type="color" id="fillColor2Input" value="#ffe600" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Stroke</label>
+              <input type="color" id="strokeColorInput" value="#ff0055" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2: PHOTO & ASCII ENGINE ==================== -->
+      <div id="tabPhoto" class="tab-content hidden space-y-2.5">
+        <div class="flex items-center justify-between border-b border-cyber-border pb-1">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-cyber-yellow font-bold text-[11px]">PHOTO ASCII &amp; MOSH ENGINE</span>
+          </div>
+          <label class="flex items-center space-x-1 text-[10px] text-slate-300">
+            <input type="checkbox" id="photoActiveCheck" class="accent-cyber-yellow">
+            <span>Active</span>
+          </label>
+        </div>
+
+        <!-- Photo Upload & Presets -->
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2">
+            <label class="flex-1 tap-btn py-2 px-3 rounded-lg bg-cyber-yellow/15 border border-cyber-yellow text-cyber-yellow font-bold text-xs flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 transition hover:bg-cyber-yellow hover:text-black">
+              <span>📁 Upload Photo</span>
+              <input type="file" id="photoFileInput" accept="image/*" class="hidden">
+            </label>
+            <button id="photoClearBtn" class="tap-btn px-3 py-2 rounded-lg bg-cyber-card border border-cyber-border text-xs text-slate-400 active:scale-95 transition hover:text-white">
+              ✕ Clear
+            </button>
+          </div>
+
+          <!-- Quick Sample Photos -->
+          <div>
+            <div class="text-[9px] text-slate-400 mb-1">QUICK SAMPLE GRAPHICS:</div>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button data-sample="skull" class="sample-photo-btn py-1.5 px-2 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] font-bold active:scale-95 transition hover:border-cyber-yellow">
+                💀 Cyber Skull
+              </button>
+              <button data-sample="mech" class="sample-photo-btn py-1.5 px-2 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] font-bold active:scale-95 transition hover:border-cyber-yellow">
+                🤖 Neo Mech
+              </button>
+              <button data-sample="statue" class="sample-photo-btn py-1.5 px-2 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] font-bold active:scale-95 transition hover:border-cyber-yellow">
+                🗿 Vapor Statue
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASCII Mode & Rendering Settings -->
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-cyber-border/60">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">RENDER MODE</label>
+            <select id="photoRenderModeSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+              <option value="ascii">Pure ASCII Art</option>
+              <option value="asciiOverlay">ASCII + Photo Underlay</option>
+              <option value="direct">Direct Photo (Raw Mosh)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">ASCII COLOR MODE</label>
+            <select id="asciiColorModeSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+              <option value="photo">Original Photo Colors</option>
+              <option value="matrix">Matrix Phosphor Green</option>
+              <option value="neon">Cyber Neon Duo (Cyan/Pink)</option>
+              <option value="mono">Monochrome High-Key</option>
+              <option value="amber">Retro CRT Amber</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Character Set & Density -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">CHARACTER SET</label>
+            <select id="asciiCharSetSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+              <option value="blocks">Blocks (█ ▓ ▒ ░)</option>
+              <option value="standard">Standard (@ % # * + = - : .)</option>
+              <option value="matrix">Matrix Glitch (* + x X $ # &amp; @)</option>
+              <option value="binary">Binary Code (0 1)</option>
+              <option value="katakana">Katakana Cyber</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">LAYER BLEND</label>
+            <select id="photoBlendSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+              <option value="behind">Under Typography</option>
+              <option value="inFront">Over Typography</option>
+              <option value="photoOnly">Photo Only (Hide Text)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Knobs: Cell Size & Contrast -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>ASCII Cell Size</span>
+              <span id="asciiCellSizeLabel" class="text-cyber-yellow">12px</span>
+            </div>
+            <input type="range" id="asciiCellSizeRange" min="6" max="32" value="12">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Contrast Boost</span>
+              <span id="photoContrastLabel" class="text-cyber-yellow">1.2x</span>
+            </div>
+            <input type="range" id="photoContrastRange" min="5" max="30" value="12">
+          </div>
+        </div>
+
+        <!-- Invert & Opacity -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Photo Opacity</span>
+              <span id="photoOpacityLabel" class="text-cyber-yellow">100%</span>
+            </div>
+            <input type="range" id="photoOpacityRange" min="10" max="100" value="100">
+          </div>
+
+          <div class="flex items-center space-x-3 pt-3">
+            <label class="flex items-center space-x-1.5 text-[10px] text-slate-300 cursor-pointer">
+              <input type="checkbox" id="photoInvertCheck" class="accent-cyber-yellow">
+              <span>Invert Inks</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2: PIXEL SORTING ==================== -->
+      <div id="tabGlitch" class="tab-content hidden space-y-2.5">
+        <div class="flex items-center justify-between border-b border-cyber-border pb-1">
+          <span class="text-cyber-cyan font-bold text-[11px]">PIXEL SORT ENGINE</span>
+          <label class="flex items-center space-x-1 text-[10px] text-slate-300">
+            <input type="checkbox" id="sortActiveCheck" checked class="accent-cyber-cyan">
+            <span>Active</span>
+          </label>
+        </div>
+
+        <!-- Sort Direction: Down (Drip) / Horizontal (Tear) / Slant -->
+        <div class="space-y-1">
+          <label class="block text-[10px] text-slate-400">DIRECTION</label>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button data-sortdir="vertical" class="sort-dir-btn py-2.5 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan font-bold text-[10px]">💧 Down Drip</button>
+            <button data-sortdir="horizontal" class="sort-dir-btn py-2.5 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px]">↔ Tear</button>
+            <button data-sortdir="diagonal" class="sort-dir-btn py-2.5 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px]">⤡ Slant</button>
+          </div>
+        </div>
+
+        <!-- Sort Criteria & Length -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">CRITERION</label>
+            <select id="sortCriterionSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+              <option value="brightness">Luminance (Bright)</option>
+              <option value="red">Red Channel Highs</option>
+              <option value="blue">Blue Highs</option>
+              <option value="saturation">Color Saturation</option>
+            </select>
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Streak Length</span>
+              <span id="sortLengthLabel" class="text-cyber-cyan">280px</span>
+            </div>
+            <input type="range" id="sortLengthRange" min="30" max="600" value="280">
+          </div>
+        </div>
+
+        <!-- Threshold Low / High -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Min Threshold</span>
+              <span id="sortLowLabel" class="text-cyber-cyan">25%</span>
+            </div>
+            <input type="range" id="sortLowRange" min="0" max="100" value="25">
+          </div>
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Max Threshold</span>
+              <span id="sortHighLabel" class="text-cyber-cyan">90%</span>
+            </div>
+            <input type="range" id="sortHighRange" min="0" max="100" value="90">
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 3: DATAMOSH ==================== -->
+      <div id="tabMosh" class="tab-content hidden space-y-2.5">
+        <div class="flex items-center justify-between border-b border-cyber-border pb-1">
+          <span class="text-cyber-pink font-bold text-[11px]">P-FRAME COMPRESSION MOSH</span>
+          <label class="flex items-center space-x-1 text-[10px] text-slate-300">
+            <input type="checkbox" id="moshActiveCheck" checked class="accent-cyber-pink">
+            <span>Active</span>
+          </label>
+        </div>
+
+        <!-- The performance pad now lives directly on the main screen -->
+        <button id="jamModeShortcut" class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-cyber-pink/10 border border-cyber-pink/50 active:scale-95 transition">
+          <span class="text-[10px] text-left text-slate-300">🎛️ <strong class="text-cyber-pink">Jam Pad</strong> is live on the main screen — drag anywhere on the text to smear &amp; shear</span>
+          <span class="text-cyber-pink text-xs shrink-0">▶</span>
+        </button>
+
+        <!-- Smear & Persistence -->
+        <div class="space-y-0.5">
+          <div class="flex justify-between text-[10px] text-slate-400">
+            <span>P-Frame Feedback Smear</span>
+            <span id="moshSmearLabel" class="text-cyber-pink">48%</span>
+          </div>
+          <input type="range" id="moshSmearRange" min="0" max="92" value="48">
+        </div>
+
+        <!-- Macroblock Displace & Slice -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Macroblocks</span>
+              <span id="moshBlockLabel" class="text-cyber-pink">35</span>
+            </div>
+            <input type="range" id="moshBlockRange" min="0" max="100" value="35">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Slice Shear</span>
+              <span id="moshSliceLabel" class="text-cyber-pink">24px</span>
+            </div>
+            <input type="range" id="moshSliceRange" min="0" max="70" value="24">
+          </div>
+        </div>
+
+        <!-- Kinetic Motion Speed -->
+        <div class="space-y-0.5">
+          <div class="flex justify-between text-[10px] text-slate-400">
+            <span>Kinetic Float / Pulse Speed</span>
+            <span id="motionSpeedLabel" class="text-cyber-pink">1.0x</span>
+          </div>
+          <input type="range" id="motionSpeedRange" min="0" max="30" value="10">
+        </div>
+      </div>
+
+      <!-- ==================== TAB 4: VIBE PRESETS ==================== -->
+      <div id="tabVibe" class="tab-content hidden space-y-2">
+        <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Viral 9:16 Visual Vibes</div>
+        <div class="grid grid-cols-2 gap-2">
+          <button data-vibe="cyberHyper" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-cyan text-left active:scale-95 transition">
+            <div class="text-[11px] font-bold text-cyber-cyan">CYBER HYPER</div>
+            <div class="text-[9px] text-slate-400">Neon cyan, tear sort &amp; chromatic drift</div>
+          </button>
+
+          <button data-vibe="acidVapor" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
+            <div class="text-[11px] font-bold text-cyber-yellow">ACID VAPOR</div>
+            <div class="text-[9px] text-slate-400">Toxic lime dripping, high-key saturation</div>
+          </button>
+
+          <button data-vibe="analogVhs" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
+            <div class="text-[11px] font-bold text-cyber-purple">ANALOG VHS</div>
+            <div class="text-[9px] text-slate-400">Heavy tape scanlines, P-frame melt</div>
+          </button>
+
+          <button data-vibe="brutalRed" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
+            <div class="text-[11px] font-bold text-cyber-pink">BRUTAL RED</div>
+            <div class="text-[9px] text-slate-400">Editorial poster, jagged slice shears</div>
+          </button>
+        </div>
+
+        <div class="pt-1">
+          <button data-vibe="meltVoid" class="w-full py-1.5 rounded bg-black border border-white/20 text-slate-300 text-center font-bold text-[10px] active:scale-95 transition">
+            🌌 MELT VOID (TRANSPARENT PURE DRIFT)
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 5: CRT & ANALOG FX ==================== -->
+      <div id="tabFx" class="tab-content hidden space-y-2.5">
+        <div class="flex items-center justify-between border-b border-cyber-border pb-1">
+          <span class="text-cyber-lime font-bold text-[11px]">ANALOG POST-PROCESSING</span>
+          <label class="flex items-center space-x-1 text-[10px] text-slate-300">
+            <input type="checkbox" id="fxActiveCheck" checked class="accent-cyber-lime">
+            <span>Active</span>
+          </label>
+        </div>
+
+        <!-- RGB Split & Angle -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>RGB Split</span>
+              <span id="rgbSplitLabel" class="text-cyber-lime">14px</span>
+            </div>
+            <input type="range" id="rgbSplitRange" min="0" max="45" value="14">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Aberration Angle</span>
+              <span id="rgbAngleLabel" class="text-cyber-lime">20°</span>
+            </div>
+            <input type="range" id="rgbAngleRange" min="0" max="360" value="20">
+          </div>
+        </div>
+
+        <!-- Scanlines & Noise Grain -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Scanlines</span>
+              <span id="scanlinesLabel" class="text-cyber-lime">40%</span>
+            </div>
+            <input type="range" id="scanlinesRange" min="0" max="100" value="40">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Tape Noise</span>
+              <span id="noiseLabel" class="text-cyber-lime">25%</span>
+            </div>
+            <input type="range" id="noiseRange" min="0" max="100" value="25">
+          </div>
+        </div>
+
+        <!-- Backdrop Mode & Custom Colors -->
+        <div class="space-y-1.5 pt-1 border-t border-cyber-border/60">
+          <div class="flex justify-between items-center">
+            <label class="block text-[10px] text-slate-400">BACKDROP GRADIENT</label>
+            <button id="resetBgColorBtn" class="text-[9px] text-cyber-lime hover:underline active:scale-95 transition">Reset to Preset</button>
+          </div>
+          <select id="bgModeSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-xs outline-none">
+            <option value="cyberGradient">Cyber Neon Gradient (Dark/Pink/Cyan)</option>
+            <option value="acidLime">Acid Vapor Lime</option>
+            <option value="deepVoid">OLED Deep Void Black</option>
+            <option value="monochrome">Brutalist Concrete Mono</option>
+          </select>
+          <div class="grid grid-cols-3 gap-2 pt-1">
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Top / Void</label>
+              <input type="color" id="bgColor1Input" value="#04020a" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Bottom / Glow</label>
+              <input type="color" id="bgColor2Input" value="#ff0055" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">Grid Line</label>
+              <input type="color" id="bgAccentInput" value="#00ffcc" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <div id="exportModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex flex-col justify-end p-4 transition-all duration-300">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 max-w-sm w-full mx-auto space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-cyber-border pb-2">
+        <div class="flex items-center space-x-1.5">
+          <span id="exportModalIcon">💾</span>
+          <h3 id="exportModalTitle" class="font-bold text-xs text-white">EXPORT READY</h3>
+        </div>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-white text-base px-2 py-0.5">✕</button>
+      </div>
+
+      <div class="relative w-full max-h-[48vh] aspect-9-16 mx-auto rounded-lg overflow-hidden border border-cyber-border bg-black flex items-center justify-center">
+        <img id="exportPreviewImg" class="w-full h-full object-contain hidden" alt="Snapshot Preview">
+        <video id="exportPreviewVid" class="w-full h-full object-contain hidden" controls playsinline loop autoplay muted></video>
+      </div>
+
+      <p class="text-[10px] text-slate-400 text-center">
+        On mobile Safari or Chrome: <strong class="text-cyber-cyan">Tap Download</strong> or long-press the preview to <strong class="text-white">"Save to Photos"</strong>.
+      </p>
+
+      <div class="flex space-x-2">
+        <a id="modalDownloadLink" download="VIBE_MOSH_9_16.png" class="flex-1 py-2 rounded-lg bg-cyber-cyan text-black font-bold text-xs text-center flex items-center justify-center space-x-1 shadow-lg active:scale-95 transition">
+          <span>⬇ Save File</span>
+        </a>
+        <button id="modalDoneBtn" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-200 text-xs font-semibold active:scale-95 transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 9:16 Canvas Buffer Native Resolution ---
+    const WIDTH = 720;
+    const HEIGHT = 1280;
+
+    const state = {
+      // Typography & 3D Text
+      type: {
+        text: "VIBE//MOSH\nRAW SIGNAL",
+        fontFamily: "Syne, sans-serif",
+        layout: 'stack', // 'stack', 'marquee', 'vertical', 'spiral', 'cube', 'sphere'
+        fontSize: 95,
+        letterSpacing: 4,
+        fillMode: 'solid', // 'solid', 'gradient', 'rainbow'
+        fillColor: '#ffffff',
+        fillColor2: '#ffe600',
+        strokeColor: '#ff0055',
+        glowColor: '#00ffcc',
+        strokeWidth: 3,
+        glowRadius: 20,
+        x: WIDTH / 2,
+        y: HEIGHT / 2,
+        // 3D parameters
+        radius3D: 260,
+        speed3D: 1.0,
+        rotX: 0.35,
+        rotY: 0.45,
+        rotZ: 0
+      },
+
+      // Photo & ASCII Engine
+      photo: {
+        active: false,
+        loaded: false,
+        img: null,
+        mode: 'ascii', // 'ascii', 'asciiOverlay', 'direct'
+        colorMode: 'photo', // 'photo', 'matrix', 'neon', 'mono', 'amber'
+        charSet: 'blocks', // 'blocks', 'standard', 'matrix', 'binary', 'katakana'
+        cellSize: 12,
+        contrast: 1.2,
+        opacity: 100,
+        invert: false,
+        blend: 'behind' // 'behind', 'inFront', 'photoOnly'
+      },
+
+      // Pixel Sorter
+      sort: {
+        active: true,
+        direction: 'vertical', // 'vertical', 'horizontal', 'diagonal'
+        criterion: 'brightness',
+        thresholdLow: 25,
+        thresholdHigh: 90,
+        maxLength: 280
+      },
+
+      // Datamosh & Smear
+      mosh: {
+        active: true,
+        smear: 48,
+        macroblocks: 35,
+        sliceShear: 24,
+        speed: 1.0,
+        tick: 0
+      },
+
+      // CRT & Analog FX
+      fx: {
+        active: true,
+        rgbSplit: 14,
+        rgbAngle: 20,
+        scanlines: 40,
+        noise: 25,
+        bgMode: 'cyberGradient',
+        customBg: false,
+        bgColor1: '#04020a',
+        bgColor2: '#ff0055',
+        bgAccent: '#00ffcc'
+      },
+
+      // Mobile Interaction Modes
+      interaction: {
+        mode: 'drag', // 'drag' | 'brush' | 'jam'
+        isInteracting: false,
+        lastX: 0,
+        lastY: 0,
+        holdClean: false
+      },
+
+      // Video Recording State
+      recording: {
+        isRecording: false,
+        recorder: null,
+        chunks: [],
+        startTime: 0,
+        timerInterval: null
+      }
+    };
+
+    // DOM References
+    const moshCanvas = document.getElementById('moshCanvas');
+    const ctx = moshCanvas.getContext('2d', { willReadFrequently: true });
+
+    // Buffers for Layering and P-Frame Feedback
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.width = WIDTH; bgCanvas.height = HEIGHT;
+    const bgCtx = bgCanvas.getContext('2d');
+
+    const textCanvas = document.createElement('canvas');
+    textCanvas.width = WIDTH; textCanvas.height = HEIGHT;
+    const textCtx = textCanvas.getContext('2d');
+
+    const feedbackCanvas = document.createElement('canvas');
+    feedbackCanvas.width = WIDTH; feedbackCanvas.height = HEIGHT;
+    const feedbackCtx = feedbackCanvas.getContext('2d', { willReadFrequently: true });
+
+    const cleanCompositeCanvas = document.createElement('canvas');
+    cleanCompositeCanvas.width = WIDTH; cleanCompositeCanvas.height = HEIGHT;
+    const cleanCompositeCtx = cleanCompositeCanvas.getContext('2d');
+
+    // Photo & ASCII Buffers
+    const photoCanvas = document.createElement('canvas');
+    photoCanvas.width = WIDTH; photoCanvas.height = HEIGHT;
+    const photoCtx = photoCanvas.getContext('2d', { willReadFrequently: true });
+
+    const photoSourceCanvas = document.createElement('canvas');
+    photoSourceCanvas.width = WIDTH; photoSourceCanvas.height = HEIGHT;
+    const photoSourceCtx = photoSourceCanvas.getContext('2d', { willReadFrequently: true });
+
+    // Scratch Brush Canvas
+    const brushMaskCanvas = document.createElement('canvas');
+    brushMaskCanvas.width = WIDTH; brushMaskCanvas.height = HEIGHT;
+    const brushMaskCtx = brushMaskCanvas.getContext('2d');
+
+    // ASCII Character Ramps
+    const CHAR_RAMPS = {
+      blocks: " ░▒▓█",
+      standard: " .:-=+*#%@",
+      matrix: " .:;*+xX$#&@",
+      binary: " 01",
+      katakana: " ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ"
+    };
+
+    // Curated Color Palettes for Instant Shuffle
+    const COLOR_PALETTES = [
+      { name: 'Cyber Neon', fill: '#ffffff', fill2: '#ffe600', stroke: '#ff0055', glow: '#00ffcc', bg1: '#04020a', bg2: '#ff0055', accent: '#00ffcc' },
+      { name: 'Toxic Acid', fill: '#39ff14', fill2: '#ffe600', stroke: '#ffe600', glow: '#39ff14', bg1: '#071002', bg2: '#1c3d05', accent: '#39ff14' },
+      { name: 'Matrix Terminal', fill: '#00ff66', fill2: '#ffffff', stroke: '#003311', glow: '#00ff66', bg1: '#000502', bg2: '#001a08', accent: '#00ff66' },
+      { name: 'Vaporwave Sunset', fill: '#ffffff', fill2: '#ff77a8', stroke: '#b026ff', glow: '#00f0ff', bg1: '#0d0221', bg2: '#261447', accent: '#ff007f' },
+      { name: 'Solar Flare', fill: '#ffffff', fill2: '#ffe600', stroke: '#ff3300', glow: '#ff9900', bg1: '#120000', bg2: '#3d0c00', accent: '#ff6600' },
+      { name: 'Ultra Violet', fill: '#f8f0ff', fill2: '#00ffcc', stroke: '#7928ca', glow: '#b026ff', bg1: '#080014', bg2: '#1a0033', accent: '#b026ff' },
+      { name: 'Blood Brutal', fill: '#ffffff', fill2: '#ff4444', stroke: '#880000', glow: '#ff0033', bg1: '#0a0a0c', bg2: '#1e0505', accent: '#ff0033' },
+      { name: 'Deep Arctic', fill: '#ffffff', fill2: '#00e1d9', stroke: '#0051ff', glow: '#00ffff', bg1: '#010814', bg2: '#001f3f', accent: '#00d4ff' }
+    ];
+    let currentPaletteIndex = 0;
+
+    // Slogans for Instant Vibe Generation
+    const SLOGANS = [
+      "SYSTEM MELTDOWN\nREALITY DRIFT",
+      "DO NOT RESIST\nTHE GLITCH",
+      "LOST IN TRANSLATION\nNEO SANTIAGO 2026",
+      "GHOST IN THE CODE\nP-FRAME COLLAPSE",
+      "RAW SIGNAL CORRUPT\nSUBCONSCIOUS ECHO",
+      "HYPER // ACID\nOVERLOAD BUFFER",
+      "NO SIGNAL DETECTED\nENTER THE VOID",
+      "DATAMOSH REEL\nKINETIC DECAY"
+    ];
+
+    // Presets
+    const PRESETS = {
+      cyberHyper: {
+        type: { fontFamily: "Syne, sans-serif", layout: 'stack', fontSize: 100, fillColor: '#ffffff', fillColor2: '#ffe600', strokeColor: '#ff0055', glowColor: '#00ffcc', radius3D: 260, speed3D: 1.0 },
+        sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 20, thresholdHigh: 90, maxLength: 300 },
+        mosh: { active: true, smear: 50, macroblocks: 40, sliceShear: 28 },
+        fx: { active: true, rgbSplit: 18, rgbAngle: 15, scanlines: 45, noise: 25, bgMode: 'cyberGradient', customBg: false }
+      },
+      acidVapor: {
+        type: { fontFamily: "Rubik Glitch, cursive", layout: 'spiral', fontSize: 95, fillColor: '#39ff14', fillColor2: '#ffe600', strokeColor: '#ffe600', glowColor: '#ffe600', radius3D: 280, speed3D: 1.2 },
+        sort: { active: true, direction: 'vertical', criterion: 'saturation', thresholdLow: 15, thresholdHigh: 95, maxLength: 360 },
+        mosh: { active: true, smear: 40, macroblocks: 30, sliceShear: 32 },
+        fx: { active: true, rgbSplit: 22, rgbAngle: 90, scanlines: 35, noise: 35, bgMode: 'acidLime', customBg: false }
+      },
+      analogVhs: {
+        type: { fontFamily: "Bebas Neue, sans-serif", layout: 'cube', fontSize: 130, fillColor: '#e2d5ff', fillColor2: '#ff0055', strokeColor: '#b026ff', glowColor: '#b026ff', radius3D: 240, speed3D: 0.8 },
+        sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 30, thresholdHigh: 80, maxLength: 180 },
+        mosh: { active: true, smear: 75, macroblocks: 20, sliceShear: 20 },
+        fx: { active: true, rgbSplit: 24, rgbAngle: 0, scanlines: 75, noise: 55, bgMode: 'cyberGradient', customBg: false }
+      },
+      brutalRed: {
+        type: { fontFamily: "Anton, sans-serif", layout: 'sphere', fontSize: 120, fillColor: '#ffffff', fillColor2: '#ff0055', strokeColor: '#ff0055', glowColor: '#ff0055', radius3D: 270, speed3D: 1.1 },
+        sort: { active: true, direction: 'vertical', criterion: 'red', thresholdLow: 10, thresholdHigh: 90, maxLength: 320 },
+        mosh: { active: true, smear: 30, macroblocks: 50, sliceShear: 45 },
+        fx: { active: true, rgbSplit: 12, rgbAngle: 45, scanlines: 50, noise: 30, bgMode: 'monochrome', customBg: false }
+      },
+      meltVoid: {
+        type: { fontFamily: "Space Mono, monospace", layout: 'marquee', fontSize: 75, fillColor: '#ffffff', fillColor2: '#00ffcc', strokeColor: '#00ffcc', glowColor: '#00ffcc', radius3D: 260, speed3D: 1.0 },
+        sort: { active: true, direction: 'vertical', criterion: 'brightness', thresholdLow: 25, thresholdHigh: 90, maxLength: 400 },
+        mosh: { active: true, smear: 80, macroblocks: 25, sliceShear: 15 },
+        fx: { active: true, rgbSplit: 15, rgbAngle: 120, scanlines: 20, noise: 15, bgMode: 'deepVoid', customBg: false }
+      }
+    };
+  </script>
+
+  <script>
+    function renderBackdropLayer(bCtx, mode, tick) {
+      bCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+      if (state.fx.customBg) {
+        const grad = bCtx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+        grad.addColorStop(0, state.fx.bgColor1);
+        grad.addColorStop(1, state.fx.bgColor2);
+        bCtx.fillStyle = grad;
+        bCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        // Perspective vertical grid using custom accent
+        bCtx.strokeStyle = state.fx.bgAccent;
+        bCtx.lineWidth = 1.5;
+        const horizon = HEIGHT * 0.68;
+        for (let x = -WIDTH; x < WIDTH * 2; x += 90) {
+          bCtx.beginPath();
+          bCtx.moveTo(WIDTH / 2, horizon);
+          bCtx.lineTo(x, HEIGHT);
+          bCtx.stroke();
+        }
+        return;
+      }
+
+      if (mode === 'cyberGradient') {
+        const grad = bCtx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+        grad.addColorStop(0, '#04020a');
+        grad.addColorStop(0.55, '#150628');
+        grad.addColorStop(1, '#ff0055');
+        bCtx.fillStyle = grad;
+        bCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        // Perspective vertical grid
+        bCtx.strokeStyle = 'rgba(0, 255, 204, 0.2)';
+        bCtx.lineWidth = 1.5;
+        const horizon = HEIGHT * 0.68;
+        for (let x = -WIDTH; x < WIDTH * 2; x += 90) {
+          bCtx.beginPath();
+          bCtx.moveTo(WIDTH / 2, horizon);
+          bCtx.lineTo(x, HEIGHT);
+          bCtx.stroke();
+        }
+      } else if (mode === 'acidLime') {
+        const grad = bCtx.createRadialGradient(WIDTH / 2, HEIGHT / 2, 80, WIDTH / 2, HEIGHT / 2, HEIGHT * 0.6);
+        grad.addColorStop(0, '#1c3d05');
+        grad.addColorStop(0.7, '#071002');
+        grad.addColorStop(1, '#000000');
+        bCtx.fillStyle = grad;
+        bCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      } else if (mode === 'deepVoid') {
+        bCtx.fillStyle = '#050608';
+        bCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      } else if (mode === 'monochrome') {
+        bCtx.fillStyle = '#0a0d14';
+        bCtx.fillRect(0, 0, WIDTH, HEIGHT);
+        bCtx.fillStyle = '#161c28';
+        bCtx.fillRect(WIDTH * 0.15, 0, WIDTH * 0.7, HEIGHT);
+      }
+    }
+
+    // Helper: dynamic fill styles (solid, dual gradient, rainbow cycle)
+    function getTextFillStyle(tCtx, t, tick, x, y, size, charIdx = 0) {
+      if (t.fillMode === 'gradient') {
+        const grad = tCtx.createLinearGradient(x - size, y - size, x + size, y + size);
+        grad.addColorStop(0, t.fillColor);
+        grad.addColorStop(1, t.fillColor2 || '#ffe600');
+        return grad;
+      } else if (t.fillMode === 'rainbow') {
+        const hue = (tick * 60 + charIdx * 25) % 360;
+        return `hsl(${hue}, 100%, 65%)`;
+      }
+      return t.fillColor;
+    }
+
+    // Helper: 3D Euler rotation matrix
+    function rotate3D(x, y, z, rx, ry, rz) {
+      // Rotate around X (pitch)
+      const cosX = Math.cos(rx), sinX = Math.sin(rx);
+      const y1 = y * cosX - z * sinX;
+      const z1 = y * sinX + z * cosX;
+
+      // Rotate around Y (yaw)
+      const cosY = Math.cos(ry), sinY = Math.sin(ry);
+      const x2 = x * cosY + z1 * sinY;
+      const z2 = -x * sinY + z1 * cosY;
+
+      // Rotate around Z (roll)
+      const cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+      const x3 = x2 * cosZ - y1 * sinZ;
+      const y3 = x2 * sinZ + y1 * cosZ;
+
+      return { x: x3, y: y3, z: z2 };
+    }
+
+    // ==================== 3D SPIRAL (HELIX) ====================
+    function render3DSpiral(tCtx, t, tick) {
+      const rawText = t.text.replace(/\n/g, '  ').toUpperCase();
+      const chars = rawText.split('');
+      if (!chars.length) return;
+
+      const fov = 700;
+      const radius = t.radius3D || 260;
+      const heightSpan = 850;
+      const turns = 3.2;
+
+      // Auto spin + interactive tilt
+      const rotY = t.rotY + tick * 0.35 * t.speed3D;
+      const rotX = t.rotX;
+      const rotZ = t.rotZ;
+
+      const points = [];
+      const totalChars = Math.max(chars.length, 36);
+      const repeatCount = Math.ceil(totalChars / chars.length);
+      const fullChars = Array(repeatCount).fill(chars).flat().slice(0, totalChars);
+
+      for (let i = 0; i < fullChars.length; i++) {
+        const progress = i / (fullChars.length - 1 || 1);
+        const theta = progress * Math.PI * 2 * turns;
+        const rawX = Math.cos(theta) * radius;
+        const rawZ = Math.sin(theta) * radius;
+        const rawY = (progress - 0.5) * heightSpan;
+
+        const p3d = rotate3D(rawX, rawY, rawZ, rotX, rotY, rotZ);
+        points.push({
+          char: fullChars[i],
+          index: i,
+          x: p3d.x,
+          y: p3d.y,
+          z: p3d.z
+        });
+      }
+
+      // Painter's algorithm: sort by depth (z descending, deeper first)
+      points.sort((a, b) => b.z - a.z);
+
+      tCtx.textAlign = 'center';
+      tCtx.textBaseline = 'middle';
+
+      points.forEach(pt => {
+        const scale = fov / (fov + pt.z + 100);
+        if (scale <= 0) return;
+        const screenX = t.x + pt.x * scale;
+        const screenY = t.y + pt.y * scale;
+        const fontSize = Math.max(10, t.fontSize * 0.65 * scale);
+
+        // Depth cueing
+        const normZ = (pt.z + radius) / (radius * 2);
+        const alpha = Math.min(1, Math.max(0.22, 1 - normZ * 0.72));
+
+        tCtx.save();
+        tCtx.font = `900 ${fontSize}px ${t.fontFamily}`;
+        tCtx.globalAlpha = alpha;
+
+        if (t.glowRadius > 0 && alpha > 0.5) {
+          tCtx.shadowColor = t.glowColor;
+          tCtx.shadowBlur = t.glowRadius * scale;
+        } else {
+          tCtx.shadowBlur = 0;
+        }
+
+        if (t.strokeWidth > 0) {
+          tCtx.strokeStyle = t.strokeColor;
+          tCtx.lineWidth = Math.max(1, t.strokeWidth * scale);
+          tCtx.strokeText(pt.char, screenX, screenY);
+        }
+
+        tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, screenX, screenY, fontSize, pt.index);
+        tCtx.fillText(pt.char, screenX, screenY);
+        tCtx.restore();
+      });
+    }
+
+    // ==================== 3D CUBE ====================
+    function render3DCube(tCtx, t, tick) {
+      const fov = 700;
+      const size = (t.radius3D || 260) * 1.25;
+      const half = size / 2;
+
+      const rotX = t.rotX + Math.sin(tick * 0.25) * 0.08;
+      const rotY = t.rotY + tick * 0.35 * t.speed3D;
+      const rotZ = t.rotZ + tick * 0.15 * t.speed3D;
+
+      // 8 vertices of cube
+      const rawVerts = [
+        { x: -half, y: -half, z: -half },
+        { x:  half, y: -half, z: -half },
+        { x:  half, y:  half, z: -half },
+        { x: -half, y:  half, z: -half },
+        { x: -half, y: -half, z:  half },
+        { x:  half, y: -half, z:  half },
+        { x:  half, y:  half, z:  half },
+        { x: -half, y:  half, z:  half }
+      ];
+
+      const projVerts = rawVerts.map(v => {
+        const p = rotate3D(v.x, v.y, v.z, rotX, rotY, rotZ);
+        const scale = fov / (fov + p.z + 100);
+        return {
+          x: p.x, y: p.y, z: p.z,
+          sx: t.x + p.x * scale,
+          sy: t.y + p.y * scale,
+          scale
+        };
+      });
+
+      // 6 Faces: [v0, v1, v2, v3], normal, label text
+      const lines = t.text.toUpperCase().split('\n');
+      const faces = [
+        { indices: [0, 1, 2, 3], normal: { x: 0, y: 0, z: -1 }, text: lines[0] || 'VIBE' }, // front
+        { indices: [5, 4, 7, 6], normal: { x: 0, y: 0, z:  1 }, text: lines[1] || lines[0] || 'MOSH' }, // back
+        { indices: [4, 0, 3, 7], normal: { x: -1, y: 0, z: 0 }, text: lines[2] || lines[0] || 'SIGNAL' }, // left
+        { indices: [1, 5, 6, 2], normal: { x:  1, y: 0, z: 0 }, text: lines[3] || lines[1] || 'CORRUPT' }, // right
+        { indices: [4, 5, 1, 0], normal: { x: 0, y: -1, z: 0 }, text: 'GLITCH' }, // top
+        { indices: [3, 2, 6, 7], normal: { x: 0, y:  1, z: 0 }, text: 'RAW 9:16' }  // bottom
+      ];
+
+      // Sort faces by depth of face center
+      faces.forEach(face => {
+        const v = face.indices.map(i => projVerts[i]);
+        face.centerZ = (v[0].z + v[1].z + v[2].z + v[3].z) / 4;
+        face.screenX = (v[0].sx + v[1].sx + v[2].sx + v[3].sx) / 4;
+        face.screenY = (v[0].sy + v[1].sy + v[2].sy + v[3].sy) / 4;
+        face.avgScale = (v[0].scale + v[1].scale + v[2].scale + v[3].scale) / 4;
+
+        // Normal rotation to check facing direction
+        const rNorm = rotate3D(face.normal.x, face.normal.y, face.normal.z, rotX, rotY, rotZ);
+        face.facingCamera = rNorm.z < 0.2;
+      });
+
+      faces.sort((a, b) => b.centerZ - a.centerZ);
+
+      // 1. Draw cyber wireframe edges
+      const edges = [
+        [0, 1], [1, 2], [2, 3], [3, 0],
+        [4, 5], [5, 6], [6, 7], [7, 4],
+        [0, 4], [1, 5], [2, 6], [3, 7]
+      ];
+      tCtx.save();
+      tCtx.strokeStyle = t.strokeColor;
+      tCtx.lineWidth = Math.max(1, t.strokeWidth * 0.7);
+      edges.forEach(([i1, i2]) => {
+        const p1 = projVerts[i1], p2 = projVerts[i2];
+        const midZ = (p1.z + p2.z) / 2;
+        const alpha = Math.min(0.8, Math.max(0.18, 1 - (midZ + half) / (half * 2.5)));
+        tCtx.globalAlpha = alpha;
+        tCtx.beginPath();
+        tCtx.moveTo(p1.sx, p1.sy);
+        tCtx.lineTo(p2.sx, p2.sy);
+        tCtx.stroke();
+      });
+      tCtx.restore();
+
+      // 2. Render text on faces
+      tCtx.textAlign = 'center';
+      tCtx.textBaseline = 'middle';
+
+      faces.forEach((face, fIdx) => {
+        if (!face.facingCamera && face.centerZ > 0) return; // culling very far backfaces
+
+        const alpha = face.facingCamera ? 0.95 : 0.3;
+        const fontSize = Math.max(12, t.fontSize * 0.7 * face.avgScale);
+
+        tCtx.save();
+        tCtx.font = `900 ${fontSize}px ${t.fontFamily}`;
+        tCtx.globalAlpha = alpha;
+
+        if (t.glowRadius > 0 && face.facingCamera) {
+          tCtx.shadowColor = t.glowColor;
+          tCtx.shadowBlur = t.glowRadius * face.avgScale;
+        } else {
+          tCtx.shadowBlur = 0;
+        }
+
+        // Fill subtle translucent face background
+        tCtx.fillStyle = 'rgba(10, 15, 25, 0.45)';
+        tCtx.beginPath();
+        face.indices.forEach((idx, i) => {
+          const v = projVerts[idx];
+          if (i === 0) tCtx.moveTo(v.sx, v.sy);
+          else tCtx.lineTo(v.sx, v.sy);
+        });
+        tCtx.closePath();
+        tCtx.fill();
+
+        if (t.strokeWidth > 0) {
+          tCtx.strokeStyle = t.strokeColor;
+          tCtx.lineWidth = Math.max(1, t.strokeWidth * face.avgScale);
+          tCtx.strokeText(face.text, face.screenX, face.screenY);
+        }
+
+        tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, face.screenX, face.screenY, fontSize, fIdx);
+        tCtx.fillText(face.text, face.screenX, face.screenY);
+        tCtx.restore();
+      });
+    }
+
+    // ==================== 3D SPHERE ====================
+    function render3DSphere(tCtx, t, tick) {
+      const fov = 700;
+      const radius = t.radius3D || 260;
+      const rawText = t.text.replace(/\n/g, ' • ').toUpperCase();
+      const chars = rawText.split('');
+      if (!chars.length) return;
+
+      const rotX = t.rotX;
+      const rotY = t.rotY + tick * 0.4 * t.speed3D;
+      const rotZ = t.rotZ;
+
+      // Arrange text on latitude rings around the sphere
+      const rings = 7;
+      const points = [];
+
+      for (let r = 0; r < rings; r++) {
+        const phi = ((r + 0.5) / rings - 0.5) * Math.PI * 0.85; // latitude angle
+        const ringRadius = radius * Math.cos(phi);
+        const ringY = radius * Math.sin(phi);
+        const charsInRing = Math.max(6, Math.round(chars.length * Math.cos(phi) * 1.5));
+
+        for (let c = 0; c < charsInRing; c++) {
+          const theta = (c / charsInRing) * Math.PI * 2;
+          const rawX = Math.cos(theta) * ringRadius;
+          const rawZ = Math.sin(theta) * ringRadius;
+
+          const p3d = rotate3D(rawX, ringY, rawZ, rotX, rotY, rotZ);
+          const char = chars[(c + r * 3) % chars.length];
+
+          points.push({
+            char,
+            x: p3d.x,
+            y: p3d.y,
+            z: p3d.z,
+            ring: r,
+            col: c
+          });
+        }
+      }
+
+      points.sort((a, b) => b.z - a.z);
+
+      tCtx.textAlign = 'center';
+      tCtx.textBaseline = 'middle';
+
+      points.forEach((pt, pIdx) => {
+        const scale = fov / (fov + pt.z + 100);
+        if (scale <= 0) return;
+        const screenX = t.x + pt.x * scale;
+        const screenY = t.y + pt.y * scale;
+        const fontSize = Math.max(8, t.fontSize * 0.55 * scale);
+
+        const normZ = (pt.z + radius) / (radius * 2);
+        const alpha = Math.min(1, Math.max(0.18, 1 - normZ * 0.78));
+
+        tCtx.save();
+        tCtx.font = `900 ${fontSize}px ${t.fontFamily}`;
+        tCtx.globalAlpha = alpha;
+
+        if (t.glowRadius > 0 && alpha > 0.55) {
+          tCtx.shadowColor = t.glowColor;
+          tCtx.shadowBlur = t.glowRadius * scale;
+        } else {
+          tCtx.shadowBlur = 0;
+        }
+
+        if (t.strokeWidth > 0) {
+          tCtx.strokeStyle = t.strokeColor;
+          tCtx.lineWidth = Math.max(1, t.strokeWidth * scale);
+          tCtx.strokeText(pt.char, screenX, screenY);
+        }
+
+        tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, screenX, screenY, fontSize, pIdx);
+        tCtx.fillText(pt.char, screenX, screenY);
+        tCtx.restore();
+      });
+    }
+
+    // ==================== PHOTO ASCII ENGINE ====================
+    function renderAsciiPhoto(targetCanvas, pState, tick) {
+      if (!pState.img) return;
+
+      const pCtx = targetCanvas.getContext('2d');
+      pCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+      // Draw original image into photoSourceCanvas with aspect fill (cover)
+      photoSourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      const img = pState.img;
+      const imgAspect = img.width / img.height;
+      const canvasAspect = WIDTH / HEIGHT;
+
+      let drawW, drawH, drawX, drawY;
+      if (imgAspect > canvasAspect) {
+        drawH = HEIGHT;
+        drawW = HEIGHT * imgAspect;
+        drawX = (WIDTH - drawW) / 2;
+        drawY = 0;
+      } else {
+        drawW = WIDTH;
+        drawH = WIDTH / imgAspect;
+        drawX = 0;
+        drawY = (HEIGHT - drawH) / 2;
+      }
+
+      photoSourceCtx.drawImage(img, drawX, drawY, drawW, drawH);
+
+      if (pState.mode === 'direct') {
+        pCtx.drawImage(photoSourceCanvas, 0, 0);
+        return;
+      }
+
+      if (pState.mode === 'asciiOverlay') {
+        pCtx.drawImage(photoSourceCanvas, 0, 0);
+        pCtx.fillStyle = 'rgba(0,0,0,0.55)';
+        pCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      }
+
+      // ASCII generation
+      const cSize = Math.max(6, Math.min(32, pState.cellSize || 12));
+      const cols = Math.floor(WIDTH / cSize);
+      const rows = Math.floor(HEIGHT / cSize);
+
+      const srcData = photoSourceCtx.getImageData(0, 0, WIDTH, HEIGHT).data;
+      const ramp = CHAR_RAMPS[pState.charSet] || CHAR_RAMPS.blocks;
+      const rampLen = ramp.length;
+      const contrast = pState.contrast || 1.2;
+
+      pCtx.font = `900 ${Math.floor(cSize * 1.15)}px 'Space Mono', monospace`;
+      pCtx.textAlign = 'center';
+      pCtx.textBaseline = 'middle';
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const px = Math.floor(x * cSize + cSize / 2);
+          const py = Math.floor(y * cSize + cSize / 2);
+          const idx = (py * WIDTH + px) * 4;
+
+          let r = srcData[idx];
+          let g = srcData[idx + 1];
+          let b = srcData[idx + 2];
+          const a = srcData[idx + 3];
+
+          if (a < 20) continue;
+
+          // Contrast adjust
+          r = Math.min(255, Math.max(0, ((r / 255 - 0.5) * contrast + 0.5) * 255));
+          g = Math.min(255, Math.max(0, ((g / 255 - 0.5) * contrast + 0.5) * 255));
+          b = Math.min(255, Math.max(0, ((b / 255 - 0.5) * contrast + 0.5) * 255));
+
+          // Luminance
+          let lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          if (pState.invert) lum = 1 - lum;
+          lum = Math.min(1, Math.max(0, lum));
+
+          const charIdx = Math.floor(lum * (rampLen - 1));
+          const char = ramp[charIdx];
+          if (!char || char === ' ') continue;
+
+          const drawPx = x * cSize + cSize / 2;
+          const drawPy = y * cSize + cSize / 2;
+
+          // Color Mode
+          if (pState.colorMode === 'photo') {
+            pCtx.fillStyle = `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+          } else if (pState.colorMode === 'matrix') {
+            const glowG = Math.round(140 + lum * 115);
+            pCtx.fillStyle = `rgb(0,${glowG},${Math.round(lum * 80)})`;
+          } else if (pState.colorMode === 'neon') {
+            const nr = Math.round(lum * 255);
+            const ng = Math.round((1 - lum) * 240);
+            const nb = 230;
+            pCtx.fillStyle = `rgb(${nr},${ng},${nb})`;
+          } else if (pState.colorMode === 'amber') {
+            pCtx.fillStyle = `rgb(255,${Math.round(150 + lum * 80)},20)`;
+          } else {
+            // mono
+            const val = Math.round(lum * 255);
+            pCtx.fillStyle = `rgb(${val},${val},${val})`;
+          }
+
+          pCtx.fillText(char, drawPx, drawPy);
+        }
+      }
+    }
+
+    // Procedural Sample Graphic Generator
+    function generateSampleGraphic(type) {
+      const c = document.createElement('canvas');
+      c.width = WIDTH; c.height = HEIGHT;
+      const g = c.getContext('2d');
+
+      if (type === 'skull') {
+        const grad = g.createRadialGradient(WIDTH/2, HEIGHT*0.45, 60, WIDTH/2, HEIGHT*0.45, 500);
+        grad.addColorStop(0, '#2b003b');
+        grad.addColorStop(1, '#05020a');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+
+        g.strokeStyle = '#00ffcc';
+        g.lineWidth = 14;
+        g.shadowColor = '#00ffcc';
+        g.shadowBlur = 30;
+
+        g.fillStyle = '#ffffff';
+        g.beginPath();
+        g.arc(WIDTH/2, HEIGHT*0.42, 190, Math.PI * 0.85, Math.PI * 2.15);
+        g.lineTo(WIDTH/2 + 130, HEIGHT*0.58);
+        g.lineTo(WIDTH/2 + 75, HEIGHT*0.65);
+        g.lineTo(WIDTH/2 - 75, HEIGHT*0.65);
+        g.lineTo(WIDTH/2 - 130, HEIGHT*0.58);
+        g.closePath();
+        g.fill();
+        g.stroke();
+
+        g.fillStyle = '#05020a';
+        g.shadowColor = '#ff0055';
+        g.shadowBlur = 20;
+        g.beginPath();
+        g.ellipse(WIDTH/2 - 65, HEIGHT*0.45, 42, 52, -0.15, 0, Math.PI * 2);
+        g.ellipse(WIDTH/2 + 65, HEIGHT*0.45, 42, 52, 0.15, 0, Math.PI * 2);
+        g.fill();
+
+        g.fillStyle = '#ff0055';
+        for (let i = -3; i <= 3; i++) {
+          g.fillRect(WIDTH/2 + i * 22 - 7, HEIGHT*0.67, 14, 28);
+        }
+      } else if (type === 'mech') {
+        const grad = g.createLinearGradient(0, 0, WIDTH, HEIGHT);
+        grad.addColorStop(0, '#001a14');
+        grad.addColorStop(1, '#000000');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+
+        g.strokeStyle = '#39ff14';
+        g.lineWidth = 10;
+        g.shadowColor = '#39ff14';
+        g.shadowBlur = 25;
+
+        g.strokeRect(WIDTH*0.2, HEIGHT*0.3, WIDTH*0.6, HEIGHT*0.35);
+        g.fillStyle = '#103022';
+        g.fillRect(WIDTH*0.2, HEIGHT*0.3, WIDTH*0.6, HEIGHT*0.35);
+
+        g.fillStyle = '#ffe600';
+        g.shadowColor = '#ffe600';
+        g.shadowBlur = 40;
+        g.fillRect(WIDTH*0.25, HEIGHT*0.42, WIDTH*0.5, 45);
+
+        g.strokeStyle = '#00ffcc';
+        g.lineWidth = 4;
+        g.beginPath();
+        g.moveTo(WIDTH*0.1, HEIGHT*0.2); g.lineTo(WIDTH*0.9, HEIGHT*0.2);
+        g.moveTo(WIDTH*0.1, HEIGHT*0.75); g.lineTo(WIDTH*0.9, HEIGHT*0.75);
+        g.stroke();
+      } else {
+        const grad = g.createLinearGradient(0, 0, 0, HEIGHT);
+        grad.addColorStop(0, '#ff007f');
+        grad.addColorStop(0.5, '#7928ca');
+        grad.addColorStop(1, '#00f0ff');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+
+        g.fillStyle = '#ffe600';
+        g.shadowColor = '#ffe600';
+        g.shadowBlur = 50;
+        g.beginPath();
+        g.arc(WIDTH/2, HEIGHT*0.45, 180, 0, Math.PI * 2);
+        g.fill();
+
+        g.fillStyle = '#0b0416';
+        g.shadowBlur = 0;
+        g.beginPath();
+        g.arc(WIDTH/2, HEIGHT*0.4, 110, 0, Math.PI * 2);
+        g.rect(WIDTH*0.25, HEIGHT*0.52, WIDTH*0.5, HEIGHT*0.35);
+        g.fill();
+      }
+
+      return c;
+    }
+
+    function renderTypographyLayer(tCtx, t, tick) {
+      tCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+      // Branch to 3D layouts
+      if (t.layout === 'spiral') {
+        render3DSpiral(tCtx, t, tick);
+        return;
+      } else if (t.layout === 'cube') {
+        render3DCube(tCtx, t, tick);
+        return;
+      } else if (t.layout === 'sphere') {
+        render3DSphere(tCtx, t, tick);
+        return;
+      }
+
+      // 2D Typography Modes
+      const lines = t.text.toUpperCase().split('\n');
+      tCtx.save();
+      tCtx.font = `900 ${t.fontSize}px ${t.fontFamily}`;
+      tCtx.textBaseline = 'middle';
+
+      if ('letterSpacing' in tCtx) {
+        tCtx.letterSpacing = `${t.letterSpacing}px`;
+      }
+
+      // Neon Shadow
+      if (t.glowRadius > 0) {
+        tCtx.shadowColor = t.glowColor;
+        tCtx.shadowBlur = t.glowRadius;
+      } else {
+        tCtx.shadowBlur = 0;
+      }
+
+      // Float wobble
+      const wobbleX = Math.sin(tick * 2.5) * 6;
+      const wobbleY = Math.cos(tick * 2) * 5;
+
+      if (t.layout === 'stack') {
+        tCtx.textAlign = 'center';
+        const lineH = t.fontSize * 1.05;
+        const totalH = (lines.length - 1) * lineH;
+        const startY = t.y - totalH / 2;
+
+        lines.forEach((line, i) => {
+          const ly = startY + i * lineH + wobbleY;
+          const lx = t.x + wobbleX;
+          if (t.strokeWidth > 0) {
+            tCtx.strokeStyle = t.strokeColor;
+            tCtx.lineWidth = t.strokeWidth;
+            tCtx.strokeText(line, lx, ly);
+          }
+          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, lx, ly, t.fontSize, i);
+          tCtx.fillText(line, lx, ly);
+        });
+
+      } else if (t.layout === 'marquee') {
+        // Vertical kinetic rolling text
+        tCtx.textAlign = 'center';
+        const fullPhrase = lines.join(' • ') + ' • ';
+        const textH = t.fontSize * 1.6;
+        const rollSpeed = (tick * 120) % HEIGHT;
+
+        for (let y = -rollSpeed - textH; y < HEIGHT + textH * 2; y += textH) {
+          if (t.strokeWidth > 0) {
+            tCtx.strokeStyle = t.strokeColor;
+            tCtx.lineWidth = t.strokeWidth;
+            tCtx.strokeText(fullPhrase, t.x, y);
+          }
+          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, t.x, y, t.fontSize, 0);
+          tCtx.fillText(fullPhrase, t.x, y);
+        }
+
+      } else if (t.layout === 'vertical') {
+        // Japanese / Poster style column text
+        tCtx.textAlign = 'center';
+        const chars = t.text.replace(/\s+/g, '').split('');
+        const stepY = t.fontSize * 0.95;
+        const startY = t.y - (chars.length * stepY) / 2;
+
+        chars.forEach((c, idx) => {
+          const cy = startY + idx * stepY + wobbleY;
+          if (t.strokeWidth > 0) {
+            tCtx.strokeStyle = t.strokeColor;
+            tCtx.lineWidth = t.strokeWidth;
+            tCtx.strokeText(c, t.x + wobbleX, cy);
+          }
+          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, t.x + wobbleX, cy, t.fontSize, idx);
+          tCtx.fillText(c, t.x + wobbleX, cy);
+        });
+      }
+
+      tCtx.restore();
+    }
+  </script>
+
+  <script>
+    function pixelSortPass(targetCtx, opt) {
+      const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
+      const d = img.data;
+
+      const low = opt.thresholdLow / 100;
+      const high = opt.thresholdHigh / 100;
+      const maxSpan = opt.maxLength;
+
+      const getMetric = (r, g, b) => {
+        if (opt.criterion === 'brightness') return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        if (opt.criterion === 'red') return r / 255;
+        if (opt.criterion === 'blue') return b / 255;
+        if (opt.criterion === 'saturation') {
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          return max === 0 ? 0 : (max - min) / max;
+        }
+        return (r + g + b) / (255 * 3);
+      };
+
+      const isVertical = opt.direction === 'vertical';
+      const isHorizontal = opt.direction === 'horizontal';
+
+      if (isVertical) {
+        // Vertical sorting (dripping down)
+        for (let x = 0; x < WIDTH; x += 2) {
+          let startY = -1;
+          let span = [];
+
+          for (let y = 0; y < HEIGHT; y++) {
+            const idx = (y * WIDTH + x) * 4;
+            const val = getMetric(d[idx], d[idx + 1], d[idx + 2]);
+
+            if (val >= low && val <= high) {
+              if (startY === -1) startY = y;
+              span.push({ r: d[idx], g: d[idx + 1], b: d[idx + 2], a: d[idx + 3], val });
+
+              if (span.length >= maxSpan || y === HEIGHT - 1) {
+                span.sort((a, b) => a.val - b.val);
+                for (let k = 0; k < span.length; k++) {
+                  const sIdx = ((startY + k) * WIDTH + x) * 4;
+                  d[sIdx] = span[k].r;
+                  d[sIdx + 1] = span[k].g;
+                  d[sIdx + 2] = span[k].b;
+                  d[sIdx + 3] = span[k].a;
+                }
+                startY = -1;
+                span = [];
+              }
+            } else if (span.length > 0) {
+              span.sort((a, b) => a.val - b.val);
+              for (let k = 0; k < span.length; k++) {
+                const sIdx = ((startY + k) * WIDTH + x) * 4;
+                d[sIdx] = span[k].r;
+                d[sIdx + 1] = span[k].g;
+                d[sIdx + 2] = span[k].b;
+                d[sIdx + 3] = span[k].a;
+              }
+              startY = -1;
+              span = [];
+            }
+          }
+        }
+      } else {
+        // Horizontal / Diagonal sorting
+        for (let y = 0; y < HEIGHT; y += 2) {
+          let startX = -1;
+          let span = [];
+
+          for (let x = 0; x < WIDTH; x++) {
+            const px = opt.direction === 'diagonal' ? (x + y) % WIDTH : x;
+            const idx = (y * WIDTH + px) * 4;
+            const val = getMetric(d[idx], d[idx + 1], d[idx + 2]);
+
+            if (val >= low && val <= high) {
+              if (startX === -1) startX = x;
+              span.push({ r: d[idx], g: d[idx + 1], b: d[idx + 2], a: d[idx + 3], val, px });
+
+              if (span.length >= maxSpan || x === WIDTH - 1) {
+                span.sort((a, b) => a.val - b.val);
+                for (let k = 0; k < span.length; k++) {
+                  const writeX = opt.direction === 'diagonal' ? (startX + k + y) % WIDTH : (startX + k);
+                  const sIdx = (y * WIDTH + writeX) * 4;
+                  d[sIdx] = span[k].r;
+                  d[sIdx + 1] = span[k].g;
+                  d[sIdx + 2] = span[k].b;
+                  d[sIdx + 3] = span[k].a;
+                }
+                startX = -1;
+                span = [];
+              }
+            } else if (span.length > 0) {
+              span.sort((a, b) => a.val - b.val);
+              for (let k = 0; k < span.length; k++) {
+                const writeX = opt.direction === 'diagonal' ? (startX + k + y) % WIDTH : (startX + k);
+                const sIdx = (y * WIDTH + writeX) * 4;
+                d[sIdx] = span[k].r;
+                d[sIdx + 1] = span[k].g;
+                d[sIdx + 2] = span[k].b;
+                d[sIdx + 3] = span[k].a;
+              }
+              startX = -1;
+              span = [];
+            }
+          }
+        }
+      }
+
+      targetCtx.putImageData(img, 0, 0);
+    }
+
+    function applyDatamoshBlocks(targetCtx, mosh, tick) {
+      // 1. Horizontal slice tear across text
+      if (mosh.sliceShear > 0) {
+        const tears = Math.floor(Math.random() * 3) + 1;
+        for (let i = 0; i < tears; i++) {
+          const sy = Math.floor(Math.random() * HEIGHT);
+          const sh = Math.floor(Math.random() * 32) + 8;
+          const shift = (Math.sin(tick * 4 + i) * mosh.sliceShear) + ((Math.random() - 0.5) * 10);
+          targetCtx.drawImage(targetCtx.canvas, 0, sy, WIDTH, sh, shift, sy, WIDTH, sh);
+        }
+      }
+
+      // 2. Macroblock video codec displacement
+      if (mosh.macroblocks > 0) {
+        const blockSize = 32;
+        const count = Math.floor((mosh.macroblocks / 100) * 16);
+        for (let i = 0; i < count; i++) {
+          const bx = Math.floor(Math.random() * (WIDTH / blockSize)) * blockSize;
+          const by = Math.floor(Math.random() * (HEIGHT / blockSize)) * blockSize;
+          const dx = bx + (Math.random() - 0.5) * (mosh.macroblocks * 0.8);
+          const dy = by + (Math.random() - 0.5) * (mosh.macroblocks * 0.5);
+          targetCtx.drawImage(targetCtx.canvas, bx, by, blockSize, blockSize, dx, dy, blockSize, blockSize);
+        }
+      }
+    }
+
+    function applyAnalogAndCrt(targetCtx, fx) {
+      if (!fx.active) return;
+
+      const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
+      const d = img.data;
+      const copy = new Uint8ClampedArray(d);
+
+      const rad = (fx.rgbAngle * Math.PI) / 180;
+      const ox = Math.round(Math.cos(rad) * fx.rgbSplit);
+      const oy = Math.round(Math.sin(rad) * fx.rgbSplit);
+
+      const scanFactor = 1 - (fx.scanlines / 100) * 0.45;
+      const noiseAmp = (fx.noise / 100) * 70;
+
+      for (let y = 0; y < HEIGHT; y++) {
+        const isScan = (y % 2 === 0);
+        for (let x = 0; x < WIDTH; x++) {
+          const idx = (y * WIDTH + x) * 4;
+
+          // RGB Split
+          if (fx.rgbSplit > 0) {
+            const rx = Math.min(Math.max(x + ox, 0), WIDTH - 1);
+            const ry = Math.min(Math.max(y + oy, 0), HEIGHT - 1);
+            d[idx] = copy[(ry * WIDTH + rx) * 4]; // Red channel
+
+            const bx = Math.min(Math.max(x - ox, 0), WIDTH - 1);
+            const by = Math.min(Math.max(y - oy, 0), HEIGHT - 1);
+            d[idx + 2] = copy[(by * WIDTH + bx) * 4 + 2]; // Blue channel
+          }
+
+          // Scanline Dim
+          if (isScan && fx.scanlines > 0) {
+            d[idx] *= scanFactor;
+            d[idx + 1] *= scanFactor;
+            d[idx + 2] *= scanFactor;
+          }
+
+          // VHS Grain
+          if (fx.noise > 0 && Math.random() < 0.25) {
+            const grain = (Math.random() - 0.5) * noiseAmp;
+            d[idx] = Math.min(255, Math.max(0, d[idx] + grain));
+            d[idx + 1] = Math.min(255, Math.max(0, d[idx + 1] + grain));
+            d[idx + 2] = Math.min(255, Math.max(0, d[idx + 2] + grain));
+          }
+        }
+      }
+
+      targetCtx.putImageData(img, 0, 0);
+    }
+  </script>
+
+  <script>
+    function render() {
+      // Step kinetic motion
+      state.mosh.tick += (state.mosh.speed * 0.05);
+
+      // 1. Render clean layers
+      renderBackdropLayer(bgCtx, state.fx.bgMode, state.mosh.tick);
+      renderTypographyLayer(textCtx, state.type, state.mosh.tick);
+
+      if (state.photo.active && state.photo.loaded) {
+        renderAsciiPhoto(photoCanvas, state.photo, state.mosh.tick);
+      }
+
+      // 2. Build clean composite (used if holding clean button)
+      cleanCompositeCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      cleanCompositeCtx.drawImage(bgCanvas, 0, 0);
+
+      // Composite photo under typography if blend mode is 'behind'
+      if (state.photo.active && state.photo.loaded && state.photo.blend === 'behind') {
+        cleanCompositeCtx.save();
+        cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
+        cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
+        cleanCompositeCtx.restore();
+      }
+
+      // Draw typography layer (unless photoOnly)
+      if (!state.photo.active || !state.photo.loaded || state.photo.blend !== 'photoOnly') {
+        cleanCompositeCtx.drawImage(textCanvas, 0, 0);
+      }
+
+      // Composite photo over typography if blend mode is 'inFront'
+      if (state.photo.active && state.photo.loaded && state.photo.blend === 'inFront') {
+        cleanCompositeCtx.save();
+        cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
+        cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
+        cleanCompositeCtx.restore();
+      }
+
+      if (state.interaction.holdClean) {
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        ctx.drawImage(cleanCompositeCanvas, 0, 0);
+        requestAnimationFrame(render);
+        return;
+      }
+
+      // 3. Datamosh smear feedback
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+      if (state.mosh.active && state.mosh.smear > 0) {
+        const smearAlpha = 1 - (state.mosh.smear / 100);
+        ctx.drawImage(feedbackCanvas, 0, 0);
+        ctx.globalAlpha = smearAlpha;
+        ctx.drawImage(cleanCompositeCanvas, 0, 0);
+        ctx.globalAlpha = 1.0;
+      } else {
+        ctx.drawImage(cleanCompositeCanvas, 0, 0);
+      }
+
+      // 4. Pixel Sort Pass
+      if (state.sort.active) {
+        pixelSortPass(ctx, state.sort);
+      }
+
+      // 5. Datamosh Slice & Codec macroblocks
+      if (state.mosh.active) {
+        applyDatamoshBlocks(ctx, state.mosh, state.mosh.tick);
+      }
+
+      // 6. Analog CRT & Chromatic pass
+      if (state.fx.active) {
+        applyAnalogAndCrt(ctx, state.fx);
+      }
+
+      // Save into feedback canvas for consecutive P-frame smear
+      feedbackCtx.drawImage(moshCanvas, 0, 0);
+
+      requestAnimationFrame(render);
+    }
+  </script>
+
+  <script>
+    // Export Modal Helpers
+    const exportModal = document.getElementById('exportModal');
+    const exportPreviewImg = document.getElementById('exportPreviewImg');
+    const exportPreviewVid = document.getElementById('exportPreviewVid');
+    const exportModalTitle = document.getElementById('exportModalTitle');
+    const exportModalIcon = document.getElementById('exportModalIcon');
+    const modalDownloadLink = document.getElementById('modalDownloadLink');
+
+    function openExportModal(type, url, filename) {
+      exportModal.classList.remove('hidden');
+      modalDownloadLink.href = url;
+      modalDownloadLink.download = filename;
+
+      if (type === 'image') {
+        exportModalIcon.textContent = '📸';
+        exportModalTitle.textContent = '9:16 PNG READY';
+        exportPreviewImg.src = url;
+        exportPreviewImg.classList.remove('hidden');
+        exportPreviewVid.classList.add('hidden');
+      } else {
+        exportModalIcon.textContent = '🎥';
+        exportModalTitle.textContent = '9:16 VIDEO READY';
+        exportPreviewVid.src = url;
+        exportPreviewVid.classList.remove('hidden');
+        exportPreviewImg.classList.add('hidden');
+        exportPreviewVid.play().catch(() => {});
+      }
+    }
+
+    function closeExportModal() {
+      exportModal.classList.add('hidden');
+      if (exportPreviewVid.src) {
+        exportPreviewVid.pause();
+        exportPreviewVid.src = '';
+      }
+    }
+
+    document.getElementById('closeModalBtn').addEventListener('click', closeExportModal);
+    document.getElementById('modalDoneBtn').addEventListener('click', closeExportModal);
+
+    // Runtime "downloads" capability (works when hosted as a published artifact).
+    // Falls back to a plain anchor download when unavailable (e.g. opened as a local file).
+    let downloadsCap = null;
+    (async () => {
+      try {
+        if (window.claude && typeof window.claude.use === 'function') {
+          downloadsCap = await window.claude.use('downloads');
+        }
+      } catch (e) {
+        downloadsCap = null;
+      }
+    })();
+
+    async function saveFile(filename, blob) {
+      if (downloadsCap) {
+        try {
+          await downloadsCap.save({ filename, data: blob });
+          return true;
+        } catch (e) {
+          console.warn('downloads capability save failed, falling back:', e);
+        }
+      }
+      try {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        return true;
+      } catch (e) {
+        console.error('Fallback download failed:', e);
+        return false;
+      }
+    }
+
+    // 1. RELIABLE SNAP PIC (PNG)
+    document.getElementById('snapPicBtn').addEventListener('click', async () => {
+      try {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `VIBE_MOSH_9_16_${timestamp}.png`;
+        const dataUrl = moshCanvas.toDataURL('image/png');
+        const blob = await (await fetch(dataUrl)).blob();
+
+        await saveFile(filename, blob);
+
+        // Also open modal fallback for iOS Safari long-press save / preview
+        openExportModal('image', dataUrl, filename);
+      } catch (err) {
+        console.error('PNG Snap failed:', err);
+      }
+    });
+
+    // 2. RELIABLE REC VIDEO (MEDIA RECORDER)
+    const recVideoBtn = document.getElementById('recVideoBtn');
+    const recBtnDot = document.getElementById('recBtnDot');
+    const recBtnLabel = document.getElementById('recBtnLabel');
+    const recHUD = document.getElementById('recHUD');
+    const recTimerText = document.getElementById('recTimerText');
+
+    function getSupportedMimeType() {
+      const types = [
+        'video/mp4;codecs=avc1',
+        'video/mp4',
+        'video/webm;codecs=vp9',
+        'video/webm;codecs=vp8',
+        'video/webm'
+      ];
+      for (const t of types) {
+        if (MediaRecorder.isTypeSupported(t)) return t;
+      }
+      return '';
+    }
+
+    recVideoBtn.addEventListener('click', () => {
+      if (!state.recording.isRecording) {
+        // Start Recording
+        try {
+          const stream = moshCanvas.captureStream(30);
+          const mimeType = getSupportedMimeType();
+          state.recording.chunks = [];
+
+          const options = mimeType ? { mimeType } : undefined;
+          state.recording.recorder = new MediaRecorder(stream, options);
+
+          state.recording.recorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+              state.recording.chunks.push(e.data);
+            }
+          };
+
+          state.recording.recorder.onstop = async () => {
+            const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+            const blobType = mimeType || 'video/webm';
+            const blob = new Blob(state.recording.chunks, { type: blobType });
+            const videoUrl = URL.createObjectURL(blob);
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `VIBE_MOSH_9_16_${timestamp}.${ext}`;
+
+            await saveFile(filename, blob);
+
+            // Open mobile playback sheet so user can preview or long-press
+            openExportModal('video', videoUrl, filename);
+          };
+
+          state.recording.recorder.start();
+          state.recording.isRecording = true;
+          state.recording.startTime = Date.now();
+
+          // Update UI
+          recBtnDot.classList.add('rec-pulsing');
+          recBtnLabel.textContent = 'STOP REC';
+          recHUD.classList.remove('hidden');
+
+          state.recording.timerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - state.recording.startTime) / 1000);
+            const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const ss = String(elapsed % 60).padStart(2, '0');
+            recTimerText.textContent = `REC ${mm}:${ss}`;
+          }, 500);
+
+        } catch (err) {
+          console.error('MediaRecorder start failed:', err);
+        }
+      } else {
+        // Stop Recording
+        state.recording.recorder.stop();
+        state.recording.isRecording = false;
+        clearInterval(state.recording.timerInterval);
+
+        recBtnDot.classList.remove('rec-pulsing');
+        recBtnLabel.textContent = 'REC 9:16';
+        recHUD.classList.add('hidden');
+      }
+    });
+  </script>
+
+  <script>
+    function initTouchGestures() {
+      const box = document.getElementById('canvasBox');
+      const crosshair = document.getElementById('touchCrosshair');
+      const jamGrid = document.getElementById('canvasJamGrid');
+
+      state.interaction.mode = state.interaction.mode || 'drag'; // 'drag' | 'brush' | 'jam'
+
+      function getCanvasCoords(clientX, clientY) {
+        const rect = moshCanvas.getBoundingClientRect();
+        const scaleX = WIDTH / rect.width;
+        const scaleY = HEIGHT / rect.height;
+        return {
+          x: Math.round((clientX - rect.left) * scaleX),
+          y: Math.round((clientY - rect.top) * scaleY)
+        };
+      }
+
+      // Jam mode: dragging directly on the text screen modulates Smear (Y) x Slice Shear (X) live
+      function jamAt(cx, cy) {
+        const rect = box.getBoundingClientRect();
+        const nx = Math.min(1, Math.max(0, (cx - rect.left) / rect.width));
+        const ny = Math.min(1, Math.max(0, (cy - rect.top) / rect.height));
+
+        const shearInput = document.getElementById('moshSliceRange');
+        const smearInput = document.getElementById('moshSmearRange');
+        const shearMax = parseFloat(shearInput.max);
+        const smearMax = parseFloat(smearInput.max);
+
+        setSliderValue('moshSliceRange', Math.round(nx * shearMax));
+        setSliderValue('moshSmearRange', Math.round((1 - ny) * smearMax));
+      }
+
+      function onStart(cx, cy) {
+        state.interaction.isInteracting = true;
+        const p = getCanvasCoords(cx, cy);
+        state.interaction.lastX = p.x;
+        state.interaction.lastY = p.y;
+
+        if (state.interaction.mode === 'brush') {
+          crosshair.style.left = `${cx}px`;
+          crosshair.style.top = `${cy}px`;
+          crosshair.classList.remove('hidden');
+          smearBrushAt(p.x, p.y);
+        } else if (state.interaction.mode === 'jam') {
+          crosshair.style.left = `${cx}px`;
+          crosshair.style.top = `${cy}px`;
+          crosshair.classList.remove('hidden');
+          jamGrid.style.opacity = '1';
+          jamAt(cx, cy);
+        } else {
+          // Drag typography position
+          state.type.x = p.x;
+          state.type.y = p.y;
+        }
+      }
+
+      function onMove(cx, cy) {
+        if (!state.interaction.isInteracting) return;
+        const p = getCanvasCoords(cx, cy);
+
+        if (state.interaction.mode === 'brush') {
+          crosshair.style.left = `${cx}px`;
+          crosshair.style.top = `${cy}px`;
+          smearBrushAt(p.x, p.y);
+        } else if (state.interaction.mode === 'jam') {
+          crosshair.style.left = `${cx}px`;
+          crosshair.style.top = `${cy}px`;
+          jamAt(cx, cy);
+        } else {
+          // Drag mode: if 3D layout, rotate 3D object on screen!
+          if (['spiral', 'cube', 'sphere'].includes(state.type.layout)) {
+            const dx = (p.x - state.interaction.lastX) * 0.012;
+            const dy = (p.y - state.interaction.lastY) * 0.012;
+            state.type.rotY += dx;
+            state.type.rotX -= dy;
+            state.interaction.lastX = p.x;
+            state.interaction.lastY = p.y;
+          } else {
+            state.type.x = p.x;
+            state.type.y = p.y;
+          }
+        }
+      }
+
+      function onEnd() {
+        state.interaction.isInteracting = false;
+        crosshair.classList.add('hidden');
+        jamGrid.style.opacity = '0';
+      }
+
+      // Localized pixel brush smear
+      function smearBrushAt(bx, by) {
+        const r = 45;
+        const sx = Math.max(0, bx - r);
+        const sy = Math.max(0, by - r);
+        const sw = Math.min(WIDTH - sx, r * 2);
+        const sh = Math.min(HEIGHT - sy, r * 2);
+
+        if (sw <= 0 || sh <= 0) return;
+        const bImg = ctx.getImageData(sx, sy, sw, sh);
+        // Instant directional sort across finger brush
+        const d = bImg.data;
+        for (let i = 0; i < d.length; i += 4) {
+          if (Math.random() < 0.3) {
+            d[i] = Math.min(255, d[i] + 50);
+            d[i + 1] = Math.min(255, d[i + 1] + 30);
+          }
+        }
+        ctx.putImageData(bImg, sx, sy);
+      }
+
+      // Touch Events -- ignore touches that start on knobs/controls living on the canvas
+      box.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.synth-knob')) return;
+        if (e.touches.length > 0) {
+          e.preventDefault();
+          onStart(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      box.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+          e.preventDefault();
+          onMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      box.addEventListener('touchend', onEnd);
+      box.addEventListener('touchcancel', onEnd);
+
+      // Mouse fallback for desktop simulation
+      box.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.synth-knob')) return;
+        onStart(e.clientX, e.clientY);
+      });
+      window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+      window.addEventListener('mouseup', onEnd);
+
+      // Photo drag & drop onto canvas box
+      box.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+      box.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          loadPhotoFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      // Cycle touch interaction: Drag -> Brush -> Jam Pad -> Drag ...
+      const modeToggle = document.getElementById('touchModeToggle');
+      const modeIcon = document.getElementById('brushIcon');
+      const modeText = document.getElementById('brushBtnText');
+      const touchModeLabel = document.getElementById('touchModeLabel');
+
+      const MODES = {
+        drag: {
+          icon: '👆', text: 'Mode: Drag', label: '👆 Touch: Drag Text',
+          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-300 flex items-center space-x-1 active:scale-95 transition'
+        },
+        brush: {
+          icon: '✏️', text: 'Mode: Brush', label: '✏️ Touch: Glitch Brush',
+          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-cyan/20 border border-cyber-cyan text-xs text-cyber-cyan flex items-center space-x-1 active:scale-95 transition'
+        },
+        jam: {
+          icon: '🎛️', text: 'Mode: Jam', label: '🎛️ Touch: Jam Pad (Smear × Shear)',
+          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-pink/20 border border-cyber-pink text-xs text-cyber-pink flex items-center space-x-1 active:scale-95 transition'
+        }
+      };
+      const ORDER = ['drag', 'brush', 'jam'];
+
+      function applyMode() {
+        const m = MODES[state.interaction.mode];
+        modeIcon.textContent = m.icon;
+        modeText.textContent = m.text;
+        modeToggle.className = m.btnClass;
+        const is3D = ['spiral', 'cube', 'sphere'].includes(state.type.layout);
+        touchModeLabel.textContent = (state.interaction.mode === 'drag' && is3D)
+          ? '👆 Touch: Rotate 3D Model'
+          : m.label;
+        crosshair.classList.remove('mode-jam', 'mode-brush');
+        if (state.interaction.mode === 'jam') crosshair.classList.add('mode-jam');
+        if (state.interaction.mode === 'brush') crosshair.classList.add('mode-brush');
+      }
+      window.applyTouchMode = applyMode;
+      applyMode();
+
+      modeToggle.addEventListener('click', () => {
+        const idx = ORDER.indexOf(state.interaction.mode);
+        state.interaction.mode = ORDER[(idx + 1) % ORDER.length];
+        applyMode();
+      });
+
+      // The Mosh tab shortcut jumps straight into Jam mode and collapses the sheet
+      const jamShortcut = document.getElementById('jamModeShortcut');
+      if (jamShortcut) {
+        jamShortcut.addEventListener('click', () => {
+          state.interaction.mode = 'jam';
+          applyMode();
+          if (window.collapseControlSheet) window.collapseControlSheet();
+        });
+      }
+
+      // Hold Clean
+      const holdBtn = document.getElementById('holdCleanBtn');
+      const startHold = () => state.interaction.holdClean = true;
+      const stopHold = () => state.interaction.holdClean = false;
+      holdBtn.addEventListener('mousedown', startHold);
+      holdBtn.addEventListener('mouseup', stopHold);
+      holdBtn.addEventListener('mouseleave', stopHold);
+      holdBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+      holdBtn.addEventListener('touchend', stopHold);
+    }
+
+    function initUI() {
+      // Bottom Sheet: collapsible control drawer so the text screen stays dominant
+      const controlSheet = document.getElementById('controlSheet');
+      const sheetHandle = document.getElementById('sheetHandle');
+      let activeTab = 'text';
+
+      function expandSheet() { controlSheet.classList.remove('sheet-collapsed'); }
+      function collapseSheet() { controlSheet.classList.add('sheet-collapsed'); }
+      function toggleSheet() { controlSheet.classList.toggle('sheet-collapsed'); }
+      window.collapseControlSheet = collapseSheet;
+      window.expandControlSheet = expandSheet;
+
+      sheetHandle.addEventListener('click', toggleSheet);
+
+      // Bottom Tabs Switching
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+      const INACTIVE_TAB_CLASS = 'tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95';
+      const ACTIVE_TAB_CLASS = 'tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-cyber-cyan border-b-2 border-cyber-cyan transition active:scale-95';
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.tab;
+          const sheetOpen = !controlSheet.classList.contains('sheet-collapsed');
+
+          if (target === activeTab && sheetOpen) {
+            // Tapping the already-open tab again tucks the sheet away
+            collapseSheet();
+            return;
+          }
+
+          activeTab = target;
+          expandSheet();
+          tabBtns.forEach(b => { b.className = INACTIVE_TAB_CLASS; });
+          btn.className = ACTIVE_TAB_CLASS;
+
+          tabContents.forEach(c => c.classList.add('hidden'));
+          document.getElementById(`tab${target.charAt(0).toUpperCase() + target.slice(1)}`).classList.remove('hidden');
+        });
+      });
+
+      // Text Input
+      const textInput = document.getElementById('textInput');
+      textInput.addEventListener('input', (e) => state.type.text = e.target.value);
+
+      document.getElementById('fontSelect').addEventListener('change', (e) => state.type.fontFamily = e.target.value);
+      document.getElementById('fillColorInput').addEventListener('input', (e) => state.type.fillColor = e.target.value);
+      document.getElementById('fillColor2Input').addEventListener('input', (e) => state.type.fillColor2 = e.target.value);
+      document.getElementById('fillModeSelect').addEventListener('change', (e) => state.type.fillMode = e.target.value);
+      document.getElementById('strokeColorInput').addEventListener('input', (e) => state.type.strokeColor = e.target.value);
+      document.getElementById('glowColorInput').addEventListener('input', (e) => state.type.glowColor = e.target.value);
+
+      // Layout mode buttons
+      document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.type.layout = btn.dataset.layout;
+          document.querySelectorAll('.layout-btn').forEach(b => {
+            b.className = 'layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+          });
+          btn.className = 'layout-btn py-2 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold';
+          if (window.applyTouchMode) window.applyTouchMode();
+        });
+      });
+
+      // Sliders Helper
+      const bind = (id, obj, key, labelId, unit = '', mul = 1) => {
+        const slider = document.getElementById(id);
+        if (!slider) return;
+        slider.addEventListener('input', (e) => {
+          const val = Number(e.target.value) * mul;
+          obj[key] = val;
+          if (labelId) {
+            const el = document.getElementById(labelId);
+            if (el) el.textContent = `${e.target.value}${unit}`;
+          }
+        });
+      };
+
+      bind('fontSizeRange', state.type, 'fontSize', 'fontSizeLabel', 'px');
+      bind('letterSpacingRange', state.type, 'letterSpacing', 'letterSpacingLabel', 'px');
+      bind('radius3DRange', state.type, 'radius3D', 'radius3DLabel', 'px');
+      bind('speed3DRange', state.type, 'speed3D', 'speed3DLabel', 'x', 0.1);
+
+      // Glitch Sort controls
+      document.getElementById('sortActiveCheck').addEventListener('change', (e) => state.sort.active = e.target.checked);
+      document.getElementById('sortCriterionSelect').addEventListener('change', (e) => state.sort.criterion = e.target.value);
+      bind('sortLengthRange', state.sort, 'maxLength', 'sortLengthLabel', 'px');
+      bind('sortLowRange', state.sort, 'thresholdLow', 'sortLowLabel', '%');
+      bind('sortHighRange', state.sort, 'thresholdHigh', 'sortHighLabel', '%');
+
+      document.querySelectorAll('.sort-dir-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.sort.direction = btn.dataset.sortdir;
+          document.querySelectorAll('.sort-dir-btn').forEach(b => {
+            b.className = 'sort-dir-btn py-2.5 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px]';
+          });
+          btn.className = 'sort-dir-btn py-2.5 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan font-bold text-[10px]';
+        });
+      });
+
+      // Mosh controls
+      document.getElementById('moshActiveCheck').addEventListener('change', (e) => state.mosh.active = e.target.checked);
+      bind('moshSmearRange', state.mosh, 'smear', 'moshSmearLabel', '%');
+      bind('moshBlockRange', state.mosh, 'macroblocks', 'moshBlockLabel');
+      bind('moshSliceRange', state.mosh, 'sliceShear', 'moshSliceLabel', 'px');
+      bind('motionSpeedRange', state.mosh, 'speed', 'motionSpeedLabel', 'x', 0.1);
+
+      // Photo & ASCII controls
+      function loadPhotoFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            state.photo.img = img;
+            state.photo.loaded = true;
+            state.photo.active = true;
+            document.getElementById('photoActiveCheck').checked = true;
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+      window.loadPhotoFile = loadPhotoFile;
+
+      document.getElementById('photoActiveCheck').addEventListener('change', (e) => state.photo.active = e.target.checked);
+      document.getElementById('photoFileInput').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          loadPhotoFile(e.target.files[0]);
+        }
+      });
+      document.getElementById('photoClearBtn').addEventListener('click', () => {
+        state.photo.img = null;
+        state.photo.loaded = false;
+        state.photo.active = false;
+        document.getElementById('photoActiveCheck').checked = false;
+        document.getElementById('photoFileInput').value = '';
+      });
+
+      document.querySelectorAll('.sample-photo-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const sampleType = btn.dataset.sample;
+          const canvasSample = generateSampleGraphic(sampleType);
+          const img = new Image();
+          img.onload = () => {
+            state.photo.img = img;
+            state.photo.loaded = true;
+            state.photo.active = true;
+            document.getElementById('photoActiveCheck').checked = true;
+          };
+          img.src = canvasSample.toDataURL();
+        });
+      });
+
+      document.getElementById('photoRenderModeSelect').addEventListener('change', (e) => state.photo.mode = e.target.value);
+      document.getElementById('asciiColorModeSelect').addEventListener('change', (e) => state.photo.colorMode = e.target.value);
+      document.getElementById('asciiCharSetSelect').addEventListener('change', (e) => state.photo.charSet = e.target.value);
+      document.getElementById('photoBlendSelect').addEventListener('change', (e) => state.photo.blend = e.target.value);
+      document.getElementById('photoInvertCheck').addEventListener('change', (e) => state.photo.invert = e.target.checked);
+
+      bind('asciiCellSizeRange', state.photo, 'cellSize', 'asciiCellSizeLabel', 'px');
+      bind('photoContrastRange', state.photo, 'contrast', 'photoContrastLabel', 'x', 0.1);
+      bind('photoOpacityRange', state.photo, 'opacity', 'photoOpacityLabel', '%');
+
+      // CRT & FX controls
+      document.getElementById('fxActiveCheck').addEventListener('change', (e) => state.fx.active = e.target.checked);
+      bind('rgbSplitRange', state.fx, 'rgbSplit', 'rgbSplitLabel', 'px');
+      bind('rgbAngleRange', state.fx, 'rgbAngle', 'rgbAngleLabel', '°');
+      bind('scanlinesRange', state.fx, 'scanlines', 'scanlinesLabel', '%');
+      bind('noiseRange', state.fx, 'noise', 'noiseLabel', '%');
+      document.getElementById('bgModeSelect').addEventListener('change', (e) => {
+        state.fx.bgMode = e.target.value;
+        state.fx.customBg = false;
+      });
+
+      document.getElementById('bgColor1Input').addEventListener('input', (e) => {
+        state.fx.bgColor1 = e.target.value;
+        state.fx.customBg = true;
+      });
+      document.getElementById('bgColor2Input').addEventListener('input', (e) => {
+        state.fx.bgColor2 = e.target.value;
+        state.fx.customBg = true;
+      });
+      document.getElementById('bgAccentInput').addEventListener('input', (e) => {
+        state.fx.bgAccent = e.target.value;
+        state.fx.customBg = true;
+      });
+      document.getElementById('resetBgColorBtn').addEventListener('click', () => {
+        state.fx.customBg = false;
+      });
+
+      // Quick Color Palette Shuffle Button
+      const paletteBtn = document.getElementById('paletteBtn');
+      if (paletteBtn) {
+        paletteBtn.addEventListener('click', () => {
+          currentPaletteIndex = (currentPaletteIndex + 1) % COLOR_PALETTES.length;
+          const pal = COLOR_PALETTES[currentPaletteIndex];
+
+          state.type.fillColor = pal.fill;
+          state.type.fillColor2 = pal.fill2;
+          state.type.strokeColor = pal.stroke;
+          state.type.glowColor = pal.glow;
+
+          state.fx.customBg = true;
+          state.fx.bgColor1 = pal.bg1;
+          state.fx.bgColor2 = pal.bg2;
+          state.fx.bgAccent = pal.accent;
+
+          document.getElementById('fillColorInput').value = pal.fill;
+          document.getElementById('fillColor2Input').value = pal.fill2;
+          document.getElementById('strokeColorInput').value = pal.stroke;
+          document.getElementById('glowColorInput').value = pal.glow;
+          document.getElementById('bgColor1Input').value = pal.bg1;
+          document.getElementById('bgColor2Input').value = pal.bg2;
+          document.getElementById('bgAccentInput').value = pal.accent;
+        });
+      }
+
+      // Presets
+      document.querySelectorAll('.vibe-card, [data-vibe]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const vKey = btn.dataset.vibe;
+          const p = PRESETS[vKey];
+          if (!p) return;
+
+          Object.assign(state.type, p.type);
+          Object.assign(state.sort, p.sort);
+          Object.assign(state.mosh, p.mosh);
+          Object.assign(state.fx, p.fx);
+
+          // Update inputs (and re-paint knobs / XY pad to match)
+          setSliderValue('sortLengthRange', state.sort.maxLength);
+          setSliderValue('moshSmearRange', state.mosh.smear);
+          setSliderValue('moshSliceRange', state.mosh.sliceShear);
+          setSliderValue('moshBlockRange', state.mosh.macroblocks);
+          setSliderValue('rgbSplitRange', state.fx.rgbSplit);
+          setSliderValue('rgbAngleRange', state.fx.rgbAngle);
+          setSliderValue('scanlinesRange', state.fx.scanlines);
+          setSliderValue('noiseRange', state.fx.noise);
+          if (state.type.radius3D) setSliderValue('radius3DRange', state.type.radius3D);
+          if (state.type.speed3D) setSliderValue('speed3DRange', Math.round(state.type.speed3D * 10));
+
+          document.getElementById('bgModeSelect').value = state.fx.bgMode;
+          document.getElementById('fontSelect').value = state.type.fontFamily;
+          document.getElementById('fillColorInput').value = state.type.fillColor;
+          document.getElementById('fillColor2Input').value = state.type.fillColor2 || '#ffe600';
+          document.getElementById('strokeColorInput').value = state.type.strokeColor;
+          document.getElementById('glowColorInput').value = state.type.glowColor;
+
+          document.querySelectorAll('.layout-btn').forEach(b => {
+            b.className = b.dataset.layout === state.type.layout
+              ? 'layout-btn py-2 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold'
+              : 'layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+          });
+          if (window.applyTouchMode) window.applyTouchMode();
+        });
+      });
+
+      // Quote Roll
+      document.getElementById('sloganRandomBtn').addEventListener('click', () => {
+        const rand = SLOGANS[Math.floor(Math.random() * SLOGANS.length)];
+        state.type.text = rand;
+        document.getElementById('textInput').value = rand;
+      });
+
+      // Chaos Randomizer
+      document.getElementById('chaosBtn').addEventListener('click', () => {
+        state.sort.direction = ['vertical', 'horizontal', 'diagonal'][Math.floor(Math.random() * 3)];
+        document.querySelectorAll('.sort-dir-btn').forEach(b => {
+          b.className = b.dataset.sortdir === state.sort.direction
+            ? 'sort-dir-btn py-2.5 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan font-bold text-[10px]'
+            : 'sort-dir-btn py-2.5 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px]';
+        });
+
+        setSliderValue('sortLengthRange', Math.floor(80 + Math.random() * 450));
+        setSliderValue('moshSmearRange', Math.floor(Math.random() * 75));
+        setSliderValue('moshSliceRange', Math.floor(Math.random() * 45));
+        setSliderValue('rgbSplitRange', Math.floor(Math.random() * 30));
+        setSliderValue('rgbAngleRange', Math.floor(Math.random() * 360));
+      });
+    }
+
+    // ===== Synth Knob-ification: turn every <input type=range> into a tactile rotary knob =====
+    function knobColorFor(input) {
+      const id = input.id;
+      if (id.startsWith('sort')) return '#00ffcc';
+      if (id.startsWith('mosh') || id.startsWith('motion') || id.startsWith('speed3D')) return '#ff0055';
+      if (id.startsWith('rgb') || id.startsWith('scanlines') || id.startsWith('noise')) return '#39ff14';
+      if (id.startsWith('ascii') || id.startsWith('photo')) return '#ffe600';
+      return '#00ffcc';
+    }
+
+    function setSliderValue(id, val) {
+      const input = document.getElementById(id);
+      if (!input) return;
+      input.value = val;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function synthifyKnobs() {
+      document.querySelectorAll('input[type=range]').forEach(input => {
+        if (input.dataset.knobified) return;
+        input.dataset.knobified = '1';
+
+        const wrap = document.createElement('span');
+        wrap.className = 'synth-knob';
+        input.parentNode.insertBefore(wrap, input);
+
+        const body = document.createElement('div');
+        body.className = 'knob-body';
+        body.style.setProperty('--knob-color', knobColorFor(input));
+
+        const ring = document.createElement('div');
+        ring.className = 'knob-ring';
+        const dial = document.createElement('div');
+        dial.className = 'knob-dial';
+        const indicator = document.createElement('div');
+        indicator.className = 'knob-indicator';
+        dial.appendChild(indicator);
+        body.appendChild(ring);
+        body.appendChild(dial);
+
+        input.classList.add('knob-native-input');
+        wrap.appendChild(body);
+        wrap.appendChild(input);
+
+        const min = parseFloat(input.min) || 0;
+        const max = parseFloat(input.max) || 100;
+        const span = max - min || 1;
+        const minDeg = -135, maxDeg = 135;
+
+        function paint() {
+          const v = parseFloat(input.value) || 0;
+          const pct = Math.min(1, Math.max(0, (v - min) / span));
+          const deg = minDeg + pct * (maxDeg - minDeg);
+          indicator.style.transform = `rotate(${deg}deg)`;
+          body.style.setProperty('--knob-arc', `${pct * 270}deg`);
+        }
+        paint();
+        input.addEventListener('input', paint);
+
+        let dragging = false, startY = 0, startVal = 0;
+        const step = parseFloat(input.step) || 1;
+
+        function down(clientY) {
+          dragging = true;
+          startY = clientY;
+          startVal = parseFloat(input.value) || 0;
+          dial.classList.add('active');
+        }
+        function move(clientY) {
+          if (!dragging) return;
+          const deltaY = startY - clientY;
+          const sensitivity = span / 160; // full sweep over ~160px vertical drag
+          let newVal = startVal + deltaY * sensitivity;
+          newVal = Math.min(max, Math.max(min, newVal));
+          newVal = Math.round(newVal / step) * step;
+          if (newVal !== parseFloat(input.value)) {
+            input.value = newVal;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+        function up() {
+          dragging = false;
+          dial.classList.remove('active');
+        }
+
+        // Modern Pointer Events with pointer capture: prevents border clipping & dropped touches on mobile
+        dial.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          try { dial.setPointerCapture(e.pointerId); } catch (err) {}
+          down(e.clientY);
+        });
+        dial.addEventListener('pointermove', (e) => {
+          if (dragging) {
+            e.preventDefault();
+            move(e.clientY);
+          }
+        });
+        dial.addEventListener('pointerup', (e) => {
+          try { dial.releasePointerCapture(e.pointerId); } catch (err) {}
+          up();
+        });
+        dial.addEventListener('pointercancel', (e) => {
+          try { dial.releasePointerCapture(e.pointerId); } catch (err) {}
+          up();
+        });
+
+        // Touch fallback for older webviews
+        dial.addEventListener('touchstart', (e) => { e.preventDefault(); down(e.touches[0].clientY); }, { passive: false });
+        dial.addEventListener('touchmove', (e) => { e.preventDefault(); move(e.touches[0].clientY); }, { passive: false });
+        dial.addEventListener('touchend', up);
+        dial.addEventListener('touchcancel', up);
+
+        // Double-tap/click resets to the knob's starting value
+        const resetVal = input.value;
+        dial.addEventListener('dblclick', () => setSliderValue(input.id, resetVal));
+      });
+    }
+
+    // ===== Integrated Knob Dock: relocate a few key knobs directly onto the text screen =====
+    function buildCanvasDock() {
+      const dock = document.getElementById('canvasKnobDock');
+      if (!dock) return;
+      const items = [
+        { id: 'fontSizeRange', label: 'SIZE' },
+        { id: 'moshSmearRange', label: 'SMEAR' },
+        { id: 'rgbSplitRange', label: 'RGB' }
+      ];
+      items.forEach(({ id, label }) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        const wrap = input.closest('.synth-knob');
+        if (!wrap) return;
+        wrap.classList.add('dock-knob');
+        const tag = document.createElement('span');
+        tag.className = 'dock-knob-label';
+        tag.textContent = label;
+        wrap.insertBefore(tag, wrap.firstChild);
+        dock.appendChild(wrap);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initUI();
+      initTouchGestures();
+      synthifyKnobs();
+      buildCanvasDock();
+      requestAnimationFrame(render);
+    });
+  </script>
+</body>
+</html>
