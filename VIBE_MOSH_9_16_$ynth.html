@@ -1165,17 +1165,6 @@ RAW SIGNAL</textarea>
         grad.addColorStop(1, state.fx.bgColor2);
         bCtx.fillStyle = grad;
         bCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
-        // Perspective vertical grid using custom accent
-        bCtx.strokeStyle = state.fx.bgAccent;
-        bCtx.lineWidth = 1.5;
-        const horizon = HEIGHT * 0.68;
-        for (let x = -WIDTH; x < WIDTH * 2; x += 90) {
-          bCtx.beginPath();
-          bCtx.moveTo(WIDTH / 2, horizon);
-          bCtx.lineTo(x, HEIGHT);
-          bCtx.stroke();
-        }
         return;
       }
 
@@ -1186,17 +1175,6 @@ RAW SIGNAL</textarea>
         grad.addColorStop(1, '#ff0055');
         bCtx.fillStyle = grad;
         bCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
-        // Perspective vertical grid
-        bCtx.strokeStyle = 'rgba(0, 255, 204, 0.2)';
-        bCtx.lineWidth = 1.5;
-        const horizon = HEIGHT * 0.68;
-        for (let x = -WIDTH; x < WIDTH * 2; x += 90) {
-          bCtx.beginPath();
-          bCtx.moveTo(WIDTH / 2, horizon);
-          bCtx.lineTo(x, HEIGHT);
-          bCtx.stroke();
-        }
       } else if (mode === 'acidLime') {
         const grad = bCtx.createRadialGradient(WIDTH / 2, HEIGHT / 2, 80, WIDTH / 2, HEIGHT / 2, HEIGHT * 0.6);
         grad.addColorStop(0, '#1c3d05');
