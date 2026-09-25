@@ -115,12 +115,34 @@
     }
     #sheetHandle { cursor: pointer; }
 
-    /* Knobs integrated directly onto the canvas / text screen - safe inset from borders */
+    /* Knobs integrated directly onto the canvas / text screen - rock-solid proportional anchor */
     #canvasKnobDock {
-      max-width: 90%;
+      position: absolute;
+      left: 50%;
+      bottom: 3.5%;
+      transform: translateX(-50%);
+      width: -moz-fit-content;
+      width: fit-content;
+      max-width: 92%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(8px, 2.2vw, 16px);
+      padding: clamp(4px, 1vh, 8px) clamp(10px, 3vw, 20px);
+      border-radius: 9999px;
+      background: rgba(6, 8, 14, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.9);
+      z-index: 30;
       pointer-events: auto;
+      transition: bottom 0.25s ease, opacity 0.2s ease;
     }
-    .dock-knob .knob-body { width: 42px; height: 42px; }
+    .dock-knob .knob-body {
+      width: clamp(34px, 5.5vh, 44px);
+      height: clamp(34px, 5.5vh, 44px);
+    }
     .dock-knob .knob-dial { inset: 5px; }
     .dock-knob .knob-indicator { top: 4px; height: 10px; transform-origin: 50% 14px; }
     .dock-knob-label {
@@ -344,8 +366,8 @@
         <span id="touchModeLabel">👆 Touch: Drag Text</span>
       </div>
 
-      <!-- Integrated Knob Dock: live controls floating safely away from screen edges & gesture zones -->
-      <div id="canvasKnobDock" class="absolute left-4 right-4 sm:left-8 sm:right-8 bottom-4 sm:bottom-6 z-30 max-w-sm mx-auto flex items-center justify-around gap-2 px-3 py-2 rounded-2xl bg-black/70 backdrop-blur-md border border-white/15 shadow-[0_4px_24px_rgba(0,0,0,0.85)]"></div>
+      <!-- Integrated Knob Dock: live controls proportionally anchored safely above bottom edge -->
+      <div id="canvasKnobDock"></div>
     </div>
 
   </main>
@@ -640,9 +662,9 @@ RAW SIGNAL</textarea>
           <div>
             <label class="block text-[10px] text-slate-400 mb-0.5">LAYER BLEND</label>
             <select id="photoBlendSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
-              <option value="behind">Under Typography</option>
-              <option value="inFront">Over Typography</option>
-              <option value="photoOnly">Photo Only (Hide Text)</option>
+              <option value="behind">Image Behind Text (Basic)</option>
+              <option value="inFront">Image In Front (Invert / Luminance Pass)</option>
+              <option value="photoOnly">Image Only</option>
             </select>
           </div>
         </div>
@@ -799,35 +821,83 @@ RAW SIGNAL</textarea>
         </div>
       </div>
 
-      <!-- ==================== TAB 4: VIBE PRESETS ==================== -->
-      <div id="tabVibe" class="tab-content hidden space-y-2">
-        <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Viral 9:16 Visual Vibes</div>
-        <div class="grid grid-cols-2 gap-2">
-          <button data-vibe="cyberHyper" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-cyan text-left active:scale-95 transition">
-            <div class="text-[11px] font-bold text-cyber-cyan">CYBER HYPER</div>
-            <div class="text-[9px] text-slate-400">Neon cyan, tear sort &amp; chromatic drift</div>
-          </button>
+      <!-- ==================== TAB 4: VIBE & GRAPHICS ==================== -->
+      <div id="tabVibe" class="tab-content hidden space-y-3">
+        <!-- Vibe Presets -->
+        <div>
+          <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Viral 9:16 Visual Vibes</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button data-vibe="cyberHyper" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-cyan text-left active:scale-95 transition">
+              <div class="text-[11px] font-bold text-cyber-cyan">CYBER HYPER</div>
+              <div class="text-[9px] text-slate-400">Neon cyan, tear sort &amp; chromatic drift</div>
+            </button>
 
-          <button data-vibe="acidVapor" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
-            <div class="text-[11px] font-bold text-cyber-yellow">ACID VAPOR</div>
-            <div class="text-[9px] text-slate-400">Toxic lime dripping, high-key saturation</div>
-          </button>
+            <button data-vibe="acidVapor" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
+              <div class="text-[11px] font-bold text-cyber-yellow">ACID VAPOR</div>
+              <div class="text-[9px] text-slate-400">Toxic lime dripping, high-key saturation</div>
+            </button>
 
-          <button data-vibe="analogVhs" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
-            <div class="text-[11px] font-bold text-cyber-purple">ANALOG VHS</div>
-            <div class="text-[9px] text-slate-400">Heavy tape scanlines, P-frame melt</div>
-          </button>
+            <button data-vibe="analogVhs" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
+              <div class="text-[11px] font-bold text-cyber-purple">ANALOG VHS</div>
+              <div class="text-[9px] text-slate-400">Heavy tape scanlines, P-frame melt</div>
+            </button>
 
-          <button data-vibe="brutalRed" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
-            <div class="text-[11px] font-bold text-cyber-pink">BRUTAL RED</div>
-            <div class="text-[9px] text-slate-400">Editorial poster, jagged slice shears</div>
-          </button>
+            <button data-vibe="brutalRed" class="vibe-card p-2 rounded bg-cyber-card border border-cyber-border text-left active:scale-95 transition">
+              <div class="text-[11px] font-bold text-cyber-pink">BRUTAL RED</div>
+              <div class="text-[9px] text-slate-400">Editorial poster, jagged slice shears</div>
+            </button>
+          </div>
+
+          <div class="pt-1.5">
+            <button data-vibe="meltVoid" class="w-full py-1.5 rounded bg-black border border-white/20 text-slate-300 text-center font-bold text-[10px] active:scale-95 transition">
+              🌌 MELT VOID (TRANSPARENT PURE DRIFT)
+            </button>
+          </div>
         </div>
 
-        <div class="pt-1">
-          <button data-vibe="meltVoid" class="w-full py-1.5 rounded bg-black border border-white/20 text-slate-300 text-center font-bold text-[10px] active:scale-95 transition">
-            🌌 MELT VOID (TRANSPARENT PURE DRIFT)
-          </button>
+        <!-- Cyberpunk & Oriental Vector Graphic Frames / Art -->
+        <div class="pt-2 border-t border-cyber-border/70 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-cyber-cyan uppercase tracking-wider">CYBERPUNK &amp; ORIENTAL SHAPES</span>
+            <span class="text-[8.5px] text-slate-400">Frames / Vector Art</span>
+          </div>
+
+          <!-- Graphic Selector Buttons -->
+          <div class="grid grid-cols-3 gap-1.5">
+            <button data-graphic="none" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold">🚫 None</button>
+            <button data-graphic="cyberHeart" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">💖 Cyber Heart</button>
+            <button data-graphic="circuitTraces" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">⚡ Circuit Traces</button>
+            <button data-graphic="sakuraSumiE" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">🌸 Ink Sakura</button>
+            <button data-graphic="neoTokyoPoster" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">⛩️ Neo-Tokyo</button>
+            <button data-graphic="mechaHudGlyphs" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">🤖 Mecha HUD</button>
+          </div>
+
+          <!-- Layer Placement & Color Controls -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">LAYER PLACEMENT</label>
+              <select id="vibeGraphicLayerSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+                <option value="frame">🖼️ Overlay Frame (Front)</option>
+                <option value="background">🌌 Backdrop Art (Behind Text)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">LINE COLOR</label>
+              <div class="flex items-center space-x-1.5">
+                <input type="color" id="vibeGraphicColorInput" value="#00ffcc" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+                <button id="syncGraphicColorBtn" type="button" class="px-2 py-1 rounded bg-cyber-card border border-cyber-border text-[9px] text-slate-300 active:scale-95 shrink-0" title="Sync with glow color">Sync</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opacity Slider -->
+          <div class="space-y-0.5 pt-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Graphic Opacity</span>
+              <span id="vibeGraphicOpacityLabel" class="text-cyber-cyan">85%</span>
+            </div>
+            <input type="range" id="vibeGraphicOpacityRange" min="10" max="100" value="85">
+          </div>
         </div>
       </div>
 
@@ -1026,6 +1096,14 @@ RAW SIGNAL</textarea>
         bgColor1: '#04020a',
         bgColor2: '#ff0055',
         bgAccent: '#00ffcc'
+      },
+
+      // Cyber & Oriental Vector Graphics (Vibe module)
+      vibe: {
+        graphic: 'none', // 'none' | 'cyberHeart' | 'circuitTraces' | 'sakuraSumiE' | 'neoTokyoPoster' | 'mechaHudGlyphs'
+        graphicLayer: 'frame', // 'frame' | 'background'
+        graphicColor: '#00ffcc',
+        graphicOpacity: 85
       },
 
       // Mobile Interaction Modes (Drag or Jam XY Pad)
@@ -1716,6 +1794,558 @@ RAW SIGNAL</textarea>
       return c;
     }
 
+    // ==================== CYBERPUNK & ORIENTAL VECTOR GRAPHIC ENGINE ====================
+
+    // Helper: Radiant 4-point sparkle star (Ref Image 1 & 4)
+    function drawFourPointStar(ctx, x, y, rOuter, rInner) {
+      ctx.beginPath();
+      for (let i = 0; i < 4; i++) {
+        const a1 = (i * Math.PI) / 2;
+        const a2 = a1 + Math.PI / 4;
+        const x1 = x + Math.cos(a1) * rOuter;
+        const y1 = y + Math.sin(a1) * rOuter;
+        const x2 = x + Math.cos(a2) * rInner;
+        const y2 = y + Math.sin(a2) * rInner;
+        if (i === 0) ctx.moveTo(x1, y1);
+        else ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // Helper: 5-Petal Oriental Sakura Blossom (Ref Image 2)
+    function drawSakuraBlossom(ctx, cx, cy, radius, rotAngle = 0) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rotAngle);
+      for (let i = 0; i < 5; i++) {
+        ctx.save();
+        ctx.rotate((i * Math.PI * 2) / 5);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-radius * 0.45, -radius * 0.55, -radius * 0.35, -radius, 0, -radius);
+        ctx.bezierCurveTo(radius * 0.35, -radius, radius * 0.45, -radius * 0.55, 0, 0);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+      // Inner pistil center
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 1. Cyber Heart & Biomechanical Wings (Ref Image 1)
+    function renderCyberHeart(ctx, color, tick) {
+      const cx = WIDTH / 2;
+      const cy = HEIGHT * 0.5;
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2.2;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 12;
+
+      // Subtle breath pulse
+      const pulse = 1.0 + Math.sin(tick * 3.2) * 0.035;
+      ctx.translate(cx, cy);
+      ctx.scale(pulse, pulse);
+      ctx.translate(-cx, -cy);
+
+      // Symmetrical wire harness antenna wings (top and bottom)
+      const sides = [-1, 1];
+      sides.forEach(dir => {
+        // Upper biomechanical curves
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 80);
+        ctx.bezierCurveTo(cx + dir * 140, cy - 220, cx + dir * 260, cy - 160, cx + dir * 290, cy - 280);
+        ctx.bezierCurveTo(cx + dir * 220, cy - 360, cx + dir * 120, cy - 320, cx + dir * 60, cy - 380);
+        ctx.stroke();
+
+        // Secondary wire branches & nodes
+        ctx.beginPath();
+        ctx.moveTo(cx + dir * 180, cy - 180);
+        ctx.lineTo(cx + dir * 240, cy - 180);
+        ctx.lineTo(cx + dir * 280, cy - 140);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx + dir * 280, cy - 140, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx + dir * 290, cy - 280, 7, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx + dir * 290, cy - 280, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Lower harness curves
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + 90);
+        ctx.bezierCurveTo(cx + dir * 120, cy + 180, cx + dir * 240, cy + 140, cx + dir * 270, cy + 240);
+        ctx.bezierCurveTo(cx + dir * 210, cy + 320, cx + dir * 100, cy + 280, cx + dir * 40, cy + 340);
+        ctx.stroke();
+
+        // Cable bus bundles
+        for (let b = 1; b <= 3; b++) {
+          ctx.beginPath();
+          ctx.moveTo(cx + dir * (30 + b * 20), cy + 20);
+          ctx.lineTo(cx + dir * (60 + b * 30), cy + 80);
+          ctx.lineTo(cx + dir * (120 + b * 35), cy + 80);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(cx + dir * (120 + b * 35), cy + 80, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Central Cyber Heart chassis
+      ctx.save();
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + 65);
+      ctx.bezierCurveTo(cx - 100, cy + 10, cx - 110, cy - 65, cx, cy - 25);
+      ctx.bezierCurveTo(cx + 110, cy - 65, cx + 100, cy + 10, cx, cy + 65);
+      ctx.stroke();
+
+      // Inner mechanical core ring
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy - 5, 28, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy - 5, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy - 5, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sparkle cross stars
+      drawFourPointStar(ctx, cx, cy - 140, 22, 6);
+      drawFourPointStar(ctx, cx - 180, cy - 70, 16, 4);
+      drawFourPointStar(ctx, cx + 180, cy - 70, 16, 4);
+      drawFourPointStar(ctx, cx, cy + 160, 20, 5);
+
+      ctx.restore();
+      ctx.restore();
+    }
+
+    // 2. Neo-PCB Circuit Traces & Microchip Frame (Ref Image 1)
+    function renderCircuitTraces(ctx, color, tick) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 10;
+      ctx.lineWidth = 2;
+
+      const m = 32;
+      const w = WIDTH - m * 2;
+      const h = HEIGHT - m * 2;
+
+      // Outer boundary tech brackets
+      ctx.strokeRect(m, m, w, h);
+
+      // Corner Chamfer Cuts & Pin headers
+      const corners = [
+        { x: m, y: m, dx: 1, dy: 1 },
+        { x: WIDTH - m, y: m, dx: -1, dy: 1 },
+        { x: m, y: HEIGHT - m, dx: 1, dy: -1 },
+        { x: WIDTH - m, y: HEIGHT - m, dx: -1, dy: -1 }
+      ];
+
+      corners.forEach(c => {
+        for (let i = 0; i < 4; i++) {
+          const off = i * 22;
+          ctx.beginPath();
+          ctx.moveTo(c.x + c.dx * 15, c.y + c.dy * (30 + off));
+          ctx.lineTo(c.x + c.dx * (30 + off), c.y + c.dy * 15);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(c.x + c.dx * (30 + off), c.y + c.dy * 15, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Top & Bottom Microchip Sockets
+      const chips = [
+        { y: HEIGHT * 0.16, label: "IC-MOSFET // 9:16" },
+        { y: HEIGHT * 0.84, label: "BUS-CTRL // AVC" }
+      ];
+
+      chips.forEach(chip => {
+        const cw = 140, ch = 54;
+        ctx.strokeRect(WIDTH / 2 - cw / 2, chip.y - ch / 2, cw, ch);
+        ctx.fillStyle = 'rgba(4, 5, 8, 0.7)';
+        ctx.fillRect(WIDTH / 2 - cw / 2, chip.y - ch / 2, cw, ch);
+        ctx.fillStyle = color;
+
+        // Pin legs
+        for (let p = -4; p <= 4; p++) {
+          const px = WIDTH / 2 + p * 13;
+          ctx.beginPath();
+          ctx.moveTo(px, chip.y - ch / 2);
+          ctx.lineTo(px, chip.y - ch / 2 - 12);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(px, chip.y - ch / 2 - 12, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(px, chip.y + ch / 2);
+          ctx.lineTo(px, chip.y + ch / 2 + 12);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(px, chip.y + ch / 2 + 12, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.font = '700 8.5px "Space Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(chip.label, WIDTH / 2, chip.y + 3);
+      });
+
+      // Symmetrical 45-degree bus runs along left and right borders
+      [-1, 1].forEach(side => {
+        const edgeX = side === -1 ? m + 18 : WIDTH - m - 18;
+        for (let i = 0; i < 6; i++) {
+          const sy = HEIGHT * 0.32 + i * 36;
+          ctx.beginPath();
+          ctx.moveTo(edgeX, sy);
+          ctx.lineTo(edgeX + side * 45, sy + 30);
+          ctx.lineTo(edgeX + side * 45, sy + 70);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(edgeX + side * 45, sy + 70, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      ctx.restore();
+    }
+
+    // 3. Oriental Sumi-e Ink Sakura Branch (Ref Image 2)
+    function renderSakuraSumiE(ctx, color, tick) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 10;
+
+      // Graceful organic bonsai sakura branch curving from top-right downwards
+      ctx.beginPath();
+      ctx.lineWidth = 9;
+      ctx.moveTo(WIDTH + 20, 60);
+      ctx.bezierCurveTo(WIDTH * 0.65, 80, WIDTH * 0.55, 240, WIDTH * 0.42, 340);
+      ctx.bezierCurveTo(WIDTH * 0.32, 420, WIDTH * 0.18, 480, -20, 560);
+      ctx.stroke();
+
+      // Secondary branches
+      ctx.beginPath();
+      ctx.lineWidth = 4.5;
+      ctx.moveTo(WIDTH * 0.58, 200);
+      ctx.bezierCurveTo(WIDTH * 0.45, 140, WIDTH * 0.32, 160, WIDTH * 0.22, 120);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.lineWidth = 3.5;
+      ctx.moveTo(WIDTH * 0.44, 320);
+      ctx.bezierCurveTo(WIDTH * 0.52, 380, WIDTH * 0.62, 420, WIDTH * 0.72, 460);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.lineWidth = 2.5;
+      ctx.moveTo(WIDTH * 0.28, 440);
+      ctx.bezierCurveTo(WIDTH * 0.22, 520, WIDTH * 0.26, 600, WIDTH * 0.15, 680);
+      ctx.stroke();
+
+      // Lower counter-balancing branch rising from bottom-left
+      ctx.beginPath();
+      ctx.lineWidth = 6;
+      ctx.moveTo(-20, HEIGHT - 180);
+      ctx.bezierCurveTo(WIDTH * 0.25, HEIGHT - 220, WIDTH * 0.38, HEIGHT - 320, WIDTH * 0.48, HEIGHT - 260);
+      ctx.stroke();
+
+      // Sakura Blossoms along the nodes
+      const blossoms = [
+        { x: WIDTH * 0.82, y: 75, r: 24, a: 0.2 },
+        { x: WIDTH * 0.65, y: 135, r: 26, a: 0.8 },
+        { x: WIDTH * 0.52, y: 180, r: 22, a: -0.4 },
+        { x: WIDTH * 0.32, y: 145, r: 28, a: 0.5 },
+        { x: WIDTH * 0.20, y: 115, r: 20, a: -0.7 },
+        { x: WIDTH * 0.42, y: 340, r: 30, a: 0.1 },
+        { x: WIDTH * 0.58, y: 405, r: 24, a: 0.9 },
+        { x: WIDTH * 0.72, y: 460, r: 21, a: -0.3 },
+        { x: WIDTH * 0.26, y: 450, r: 25, a: 0.4 },
+        { x: WIDTH * 0.14, y: 550, r: 22, a: 1.2 },
+        { x: WIDTH * 0.24, y: HEIGHT - 210, r: 27, a: -0.6 },
+        { x: WIDTH * 0.46, y: HEIGHT - 265, r: 25, a: 0.3 }
+      ];
+
+      blossoms.forEach(b => {
+        ctx.save();
+        ctx.lineWidth = 1.5;
+        const wobble = Math.sin(tick * 2 + b.x) * 0.08;
+        drawSakuraBlossom(ctx, b.x, b.y, b.r, b.a + wobble);
+        ctx.restore();
+      });
+
+      // Drifting loose petals & ink spatter dots
+      const spatters = [
+        { x: WIDTH * 0.48, y: 260, r: 4 },
+        { x: WIDTH * 0.62, y: 290, r: 6 },
+        { x: WIDTH * 0.35, y: 380, r: 3.5 },
+        { x: WIDTH * 0.15, y: 420, r: 5 },
+        { x: WIDTH * 0.78, y: 520, r: 4.5 },
+        { x: WIDTH * 0.52, y: 640, r: 6 },
+        { x: WIDTH * 0.38, y: 720, r: 4 }
+      ];
+      spatters.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    // 4. Neo-Tokyo Technical Poster Frame (Ref Image 3)
+    function renderNeoTokyoPoster(ctx, color, tick) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
+      ctx.lineWidth = 2;
+
+      const m = 26;
+      const w = WIDTH - m * 2;
+      const h = HEIGHT - m * 2;
+
+      // Outer poster frame with technical corner notches
+      ctx.strokeRect(m, m, w, h);
+
+      // Top Technical Disclaimer Bar
+      ctx.beginPath();
+      ctx.moveTo(m, m + 75);
+      ctx.lineTo(WIDTH - m, m + 75);
+      ctx.stroke();
+
+      ctx.font = '700 8.5px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText("WE ARE BEING TRANSFORMED BY THE CONTINUOUS INFORMATION REVOLUTION", m + 14, m + 28);
+      ctx.fillText("OVERWHELMED BY A GROWING FLOOD OF SYMBOLS, IMAGES (       ) AND ILLUSIONS", m + 14, m + 45);
+      ctx.fillText("// PROTOCOL NEO-SANTIAGO 2026", m + 14, m + 62);
+
+      // Left Vertical Katakana/Kanji Telemetry Column
+      const leftColW = 44;
+      ctx.beginPath();
+      ctx.moveTo(m + leftColW, m + 75);
+      ctx.lineTo(m + leftColW, HEIGHT - m);
+      ctx.stroke();
+
+      const verticalKanji = ["情", "報", "革", "命", "電", "脳", "兆", "候", "画", "像", "幻", "想", "次", "元"];
+      ctx.font = '900 13px "Syne", sans-serif';
+      ctx.textAlign = 'center';
+      verticalKanji.forEach((char, idx) => {
+        const ky = m + 105 + idx * 26;
+        if (ky < HEIGHT - m - 120) {
+          ctx.fillText(char, m + leftColW / 2, ky);
+        }
+      });
+
+      // Triple circular status badges in left column
+      for (let c = 0; c < 3; c++) {
+        const cy = HEIGHT - m - 80 + c * 24;
+        ctx.beginPath();
+        ctx.arc(m + leftColW / 2, cy, 7, 0, Math.PI * 2);
+        ctx.stroke();
+        if (c === 0) ctx.fill();
+      }
+
+      // Large Inverted Triangle Crosshair (Image 3)
+      ctx.save();
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(WIDTH * 0.28, m + 85);
+      ctx.lineTo(WIDTH - m - 12, m + 85);
+      ctx.lineTo(WIDTH * 0.58, HEIGHT * 0.55);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Crosshair center circle inside triangle
+      ctx.beginPath();
+      ctx.arc(WIDTH * 0.58, HEIGHT * 0.42, 14, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(WIDTH * 0.58, HEIGHT * 0.42 - 20); ctx.lineTo(WIDTH * 0.58, HEIGHT * 0.42 + 20);
+      ctx.moveTo(WIDTH * 0.58 - 20, HEIGHT * 0.42); ctx.lineTo(WIDTH * 0.58 + 20, HEIGHT * 0.42);
+      ctx.stroke();
+      ctx.restore();
+
+      // Bottom Area: Horizontal ventilation frequency louvers (Image 3)
+      const louverY = HEIGHT * 0.62;
+      const louverW = WIDTH * 0.48;
+      const louverH = 140;
+      const bars = 11;
+      const barStep = louverH / bars;
+
+      ctx.beginPath();
+      ctx.rect(m + leftColW + 12, louverY, louverW, louverH);
+      ctx.stroke();
+
+      for (let b = 0; b < bars; b++) {
+        if (b % 2 === 0) {
+          ctx.fillRect(m + leftColW + 14, louverY + b * barStep + 2, louverW - 4, barStep - 3);
+        }
+      }
+
+      // Right bottom Kanji block (兆候 / 画像 / 幻想)
+      const rightBlockX = m + leftColW + louverW + 24;
+      const rightKanji = ["兆候", "画像", "幻想"];
+      ctx.font = '900 24px "Syne", sans-serif';
+      ctx.textAlign = 'left';
+      rightKanji.forEach((k, idx) => {
+        const ry = louverY + 32 + idx * 44;
+        ctx.fillText(k, rightBlockX, ry);
+        ctx.beginPath();
+        ctx.moveTo(rightBlockX, ry + 8);
+        ctx.lineTo(WIDTH - m - 14, ry + 8);
+        ctx.stroke();
+      });
+
+      // Bottom banner text
+      ctx.font = '900 28px "Syne", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText("が溢れている // 2026", WIDTH / 2, HEIGHT - m - 18);
+
+      ctx.restore();
+    }
+
+    // 5. Mecha HUD Stencil & Target Brackets (Ref Image 4)
+    function renderMechaHudGlyphs(ctx, color, tick) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 10;
+      ctx.lineWidth = 2.5;
+
+      const m = 30;
+      const bracketLen = 65;
+
+      // 4 High-tech Corner L-Brackets with tick marks
+      // Top-Left
+      ctx.beginPath();
+      ctx.moveTo(m + bracketLen, m); ctx.lineTo(m, m); ctx.lineTo(m, m + bracketLen);
+      ctx.stroke();
+      ctx.strokeRect(m + 8, m + 8, 8, 8);
+
+      // Top-Right
+      ctx.beginPath();
+      ctx.moveTo(WIDTH - m - bracketLen, m); ctx.lineTo(WIDTH - m, m); ctx.lineTo(WIDTH - m, m + bracketLen);
+      ctx.stroke();
+      ctx.strokeRect(WIDTH - m - 16, m + 8, 8, 8);
+
+      // Bottom-Left
+      ctx.beginPath();
+      ctx.moveTo(m, HEIGHT - m - bracketLen); ctx.lineTo(m, HEIGHT - m); ctx.lineTo(m + bracketLen, HEIGHT - m);
+      ctx.stroke();
+      ctx.strokeRect(m + 8, HEIGHT - m - 16, 8, 8);
+
+      // Bottom-Right
+      ctx.beginPath();
+      ctx.moveTo(WIDTH - m - bracketLen, HEIGHT - m); ctx.lineTo(WIDTH - m, HEIGHT - m); ctx.lineTo(WIDTH - m, HEIGHT - m - bracketLen);
+      ctx.stroke();
+      ctx.strokeRect(WIDTH - m - 16, HEIGHT - m - 16, 8, 8);
+
+      // Segmented Calibration Ticks along top & bottom
+      for (let i = 0; i <= 8; i++) {
+        const tx = m + bracketLen + 20 + i * 40;
+        if (tx < WIDTH - m - bracketLen - 20) {
+          ctx.beginPath();
+          ctx.moveTo(tx, m); ctx.lineTo(tx, m + 8);
+          ctx.moveTo(tx, HEIGHT - m); ctx.lineTo(tx, HEIGHT - m - 8);
+          ctx.stroke();
+        }
+      }
+
+      // Center Crosshair Reticle with Degree Marks
+      const cx = WIDTH / 2;
+      const cy = HEIGHT / 2;
+      const rot = tick * 0.25;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, 110, 0, Math.PI * 0.4);
+      ctx.arc(0, 0, 110, Math.PI * 0.5, Math.PI * 0.9);
+      ctx.arc(0, 0, 110, Math.PI, Math.PI * 1.4);
+      ctx.arc(0, 0, 110, Math.PI * 1.5, Math.PI * 1.9);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(-25, 0); ctx.lineTo(25, 0);
+      ctx.moveTo(0, -25); ctx.lineTo(0, 25);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 6, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Stencil Tech Glyphs and Badges (Ref Image 4)
+      ctx.font = '700 9px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText("[ SYS://9:16_VIBE_MOSH ]", m + 22, m + 22);
+      ctx.fillText("GRID: 720x1280 // SEC_01", m + 22, m + 36);
+
+      ctx.textAlign = 'right';
+      ctx.fillText("SPECIMEN_01 [AVANT]", WIDTH - m - 22, m + 22);
+      ctx.fillText("CALIB: 100% OK", WIDTH - m - 22, m + 36);
+
+      ctx.textAlign = 'left';
+      ctx.fillText("STATUS: ARMED // REC", m + 22, HEIGHT - m - 24);
+      ctx.textAlign = 'right';
+      ctx.fillText("TARGET: LOCKED [+] 090°", WIDTH - m - 22, HEIGHT - m - 24);
+
+      ctx.restore();
+    }
+
+    // Master Vector Graphic Renderer
+    function renderVibeGraphic(targetCtx, vibeState, tick) {
+      if (!vibeState || vibeState.graphic === 'none') return;
+
+      const alpha = (vibeState.graphicOpacity || 85) / 100;
+      targetCtx.save();
+      targetCtx.globalAlpha = alpha;
+
+      const color = vibeState.graphicColor || '#00ffcc';
+
+      if (vibeState.graphic === 'cyberHeart') {
+        renderCyberHeart(targetCtx, color, tick);
+      } else if (vibeState.graphic === 'circuitTraces') {
+        renderCircuitTraces(targetCtx, color, tick);
+      } else if (vibeState.graphic === 'sakuraSumiE') {
+        renderSakuraSumiE(targetCtx, color, tick);
+      } else if (vibeState.graphic === 'neoTokyoPoster') {
+        renderNeoTokyoPoster(targetCtx, color, tick);
+      } else if (vibeState.graphic === 'mechaHudGlyphs') {
+        renderMechaHudGlyphs(targetCtx, color, tick);
+      }
+
+      targetCtx.restore();
+    }
+
     function renderTypographyLayer(tCtx, t, tick) {
       tCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
@@ -2138,25 +2768,54 @@ RAW SIGNAL</textarea>
       cleanCompositeCtx.clearRect(0, 0, WIDTH, HEIGHT);
       cleanCompositeCtx.drawImage(bgCanvas, 0, 0);
 
-      // Composite photo under typography if blend mode is 'behind' or 'photoOnly'
-      if (state.photo.active && state.photo.loaded && (state.photo.blend === 'behind' || state.photo.blend === 'photoOnly')) {
-        cleanCompositeCtx.save();
-        cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
-        cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
-        cleanCompositeCtx.restore();
+      // If Cyber/Oriental graphic is set to 'background' layer, draw into backdrop
+      if (state.vibe && state.vibe.graphic !== 'none' && state.vibe.graphicLayer === 'background') {
+        renderVibeGraphic(cleanCompositeCtx, state.vibe, state.mosh.tick);
       }
 
-      // Draw typography layer (unless photoOnly)
-      if (!state.photo.active || !state.photo.loaded || state.photo.blend !== 'photoOnly') {
+      const hasPhoto = state.photo.active && state.photo.loaded;
+
+      if (hasPhoto) {
+        const blend = state.photo.blend || 'behind';
+
+        if (blend === 'behind') {
+          // 1. Photo under typography (basic)
+          cleanCompositeCtx.save();
+          cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
+          cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
+          cleanCompositeCtx.restore();
+
+          // 2. Typography on top, fully visible & crisp
+          cleanCompositeCtx.drawImage(textCanvas, 0, 0);
+
+        } else if (blend === 'inFront') {
+          // Photo in front: text cuts through as an invert / luminance difference pass
+          cleanCompositeCtx.save();
+          cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
+          cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
+          cleanCompositeCtx.restore();
+
+          // Invert / Difference pass of text over the photo
+          cleanCompositeCtx.save();
+          cleanCompositeCtx.globalCompositeOperation = 'difference';
+          cleanCompositeCtx.drawImage(textCanvas, 0, 0);
+          cleanCompositeCtx.restore();
+
+        } else if (blend === 'photoOnly') {
+          // Photo Only: hide text completely
+          cleanCompositeCtx.save();
+          cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
+          cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
+          cleanCompositeCtx.restore();
+        }
+      } else {
+        // No photo: standard typography
         cleanCompositeCtx.drawImage(textCanvas, 0, 0);
       }
 
-      // Composite photo over typography if blend mode is 'inFront'
-      if (state.photo.active && state.photo.loaded && state.photo.blend === 'inFront') {
-        cleanCompositeCtx.save();
-        cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
-        cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
-        cleanCompositeCtx.restore();
+      // If Cyber/Oriental graphic is set to 'frame' layer, draw as framing overlay
+      if (state.vibe && state.vibe.graphic !== 'none' && state.vibe.graphicLayer === 'frame') {
+        renderVibeGraphic(cleanCompositeCtx, state.vibe, state.mosh.tick);
       }
 
       if (state.interaction.holdClean) {
@@ -3074,6 +3733,33 @@ RAW SIGNAL</textarea>
         });
       });
 
+      // Cyber & Oriental Graphic Selection
+      document.querySelectorAll('.vibe-graphic-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.vibe.graphic = btn.dataset.graphic;
+          document.querySelectorAll('.vibe-graphic-btn').forEach(b => {
+            b.className = 'vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+          });
+          btn.className = 'vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold';
+        });
+      });
+      const vibeGraphicLayerSelect = document.getElementById('vibeGraphicLayerSelect');
+      if (vibeGraphicLayerSelect) {
+        vibeGraphicLayerSelect.addEventListener('change', (e) => state.vibe.graphicLayer = e.target.value);
+      }
+      const vibeGraphicColorInput = document.getElementById('vibeGraphicColorInput');
+      if (vibeGraphicColorInput) {
+        vibeGraphicColorInput.addEventListener('input', (e) => state.vibe.graphicColor = e.target.value);
+      }
+      const syncGraphicColorBtn = document.getElementById('syncGraphicColorBtn');
+      if (syncGraphicColorBtn) {
+        syncGraphicColorBtn.addEventListener('click', () => {
+          state.vibe.graphicColor = state.type.glowColor || state.fx.bgAccent || '#00ffcc';
+          if (vibeGraphicColorInput) vibeGraphicColorInput.value = state.vibe.graphicColor;
+        });
+      }
+      bind('vibeGraphicOpacityRange', state.vibe, 'graphicOpacity', 'vibeGraphicOpacityLabel', '%');
+
       // Quote Roll
       document.getElementById('sloganRandomBtn').addEventListener('click', () => {
         const rand = SLOGANS[Math.floor(Math.random() * SLOGANS.length)];
@@ -3106,6 +3792,7 @@ RAW SIGNAL</textarea>
       if (id.startsWith('mosh') || id.startsWith('motion') || id.startsWith('speed3D')) return '#ff0055';
       if (id.startsWith('rgb') || id.startsWith('scanlines') || id.startsWith('noise')) return '#39ff14';
       if (id.startsWith('ascii') || id.startsWith('photo')) return '#ffe600';
+      if (id.startsWith('vibe')) return '#00ffcc';
       return '#00ffcc';
     }
 
