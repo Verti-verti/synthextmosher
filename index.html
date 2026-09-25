@@ -60,13 +60,19 @@
       -webkit-user-select: text;
     }
 
-    /* Prevent mobile bounce / pull down refresh on touch screens */
+    /* Prevent mobile bounce / pull down refresh on touch screens & support iOS dynamic viewport */
     html, body {
-      overscroll-behavior: contain;
+      overscroll-behavior: none;
       touch-action: pan-y;
       height: 100%;
+      height: 100dvh;
+      min-height: -webkit-fill-available;
       overflow: hidden;
       background-color: #06070a;
+    }
+
+    #canvasBox, #moshCanvas {
+      touch-action: none;
     }
 
     /* Sliders */
@@ -131,10 +137,6 @@
       border: 2px solid #fff;
       background: radial-gradient(circle, rgba(255,0,85,0.55), rgba(255,0,85,0.15) 60%, transparent 75%);
       box-shadow: 0 0 18px #ff0055, 0 0 4px #fff;
-    }
-    #touchCrosshair.mode-brush {
-      border-color: rgba(0, 255, 204, 0.8);
-      box-shadow: 0 0 12px #00ffcc;
     }
 
     /* ===== Synth Knob Component ===== */
@@ -471,6 +473,37 @@ RAW SIGNAL</textarea>
           </div>
         </div>
 
+        <!-- Alignment & Motion Composition -->
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-cyber-border/40">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">ALIGNMENT</label>
+            <div class="grid grid-cols-3 gap-1">
+              <button type="button" data-align="left" class="align-btn py-1 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">LEFT</button>
+              <button type="button" data-align="center" class="align-btn py-1 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold">CENTER</button>
+              <button type="button" data-align="right" class="align-btn py-1 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">RIGHT</button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5">MOTION COMPOSITION</label>
+            <select id="textMotionSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+              <option value="float">Float Wobble (Harmonic)</option>
+              <option value="pulse">Kinetic Bass Pulse</option>
+              <option value="jitter">Glitch Jitter (Cyber Stutter)</option>
+              <option value="wave">Sinusoidal Liquid Wave</option>
+              <option value="cascade">Diagonal Cascade Drift</option>
+              <option value="bounce">Kinetic Rebound Bounce</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Random Letter Sizes (Zine / Ransom Mode) -->
+        <div class="flex items-center justify-between pt-0.5">
+          <label class="flex items-center space-x-1.5 text-[10px] text-slate-300 cursor-pointer">
+            <input type="checkbox" id="randomLetterSizeCheck" class="accent-cyber-cyan">
+            <span>🎲 Random Letter Sizes (Zine / Ransom Chaos)</span>
+          </label>
+        </div>
+
         <!-- Font Size & Spacing -->
         <div class="grid grid-cols-2 gap-3">
           <div class="space-y-0.5">
@@ -537,12 +570,16 @@ RAW SIGNAL</textarea>
 
         <!-- Photo Upload & Presets -->
         <div class="space-y-1.5">
-          <div class="flex items-center gap-2">
-            <label class="flex-1 tap-btn py-2 px-3 rounded-lg bg-cyber-yellow/15 border border-cyber-yellow text-cyber-yellow font-bold text-xs flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 transition hover:bg-cyber-yellow hover:text-black">
-              <span>📁 Upload Photo</span>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="tap-btn py-2 px-1.5 rounded-lg bg-cyber-yellow/20 border border-cyber-yellow text-cyber-yellow font-bold text-xs flex items-center justify-center space-x-1 cursor-pointer active:scale-95 transition hover:bg-cyber-yellow hover:text-black">
+              <span>📸 Camera</span>
+              <input type="file" id="photoCameraInput" accept="image/*" capture="environment" class="hidden">
+            </label>
+            <label class="tap-btn py-2 px-1.5 rounded-lg bg-cyber-card border border-cyber-border text-slate-200 font-bold text-xs flex items-center justify-center space-x-1 cursor-pointer active:scale-95 transition hover:border-cyber-yellow hover:text-cyber-yellow">
+              <span>🖼️ Gallery</span>
               <input type="file" id="photoFileInput" accept="image/*" class="hidden">
             </label>
-            <button id="photoClearBtn" class="tap-btn px-3 py-2 rounded-lg bg-cyber-card border border-cyber-border text-xs text-slate-400 active:scale-95 transition hover:text-white">
+            <button id="photoClearBtn" class="tap-btn px-2 py-2 rounded-lg bg-cyber-card border border-cyber-border text-xs text-slate-400 active:scale-95 transition hover:text-white">
               ✕ Clear
             </button>
           </div>
@@ -886,20 +923,25 @@ RAW SIGNAL</textarea>
 
       <div class="relative w-full max-h-[48vh] aspect-9-16 mx-auto rounded-lg overflow-hidden border border-cyber-border bg-black flex items-center justify-center">
         <img id="exportPreviewImg" class="w-full h-full object-contain hidden" alt="Snapshot Preview">
-        <video id="exportPreviewVid" class="w-full h-full object-contain hidden" controls playsinline loop autoplay muted></video>
+        <video id="exportPreviewVid" class="w-full h-full object-contain hidden" controls playsinline webkit-playsinline loop autoplay muted></video>
       </div>
 
       <p class="text-[10px] text-slate-400 text-center">
-        On mobile Safari or Chrome: <strong class="text-cyber-cyan">Tap Save File</strong> or long-press the preview to <strong class="text-white">"Save to Photos"</strong>. Ready for Instagram, TikTok, Reels & WhatsApp!
+        On iPhone & Mobile: <strong class="text-cyber-cyan">Tap "Save to Photos"</strong> or Save File. Ready for Instagram Stories, Reels, TikTok & WhatsApp!
       </p>
 
-      <div class="flex space-x-2">
-        <a id="modalDownloadLink" download="VIBE_MOSH_9_16.png" class="flex-1 py-2 rounded-lg bg-cyber-cyan text-black font-bold text-xs text-center flex items-center justify-center space-x-1 shadow-lg active:scale-95 transition">
-          <span>⬇ Save File</span>
-        </a>
-        <button id="modalDoneBtn" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-200 text-xs font-semibold active:scale-95 transition">
-          Close
+      <div class="flex flex-col gap-2">
+        <button id="modalShareBtn" class="hidden w-full py-2.5 rounded-lg bg-cyber-pink text-black font-bold text-xs text-center flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(255,0,85,0.4)] active:scale-95 transition">
+          <span>📲 Save to Photos / Share to Instagram</span>
         </button>
+        <div class="flex space-x-2">
+          <a id="modalDownloadLink" download="VIBE_MOSH_9_16.mp4" class="flex-1 py-2 rounded-lg bg-cyber-cyan text-black font-bold text-xs text-center flex items-center justify-center space-x-1 shadow-lg active:scale-95 transition">
+            <span>⬇ Save File</span>
+          </a>
+          <button id="modalDoneBtn" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-200 text-xs font-semibold active:scale-95 transition">
+            Close
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -917,6 +959,9 @@ RAW SIGNAL</textarea>
         layout: 'stack', // 'stack', 'marquee', 'vertical', 'spiral', 'cube', 'sphere'
         fontSize: 95,
         letterSpacing: 4,
+        align: 'center', // 'left', 'center', 'right'
+        motion: 'float', // 'float', 'pulse', 'jitter', 'wave', 'cascade', 'bounce'
+        randomSize: false,
         fillMode: 'solid', // 'solid', 'gradient', 'rainbow'
         fillColor: '#ffffff',
         fillColor2: '#ffe600',
@@ -983,9 +1028,9 @@ RAW SIGNAL</textarea>
         bgAccent: '#00ffcc'
       },
 
-      // Mobile Interaction Modes
+      // Mobile Interaction Modes (Drag or Jam XY Pad)
       interaction: {
-        mode: 'drag', // 'drag' | 'brush' | 'jam'
+        mode: 'drag', // 'drag' | 'jam'
         isInteracting: false,
         lastX: 0,
         lastY: 0,
@@ -1040,10 +1085,6 @@ RAW SIGNAL</textarea>
     photoSourceCanvas.width = WIDTH; photoSourceCanvas.height = HEIGHT;
     const photoSourceCtx = photoSourceCanvas.getContext('2d', { willReadFrequently: true });
 
-    // Scratch Brush Canvas
-    const brushMaskCanvas = document.createElement('canvas');
-    brushMaskCanvas.width = WIDTH; brushMaskCanvas.height = HEIGHT;
-    const brushMaskCtx = brushMaskCanvas.getContext('2d');
 
     // ASCII Character Ramps
     const CHAR_RAMPS = {
@@ -1224,7 +1265,8 @@ RAW SIGNAL</textarea>
       const fov = 700;
       const radius = t.radius3D || 260;
       const heightSpan = 850;
-      const turns = 3.2;
+      const fullChars = chars;
+      const turns = Math.min(3.5, Math.max(0.8, fullChars.length * 0.12));
 
       // Auto spin + interactive tilt
       const rotY = t.rotY + tick * 0.35 * t.speed3D;
@@ -1232,9 +1274,6 @@ RAW SIGNAL</textarea>
       const rotZ = t.rotZ;
 
       const points = [];
-      const totalChars = Math.max(chars.length, 36);
-      const repeatCount = Math.ceil(totalChars / chars.length);
-      const fullChars = Array(repeatCount).fill(chars).flat().slice(0, totalChars);
 
       for (let i = 0; i < fullChars.length; i++) {
         const progress = i / (fullChars.length - 1 || 1);
@@ -1326,15 +1365,16 @@ RAW SIGNAL</textarea>
         };
       });
 
-      // 6 Faces: [v0, v1, v2, v3], normal, label text
-      const lines = t.text.toUpperCase().split('\n');
+      // 6 Faces: assign ONLY the user's actual text lines (no filler words)
+      const rawLines = t.text.toUpperCase().split('\n').map(l => l.trim()).filter(Boolean);
+      const userLines = rawLines.length > 0 ? rawLines : ['VIBE//MOSH'];
       const faces = [
-        { indices: [0, 1, 2, 3], normal: { x: 0, y: 0, z: -1 }, text: lines[0] || 'VIBE' }, // front
-        { indices: [5, 4, 7, 6], normal: { x: 0, y: 0, z:  1 }, text: lines[1] || lines[0] || 'MOSH' }, // back
-        { indices: [4, 0, 3, 7], normal: { x: -1, y: 0, z: 0 }, text: lines[2] || lines[0] || 'SIGNAL' }, // left
-        { indices: [1, 5, 6, 2], normal: { x:  1, y: 0, z: 0 }, text: lines[3] || lines[1] || 'CORRUPT' }, // right
-        { indices: [4, 5, 1, 0], normal: { x: 0, y: -1, z: 0 }, text: 'GLITCH' }, // top
-        { indices: [3, 2, 6, 7], normal: { x: 0, y:  1, z: 0 }, text: 'RAW 9:16' }  // bottom
+        { indices: [0, 1, 2, 3], normal: { x: 0, y: 0, z: -1 }, text: userLines[0 % userLines.length] }, // front
+        { indices: [5, 4, 7, 6], normal: { x: 0, y: 0, z:  1 }, text: userLines[1 % userLines.length] }, // back
+        { indices: [4, 0, 3, 7], normal: { x: -1, y: 0, z: 0 }, text: userLines[2 % userLines.length] }, // left
+        { indices: [1, 5, 6, 2], normal: { x:  1, y: 0, z: 0 }, text: userLines[3 % userLines.length] }, // right
+        { indices: [4, 5, 1, 0], normal: { x: 0, y: -1, z: 0 }, text: userLines[4 % userLines.length] }, // top
+        { indices: [3, 2, 6, 7], normal: { x: 0, y:  1, z: 0 }, text: userLines[5 % userLines.length] }  // bottom
       ];
 
       // Sort faces by depth of face center
@@ -1421,42 +1461,43 @@ RAW SIGNAL</textarea>
     function render3DSphere(tCtx, t, tick) {
       const fov = 700;
       const radius = t.radius3D || 260;
-      const rawText = t.text.replace(/\n/g, ' • ').toUpperCase();
-      const chars = rawText.split('');
-      if (!chars.length) return;
+      const rawLines = t.text.toUpperCase().split('\n').map(l => l.trim()).filter(Boolean);
+      if (!rawLines.length) return;
 
       const rotX = t.rotX;
       const rotY = t.rotY + tick * 0.4 * t.speed3D;
       const rotZ = t.rotZ;
 
-      // Arrange text on latitude rings around the sphere
-      const rings = 7;
       const points = [];
+      const numLines = rawLines.length;
 
-      for (let r = 0; r < rings; r++) {
-        const phi = ((r + 0.5) / rings - 0.5) * Math.PI * 0.85; // latitude angle
+      // Render ONLY user's actual lines along spherical latitude rings (no filler characters)
+      rawLines.forEach((line, lineIdx) => {
+        const chars = line.split('');
+        if (!chars.length) return;
+
+        const phi = numLines === 1 
+          ? 0 
+          : ((lineIdx / (numLines - 1)) - 0.5) * (Math.PI * 0.45);
+
         const ringRadius = radius * Math.cos(phi);
         const ringY = radius * Math.sin(phi);
-        const charsInRing = Math.max(6, Math.round(chars.length * Math.cos(phi) * 1.5));
 
-        for (let c = 0; c < charsInRing; c++) {
-          const theta = (c / charsInRing) * Math.PI * 2;
+        chars.forEach((char, cIdx) => {
+          const theta = (cIdx / chars.length) * Math.PI * 2;
           const rawX = Math.cos(theta) * ringRadius;
           const rawZ = Math.sin(theta) * ringRadius;
 
           const p3d = rotate3D(rawX, ringY, rawZ, rotX, rotY, rotZ);
-          const char = chars[(c + r * 3) % chars.length];
-
           points.push({
             char,
+            index: cIdx,
             x: p3d.x,
             y: p3d.y,
-            z: p3d.z,
-            ring: r,
-            col: c
+            z: p3d.z
           });
-        }
-      }
+        });
+      });
 
       points.sort((a, b) => b.z - a.z);
 
@@ -1715,7 +1756,6 @@ RAW SIGNAL</textarea>
       // 2D Typography Modes
       const lines = t.text.toUpperCase().split('\n');
       tCtx.save();
-      tCtx.font = `900 ${t.fontSize}px ${t.fontFamily}`;
       tCtx.textBaseline = 'middle';
 
       if ('letterSpacing' in tCtx) {
@@ -1723,50 +1763,149 @@ RAW SIGNAL</textarea>
       }
 
       // Neon Shadow
-      if (t.glowRadius > 0) {
+      if (t.glowRadius > 0 && !state.isTyping) {
         tCtx.shadowColor = t.glowColor;
         tCtx.shadowBlur = t.glowRadius;
       } else {
         tCtx.shadowBlur = 0;
       }
 
-      // Float wobble
-      const wobbleX = Math.sin(tick * 2.5) * 6;
-      const wobbleY = Math.cos(tick * 2) * 5;
+      // Motion Compositions:
+      // 'float' (harmonic wave), 'pulse' (heavy sub-bass hit), 'jitter' (cyber glitch twitch),
+      // 'wave' (liquid serpentine ripple), 'cascade' (diagonal drift), 'bounce' (rebound snap)
+      let wobbleX = 0;
+      let wobbleY = 0;
+      let scaleMod = 1.0;
+      const motion = t.motion || 'float';
+
+      if (motion === 'float') {
+        wobbleX = Math.sin(tick * 2.5) * 8;
+        wobbleY = Math.cos(tick * 2.0) * 7;
+      } else if (motion === 'pulse') {
+        const beat = Math.pow(Math.sin(tick * 3.8), 6);
+        scaleMod = 1.0 + beat * 0.14;
+      } else if (motion === 'jitter') {
+        const glitchBurst = (Math.sin(tick * 7.5) + Math.cos(tick * 11.2)) > 1.2;
+        wobbleX = glitchBurst ? (Math.random() - 0.5) * 22 : (Math.random() - 0.5) * 4;
+        wobbleY = glitchBurst ? (Math.random() - 0.5) * 16 : (Math.random() - 0.5) * 3;
+      } else if (motion === 'wave') {
+        wobbleX = Math.cos(tick * 2.8) * 12;
+        wobbleY = Math.sin(tick * 3.4) * 14;
+      } else if (motion === 'cascade') {
+        wobbleX = ((tick * 45) % 140) - 70;
+        wobbleY = ((tick * 38) % 110) - 55;
+      } else if (motion === 'bounce') {
+        const bounceVal = Math.abs(Math.sin(tick * 3.2));
+        wobbleY = -bounceVal * 28;
+        scaleMod = 0.96 + bounceVal * 0.1;
+      }
+
+      if (scaleMod !== 1.0) {
+        tCtx.translate(t.x, t.y);
+        tCtx.scale(scaleMod, scaleMod);
+        tCtx.translate(-t.x, -t.y);
+      }
+
+      // Alignment handling: 'left' | 'center' | 'right'
+      const align = t.align || 'center';
+      tCtx.textAlign = align;
+      let baseX = t.x;
+      if (align === 'left') {
+        baseX = Math.max(50, t.x - 260);
+      } else if (align === 'right') {
+        baseX = Math.min(WIDTH - 50, t.x + 260);
+      }
+
+      // Helper for deterministic random letter size
+      const getCharScale = (lineIdx, cIdx, char) => {
+        if (!t.randomSize) return 1.0;
+        const code = char.charCodeAt(0) || 65;
+        const hash = ((lineIdx * 73 + cIdx * 37 + code * 19) % 100);
+        return 0.68 + (hash / 100) * 0.74; // 0.68x to 1.42x
+      };
 
       if (t.layout === 'stack') {
-        tCtx.textAlign = 'center';
         const lineH = t.fontSize * 1.05;
         const totalH = (lines.length - 1) * lineH;
         const startY = t.y - totalH / 2;
 
         lines.forEach((line, i) => {
-          const ly = startY + i * lineH + wobbleY;
-          const lx = t.x + wobbleX;
-          if (t.strokeWidth > 0) {
-            tCtx.strokeStyle = t.strokeColor;
-            tCtx.lineWidth = t.strokeWidth;
-            tCtx.strokeText(line, lx, ly);
+          let lineWobbleX = wobbleX;
+          let lineWobbleY = wobbleY;
+          if (motion === 'wave') {
+            lineWobbleX = Math.cos(tick * 2.8 + i * 0.9) * 14;
+            lineWobbleY = Math.sin(tick * 3.4 + i * 0.9) * 16;
           }
-          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, lx, ly, t.fontSize, i);
-          tCtx.fillText(line, lx, ly);
+          const ly = startY + i * lineH + lineWobbleY;
+          const lx = baseX + lineWobbleX;
+
+          if (!t.randomSize) {
+            tCtx.font = `900 ${t.fontSize}px ${t.fontFamily}`;
+            if (t.strokeWidth > 0) {
+              tCtx.strokeStyle = t.strokeColor;
+              tCtx.lineWidth = t.strokeWidth;
+              tCtx.strokeText(line, lx, ly);
+            }
+            tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, lx, ly, t.fontSize, i);
+            tCtx.fillText(line, lx, ly);
+          } else {
+            // Render individual characters with random sizing (Zine / Ransom note mode)
+            const chars = line.split('');
+            const charScales = chars.map((ch, cIdx) => getCharScale(i, cIdx, ch));
+            
+            // Measure total width
+            const widths = chars.map((ch, cIdx) => {
+              tCtx.font = `900 ${Math.round(t.fontSize * charScales[cIdx])}px ${t.fontFamily}`;
+              return tCtx.measureText(ch).width + (t.letterSpacing || 0);
+            });
+            const totalWidth = widths.reduce((a, b) => a + b, 0);
+
+            let curX = lx;
+            if (align === 'center') curX = lx - totalWidth / 2;
+            else if (align === 'right') curX = lx - totalWidth;
+
+            chars.forEach((ch, cIdx) => {
+              const chScale = charScales[cIdx];
+              const chSize = Math.round(t.fontSize * chScale);
+              const chW = widths[cIdx];
+              const chX = curX + chW / 2;
+              const chY = ly + ((cIdx % 2 === 0 ? -1 : 1) * (1 - chScale) * 12);
+
+              tCtx.save();
+              tCtx.font = `900 ${chSize}px ${t.fontFamily}`;
+              tCtx.textAlign = 'center';
+              if (t.strokeWidth > 0) {
+                tCtx.strokeStyle = t.strokeColor;
+                tCtx.lineWidth = Math.max(1, t.strokeWidth * chScale);
+                tCtx.strokeText(ch, chX, chY);
+              }
+              tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, chX, chY, chSize, i + cIdx);
+              tCtx.fillText(ch, chX, chY);
+              tCtx.restore();
+
+              curX += chW;
+            });
+          }
         });
 
       } else if (t.layout === 'marquee') {
         // Vertical kinetic rolling text
         tCtx.textAlign = 'center';
+        tCtx.font = `900 ${t.fontSize}px ${t.fontFamily}`;
         const fullPhrase = lines.join(' • ') + ' • ';
         const textH = t.fontSize * 1.6;
         const rollSpeed = (tick * 120) % HEIGHT;
 
         for (let y = -rollSpeed - textH; y < HEIGHT + textH * 2; y += textH) {
+          const my = y + wobbleY;
+          const mx = t.x + wobbleX;
           if (t.strokeWidth > 0) {
             tCtx.strokeStyle = t.strokeColor;
             tCtx.lineWidth = t.strokeWidth;
-            tCtx.strokeText(fullPhrase, t.x, y);
+            tCtx.strokeText(fullPhrase, mx, my);
           }
-          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, t.x, y, t.fontSize, 0);
-          tCtx.fillText(fullPhrase, t.x, y);
+          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, mx, my, t.fontSize, 0);
+          tCtx.fillText(fullPhrase, mx, my);
         }
 
       } else if (t.layout === 'vertical') {
@@ -1777,14 +1916,18 @@ RAW SIGNAL</textarea>
         const startY = t.y - (chars.length * stepY) / 2;
 
         chars.forEach((c, idx) => {
+          const chScale = getCharScale(0, idx, c);
+          const chSize = Math.round(t.fontSize * chScale);
+          tCtx.font = `900 ${chSize}px ${t.fontFamily}`;
           const cy = startY + idx * stepY + wobbleY;
+          const cx = baseX + wobbleX;
           if (t.strokeWidth > 0) {
             tCtx.strokeStyle = t.strokeColor;
-            tCtx.lineWidth = t.strokeWidth;
-            tCtx.strokeText(c, t.x + wobbleX, cy);
+            tCtx.lineWidth = Math.max(1, t.strokeWidth * chScale);
+            tCtx.strokeText(c, cx, cy);
           }
-          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, t.x + wobbleX, cy, t.fontSize, idx);
-          tCtx.fillText(c, t.x + wobbleX, cy);
+          tCtx.fillStyle = getTextFillStyle(tCtx, t, tick, cx, cy, chSize, idx);
+          tCtx.fillText(c, cx, cy);
         });
       }
 
@@ -2017,8 +2160,8 @@ RAW SIGNAL</textarea>
       cleanCompositeCtx.clearRect(0, 0, WIDTH, HEIGHT);
       cleanCompositeCtx.drawImage(bgCanvas, 0, 0);
 
-      // Composite photo under typography if blend mode is 'behind'
-      if (state.photo.active && state.photo.loaded && state.photo.blend === 'behind') {
+      // Composite photo under typography if blend mode is 'behind' or 'photoOnly'
+      if (state.photo.active && state.photo.loaded && (state.photo.blend === 'behind' || state.photo.blend === 'photoOnly')) {
         cleanCompositeCtx.save();
         cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
         cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
@@ -2093,10 +2236,45 @@ RAW SIGNAL</textarea>
     const exportModalIcon = document.getElementById('exportModalIcon');
     const modalDownloadLink = document.getElementById('modalDownloadLink');
 
-    function openExportModal(type, url, filename) {
+    function openExportModal(type, url, filename, blob = null) {
       exportModal.classList.remove('hidden');
       modalDownloadLink.href = url;
       modalDownloadLink.download = filename;
+
+      // Native iOS / Mobile Share Sheet integration
+      const modalShareBtn = document.getElementById('modalShareBtn');
+      if (modalShareBtn) {
+        let canShare = false;
+        if (blob && navigator.share) {
+          try {
+            const mime = blob.type || (type === 'image' ? 'image/png' : 'video/mp4');
+            const testFile = new File([blob], filename, { type: mime });
+            if (navigator.canShare && navigator.canShare({ files: [testFile] })) {
+              canShare = true;
+            }
+          } catch (e) {
+            canShare = false;
+          }
+        }
+        if (canShare) {
+          modalShareBtn.classList.remove('hidden');
+          modalShareBtn.onclick = async () => {
+            try {
+              const mime = blob.type || (type === 'image' ? 'image/png' : 'video/mp4');
+              const shareFile = new File([blob], filename, { type: mime });
+              await navigator.share({
+                files: [shareFile],
+                title: filename,
+                text: 'Created with SynthText Mosher'
+              });
+            } catch (err) {
+              if (err.name !== 'AbortError') console.warn('Share sheet error:', err);
+            }
+          };
+        } else {
+          modalShareBtn.classList.add('hidden');
+        }
+      }
 
       if (type === 'image') {
         exportModalIcon.textContent = '📸';
@@ -2117,6 +2295,8 @@ RAW SIGNAL</textarea>
 
     function closeExportModal() {
       exportModal.classList.add('hidden');
+      const modalShareBtn = document.getElementById('modalShareBtn');
+      if (modalShareBtn) modalShareBtn.onclick = null;
       if (exportPreviewVid.src) {
         exportPreviewVid.pause();
         exportPreviewVid.src = '';
@@ -2174,8 +2354,8 @@ RAW SIGNAL</textarea>
 
         await saveFile(filename, blob);
 
-        // Also open modal fallback for iOS Safari long-press save / preview
-        openExportModal('image', dataUrl, filename);
+        // Also open modal fallback for iOS Safari native Save to Photos / preview
+        openExportModal('image', dataUrl, filename, blob);
       } catch (err) {
         console.error('PNG Snap failed:', err);
       }
@@ -2220,6 +2400,15 @@ RAW SIGNAL</textarea>
     }
 
     async function checkWebCodecsSupport() {
+      // Check for iOS / iPadOS
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isIOS) {
+        // Return null on iOS so it directly uses Apple's native hardware MediaRecorder('video/mp4;codecs=avc1')
+        // which encodes natively without WebKit canvas-to-VideoFrame memory leaks or exceptions.
+        return null;
+      }
+
       if (typeof VideoEncoder === 'undefined' || typeof Mp4Muxer === 'undefined') {
         return null;
       }
@@ -2317,7 +2506,7 @@ RAW SIGNAL</textarea>
             return;
           }
 
-          // 2. Fallback to MediaRecorder
+          // 2. Fallback to MediaRecorder (Default on iOS Safari, outputting hardware-encoded MP4)
           state.recording.useWebCodecs = false;
           const stream = moshCanvas.captureStream(30);
           const mimeType = getSupportedMimeType();
@@ -2341,7 +2530,7 @@ RAW SIGNAL</textarea>
             const filename = `VIBE_MOSH_9_16_${timestamp}.${ext}`;
 
             await saveFile(filename, blob);
-            openExportModal('video', videoUrl, filename);
+            openExportModal('video', videoUrl, filename, blob);
           };
 
           state.recording.recorder.start();
@@ -2383,7 +2572,7 @@ RAW SIGNAL</textarea>
             const filename = `VIBE_MOSH_9_16_${timestamp}.mp4`;
 
             await saveFile(filename, blob);
-            openExportModal('video', videoUrl, filename);
+            openExportModal('video', videoUrl, filename, blob);
           } catch (err) {
             console.error('Error finalizing MP4:', err);
             alert('Error exporting MP4: ' + err.message);
@@ -2450,12 +2639,7 @@ RAW SIGNAL</textarea>
         state.interaction.lastX = p.x;
         state.interaction.lastY = p.y;
 
-        if (state.interaction.mode === 'brush') {
-          crosshair.style.left = `${cx}px`;
-          crosshair.style.top = `${cy}px`;
-          crosshair.classList.remove('hidden');
-          smearBrushAt(p.x, p.y);
-        } else if (state.interaction.mode === 'jam') {
+        if (state.interaction.mode === 'jam') {
           crosshair.style.left = `${cx}px`;
           crosshair.style.top = `${cy}px`;
           crosshair.classList.remove('hidden');
@@ -2472,11 +2656,7 @@ RAW SIGNAL</textarea>
         if (!state.interaction.isInteracting) return;
         const p = getCanvasCoords(cx, cy);
 
-        if (state.interaction.mode === 'brush') {
-          crosshair.style.left = `${cx}px`;
-          crosshair.style.top = `${cy}px`;
-          smearBrushAt(p.x, p.y);
-        } else if (state.interaction.mode === 'jam') {
+        if (state.interaction.mode === 'jam') {
           crosshair.style.left = `${cx}px`;
           crosshair.style.top = `${cy}px`;
           jamAt(cx, cy);
@@ -2500,27 +2680,6 @@ RAW SIGNAL</textarea>
         state.interaction.isInteracting = false;
         crosshair.classList.add('hidden');
         jamGrid.style.opacity = '0';
-      }
-
-      // Localized pixel brush smear
-      function smearBrushAt(bx, by) {
-        const r = 45;
-        const sx = Math.max(0, bx - r);
-        const sy = Math.max(0, by - r);
-        const sw = Math.min(WIDTH - sx, r * 2);
-        const sh = Math.min(HEIGHT - sy, r * 2);
-
-        if (sw <= 0 || sh <= 0) return;
-        const bImg = ctx.getImageData(sx, sy, sw, sh);
-        // Instant directional sort across finger brush
-        const d = bImg.data;
-        for (let i = 0; i < d.length; i += 4) {
-          if (Math.random() < 0.3) {
-            d[i] = Math.min(255, d[i] + 50);
-            d[i + 1] = Math.min(255, d[i + 1] + 30);
-          }
-        }
-        ctx.putImageData(bImg, sx, sy);
       }
 
       // Touch Events -- ignore touches that start on knobs/controls living on the canvas
@@ -2559,7 +2718,7 @@ RAW SIGNAL</textarea>
         }
       });
 
-      // Cycle touch interaction: Drag -> Brush -> Jam Pad -> Drag ...
+      // Cycle touch interaction: Drag <-> Jam Pad
       const modeToggle = document.getElementById('touchModeToggle');
       const modeIcon = document.getElementById('brushIcon');
       const modeText = document.getElementById('brushBtnText');
@@ -2570,19 +2729,15 @@ RAW SIGNAL</textarea>
           icon: '👆', text: 'Mode: Drag', label: '👆 Touch: Drag Text',
           btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-300 flex items-center space-x-1 active:scale-95 transition'
         },
-        brush: {
-          icon: '✏️', text: 'Mode: Brush', label: '✏️ Touch: Glitch Brush',
-          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-cyan/20 border border-cyber-cyan text-xs text-cyber-cyan flex items-center space-x-1 active:scale-95 transition'
-        },
         jam: {
           icon: '🎛️', text: 'Mode: Jam', label: '🎛️ Touch: Jam Pad (Smear × Shear)',
           btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-pink/20 border border-cyber-pink text-xs text-cyber-pink flex items-center space-x-1 active:scale-95 transition'
         }
       };
-      const ORDER = ['drag', 'brush', 'jam'];
+      const ORDER = ['drag', 'jam'];
 
       function applyMode() {
-        const m = MODES[state.interaction.mode];
+        const m = MODES[state.interaction.mode] || MODES.drag;
         modeIcon.textContent = m.icon;
         modeText.textContent = m.text;
         modeToggle.className = m.btnClass;
@@ -2592,7 +2747,6 @@ RAW SIGNAL</textarea>
           : m.label;
         crosshair.classList.remove('mode-jam', 'mode-brush');
         if (state.interaction.mode === 'jam') crosshair.classList.add('mode-jam');
-        if (state.interaction.mode === 'brush') crosshair.classList.add('mode-brush');
       }
       window.applyTouchMode = applyMode;
       applyMode();
@@ -2699,6 +2853,33 @@ RAW SIGNAL</textarea>
         });
       });
 
+      // Alignment buttons (left, center, right)
+      document.querySelectorAll('.align-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.type.align = btn.dataset.align;
+          document.querySelectorAll('.align-btn').forEach(b => {
+            b.className = 'align-btn py-1 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+          });
+          btn.className = 'align-btn py-1 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold';
+        });
+      });
+
+      // Text motion composition
+      const textMotionSelect = document.getElementById('textMotionSelect');
+      if (textMotionSelect) {
+        textMotionSelect.addEventListener('change', (e) => {
+          state.type.motion = e.target.value;
+        });
+      }
+
+      // Random letter sizes (Zine / Ransom mode)
+      const randomLetterSizeCheck = document.getElementById('randomLetterSizeCheck');
+      if (randomLetterSizeCheck) {
+        randomLetterSizeCheck.addEventListener('change', (e) => {
+          state.type.randomSize = e.target.checked;
+        });
+      }
+
       // Sliders Helper
       const bind = (id, obj, key, labelId, unit = '', mul = 1) => {
         const slider = document.getElementById(id);
@@ -2766,12 +2947,21 @@ RAW SIGNAL</textarea>
           loadPhotoFile(e.target.files[0]);
         }
       });
+      const photoCameraInput = document.getElementById('photoCameraInput');
+      if (photoCameraInput) {
+        photoCameraInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            loadPhotoFile(e.target.files[0]);
+          }
+        });
+      }
       document.getElementById('photoClearBtn').addEventListener('click', () => {
         state.photo.img = null;
         state.photo.loaded = false;
         state.photo.active = false;
         document.getElementById('photoActiveCheck').checked = false;
         document.getElementById('photoFileInput').value = '';
+        if (photoCameraInput) photoCameraInput.value = '';
       });
 
       document.querySelectorAll('.sample-photo-btn').forEach(btn => {
@@ -2889,6 +3079,19 @@ RAW SIGNAL</textarea>
               ? 'layout-btn py-2 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold'
               : 'layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
           });
+          if (state.type.align) {
+            document.querySelectorAll('.align-btn').forEach(b => {
+              b.className = b.dataset.align === state.type.align
+                ? 'align-btn py-1 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold'
+                : 'align-btn py-1 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+            });
+          }
+          if (state.type.motion && document.getElementById('textMotionSelect')) {
+            document.getElementById('textMotionSelect').value = state.type.motion;
+          }
+          if (document.getElementById('randomLetterSizeCheck')) {
+            document.getElementById('randomLetterSizeCheck').checked = !!state.type.randomSize;
+          }
           if (window.applyTouchMode) window.applyTouchMode();
         });
       });
