@@ -859,6 +859,139 @@ RAW SIGNAL</textarea>
             <input type="range" id="sortHighRange" min="0" max="100" value="90">
           </div>
         </div>
+
+        <!-- ==================== LUMA HEATMAP & WIREFRAME MESH ==================== -->
+        <div class="p-2.5 rounded-lg bg-[#070b12] border border-cyber-pink/40 space-y-2.5 mt-2">
+          <div class="flex items-center justify-between border-b border-cyber-border/70 pb-1">
+            <span class="text-cyber-pink font-bold text-[11px] flex items-center gap-1.5">
+              <span>🌡️</span> LUMA HEATMAP &amp; WIREFRAME
+            </span>
+            <label class="flex items-center space-x-1 text-[10px] text-slate-300">
+              <input type="checkbox" id="heatWireActiveCheck" class="accent-cyber-pink">
+              <span>Active</span>
+            </label>
+          </div>
+
+          <!-- Mode Selector: Heatmap / Wireframe / Both -->
+          <div class="space-y-1">
+            <label class="block text-[10px] text-slate-400">EFFECT MODE</label>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" data-hwmode="both" class="hw-mode-btn py-2 rounded bg-cyber-card border border-cyber-pink text-cyber-pink font-bold text-[10px] active:scale-95 transition">🔥+📐 Combined</button>
+              <button type="button" data-hwmode="heatmap" class="hw-mode-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] active:scale-95 transition">🔥 Heatmap</button>
+              <button type="button" data-hwmode="wireframe" class="hw-mode-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] active:scale-95 transition">📐 Wireframe</button>
+            </div>
+          </div>
+
+          <!-- Trigger / Mask Condition -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-0.5">TRIGGER MASK</label>
+              <select id="hwTriggerSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+                <option value="bright">☀️ Bright Highlights (Luma Highs)</option>
+                <option value="contrast">⚡ High Contrast / Edges</option>
+                <option value="dark">🌑 Dark Shadows (Luma Lows)</option>
+                <option value="global">🌐 Global (Full Canvas)</option>
+              </select>
+            </div>
+            <div class="flex items-center pt-3.5">
+              <label class="flex items-center space-x-1.5 text-[10px] text-slate-300 cursor-pointer">
+                <input type="checkbox" id="hwInvertCheck" class="accent-cyber-pink">
+                <span>Invert Mask Range</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Threshold Knobs -->
+          <div class="grid grid-cols-3 gap-2">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Threshold</span>
+                <span id="hwThresholdLabel" class="text-cyber-pink">55%</span>
+              </div>
+              <input type="range" id="hwThresholdRange" min="0" max="100" value="55">
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Soft Feather</span>
+                <span id="hwFeatherLabel" class="text-cyber-pink">15%</span>
+              </div>
+              <input type="range" id="hwFeatherRange" min="0" max="50" value="15">
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Opacity</span>
+                <span id="hwOpacityLabel" class="text-cyber-pink">95%</span>
+              </div>
+              <input type="range" id="hwOpacityRange" min="0" max="100" value="95">
+            </div>
+          </div>
+
+          <!-- Heatmap Palettes -->
+          <div class="space-y-1.5 pt-1 border-t border-cyber-border/40">
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] text-slate-400 font-bold">HEATMAP PALETTE</label>
+              <div class="flex items-center space-x-1">
+                <span class="text-[9px] text-slate-400">Custom Grad:</span>
+                <input type="color" id="hwCustomColorA" value="#110033" class="w-4 h-4 rounded border-0 bg-transparent cursor-pointer">
+                <input type="color" id="hwCustomColorB" value="#ff0055" class="w-4 h-4 rounded border-0 bg-transparent cursor-pointer">
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-1">
+              <button type="button" data-hwpal="thermal" class="hw-pal-btn py-1 px-1 rounded bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[9px] font-bold">🔥 Thermal FLIR</button>
+              <button type="button" data-hwpal="cyber" class="hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">💜 Cyber Neon</button>
+              <button type="button" data-hwpal="acid" class="hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">🧪 Acid Lime</button>
+              <button type="button" data-hwpal="magma" class="hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">🌋 Magma Lava</button>
+              <button type="button" data-hwpal="rainbow" class="hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">🌈 Spectral IR</button>
+              <button type="button" data-hwpal="custom" class="hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">🎨 Custom 2-Tone</button>
+            </div>
+          </div>
+
+          <!-- Wireframe Configuration -->
+          <div class="space-y-1.5 pt-1 border-t border-cyber-border/40">
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] text-slate-400 font-bold">WIREFRAME MESH &amp; STROKE</label>
+              <div class="flex items-center space-x-1.5">
+                <span class="text-[9px] text-slate-400">Stroke:</span>
+                <input type="color" id="hwWireColor" value="#00ffcc" class="w-5 h-5 rounded border border-cyber-border bg-transparent cursor-pointer">
+                <!-- Swatches -->
+                <button type="button" data-wirecolor="#00ffcc" class="hw-wire-swatch w-3.5 h-3.5 rounded-full bg-[#00ffcc] border border-white/20 active:scale-90" title="Cyber Cyan"></button>
+                <button type="button" data-wirecolor="#ff0055" class="hw-wire-swatch w-3.5 h-3.5 rounded-full bg-[#ff0055] border border-white/20 active:scale-90" title="Neon Pink"></button>
+                <button type="button" data-wirecolor="#39ff14" class="hw-wire-swatch w-3.5 h-3.5 rounded-full bg-[#39ff14] border border-white/20 active:scale-90" title="Toxic Lime"></button>
+                <button type="button" data-wirecolor="#ffe600" class="hw-wire-swatch w-3.5 h-3.5 rounded-full bg-[#ffe600] border border-white/20 active:scale-90" title="Solar Gold"></button>
+                <button type="button" data-wirecolor="#ffffff" class="hw-wire-swatch w-3.5 h-3.5 rounded-full bg-[#ffffff] border border-white/20 active:scale-90" title="Pure White"></button>
+              </div>
+            </div>
+
+            <!-- Wireframe Style: Grid / Isometric / Contours / Scanlines -->
+            <div class="grid grid-cols-4 gap-1">
+              <button type="button" data-wirestyle="grid" class="hw-wire-style-btn py-1 px-1 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan text-[9px] font-bold">📐 Grid</button>
+              <button type="button" data-wirestyle="iso" class="hw-wire-style-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">⤡ Isometric</button>
+              <button type="button" data-wirestyle="contour" class="hw-wire-style-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">〰️ Contour</button>
+              <button type="button" data-wirestyle="scanlines" class="hw-wire-style-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold">═ Scanlines</button>
+            </div>
+
+            <!-- Wireframe Knobs: Density & Thickness -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-0.5">
+                <div class="flex justify-between text-[10px] text-slate-400">
+                  <span>Grid Spacing</span>
+                  <span id="hwWireStepLabel" class="text-cyber-cyan">14px</span>
+                </div>
+                <input type="range" id="hwWireStepRange" min="6" max="40" value="14">
+              </div>
+
+              <div class="space-y-0.5">
+                <div class="flex justify-between text-[10px] text-slate-400">
+                  <span>Line Thickness</span>
+                  <span id="hwWireThickLabel" class="text-cyber-cyan">1px</span>
+                </div>
+                <input type="range" id="hwWireThickRange" min="1" max="4" value="1">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ==================== TAB 3: DATAMOSH ==================== -->
@@ -1343,6 +1476,24 @@ RAW SIGNAL</textarea>
         thresholdLow: 25,
         thresholdHigh: 90,
         maxLength: 280
+      },
+
+      // Heatmap & Wireframe Engine
+      heatWire: {
+        active: false,
+        mode: 'both', // 'both' | 'heatmap' | 'wireframe'
+        trigger: 'bright', // 'bright' | 'contrast' | 'dark' | 'global'
+        invert: false,
+        threshold: 55, // 0 - 100%
+        feather: 15,   // 0 - 50%
+        opacity: 95,   // 0 - 100%
+        palette: 'thermal', // 'thermal' | 'cyber' | 'acid' | 'magma' | 'rainbow' | 'custom'
+        customColorA: '#110033',
+        customColorB: '#ff0055',
+        wireColor: '#00ffcc',
+        wireStyle: 'grid', // 'grid' | 'iso' | 'contour' | 'scanlines'
+        wireStep: 14, // 6 - 40px
+        wireThick: 1  // 1 - 4px
       },
 
       // Datamosh & Smear
@@ -2965,6 +3116,228 @@ RAW SIGNAL</textarea>
       targetCtx.putImageData(img, 0, 0);
     }
 
+    // ===== LUMA HEATMAP & WIREFRAME ENGINE =====
+    const hwLUT = new Uint32Array(256);
+    let hwLUTPalette = '';
+    let hwLUTColA = '';
+    let hwLUTColB = '';
+
+    function hwHexToRgb(hex) {
+      if (!hex) return [0, 255, 204];
+      const clean = hex.replace('#', '');
+      const num = parseInt(clean, 16);
+      if (isNaN(num)) return [0, 255, 204];
+      return [(num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff];
+    }
+
+    function updateHeatmapLUT(palette, colAHex, colBHex) {
+      if (hwLUTPalette === palette && hwLUTColA === colAHex && hwLUTColB === colBHex) return;
+      hwLUTPalette = palette;
+      hwLUTColA = colAHex;
+      hwLUTColB = colBHex;
+
+      let stops;
+      if (palette === 'thermal') {
+        stops = [
+          { p: 0.0, c: [0, 0, 30] },
+          { p: 0.2, c: [70, 0, 130] },
+          { p: 0.45, c: [220, 25, 20] },
+          { p: 0.7, c: [255, 160, 0] },
+          { p: 0.9, c: [255, 240, 70] },
+          { p: 1.0, c: [255, 255, 255] }
+        ];
+      } else if (palette === 'cyber') {
+        stops = [
+          { p: 0.0, c: [5, 10, 28] },
+          { p: 0.25, c: [0, 255, 204] },
+          { p: 0.55, c: [160, 0, 255] },
+          { p: 0.8, c: [255, 0, 110] },
+          { p: 1.0, c: [255, 245, 120] }
+        ];
+      } else if (palette === 'acid') {
+        stops = [
+          { p: 0.0, c: [5, 20, 10] },
+          { p: 0.3, c: [0, 150, 60] },
+          { p: 0.65, c: [57, 255, 20] },
+          { p: 0.85, c: [220, 255, 20] },
+          { p: 1.0, c: [255, 255, 255] }
+        ];
+      } else if (palette === 'magma') {
+        stops = [
+          { p: 0.0, c: [15, 0, 25] },
+          { p: 0.3, c: [130, 10, 80] },
+          { p: 0.6, c: [230, 45, 10] },
+          { p: 0.85, c: [255, 180, 20] },
+          { p: 1.0, c: [255, 255, 230] }
+        ];
+      } else if (palette === 'rainbow') {
+        stops = [
+          { p: 0.0, c: [0, 0, 180] },
+          { p: 0.2, c: [0, 200, 220] },
+          { p: 0.4, c: [0, 220, 40] },
+          { p: 0.65, c: [240, 220, 0] },
+          { p: 0.85, c: [255, 30, 0] },
+          { p: 1.0, c: [255, 255, 255] }
+        ];
+      } else {
+        const cA = hwHexToRgb(colAHex || '#110033');
+        const cB = hwHexToRgb(colBHex || '#ff0055');
+        stops = [
+          { p: 0.0, c: cA },
+          { p: 0.8, c: cB },
+          { p: 1.0, c: [255, 255, 255] }
+        ];
+      }
+
+      for (let i = 0; i < 256; i++) {
+        const t = i / 255;
+        let s0 = stops[0], s1 = stops[stops.length - 1];
+        for (let s = 0; s < stops.length - 1; s++) {
+          if (t >= stops[s].p && t <= stops[s + 1].p) {
+            s0 = stops[s];
+            s1 = stops[s + 1];
+            break;
+          }
+        }
+        const span = (s1.p - s0.p) || 0.001;
+        const factor = Math.min(1, Math.max(0, (t - s0.p) / span));
+        const r = Math.round(s0.c[0] + factor * (s1.c[0] - s0.c[0]));
+        const g = Math.round(s0.c[1] + factor * (s1.c[1] - s0.c[1]));
+        const b = Math.round(s0.c[2] + factor * (s1.c[2] - s0.c[2]));
+        hwLUT[i] = (r & 0xff) | ((g & 0xff) << 8) | ((b & 0xff) << 16) | (0xff << 24);
+      }
+    }
+
+    function applyHeatmapWireframePass(targetCtx, opt) {
+      if (!opt.active) return;
+      updateHeatmapLUT(opt.palette, opt.customColorA, opt.customColorB);
+
+      const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
+      const data32 = new Uint32Array(img.data.buffer);
+
+      const mode = opt.mode || 'both'; // 'both' | 'heatmap' | 'wireframe'
+      const trigger = opt.trigger || 'bright';
+      const thresh = (opt.threshold || 55) / 100;
+      const feather = Math.max(0.005, (opt.feather || 15) / 100);
+      const baseAlpha = (opt.opacity || 95) / 100;
+      const invert = !!opt.invert;
+
+      const wireRgb = hwHexToRgb(opt.wireColor || '#00ffcc');
+      const wireR = wireRgb[0], wireG = wireRgb[1], wireB = wireRgb[2];
+      const wireStyle = opt.wireStyle || 'grid';
+      const wireStep = Math.max(4, opt.wireStep | 0);
+      const wireThick = Math.max(1, opt.wireThick | 0);
+
+      const isBright = trigger === 'bright';
+      const isDark = trigger === 'dark';
+      const isContrast = trigger === 'contrast';
+      const isGlobal = trigger === 'global';
+
+      const lowBound = Math.max(0, thresh - feather);
+      const highBound = thresh;
+      const rangeInv = 1.0 / (highBound - lowBound || 0.001);
+
+      for (let y = 0; y < HEIGHT; y++) {
+        const rowOffset = y * WIDTH;
+        for (let x = 0; x < WIDTH; x++) {
+          const idx = rowOffset + x;
+          const p = data32[idx];
+          const r = p & 0xff;
+          const g = (p >> 8) & 0xff;
+          const b = (p >> 16) & 0xff;
+
+          // Rec 601 integer luminance
+          const luma = (r * 77 + g * 150 + b * 29) >> 8;
+
+          let metric = 1.0;
+          let diff = 0;
+          if (isGlobal) {
+            metric = 1.0;
+          } else if (isBright) {
+            metric = luma / 255.0;
+          } else if (isDark) {
+            metric = (255 - luma) / 255.0;
+          } else if (isContrast) {
+            const pR = (x < WIDTH - 1) ? data32[idx + 1] : p;
+            const lumaR = ((pR & 0xff) * 77 + ((pR >> 8) & 0xff) * 150 + ((pR >> 16) & 0xff) * 29) >> 8;
+            const pD = (y < HEIGHT - 1) ? data32[idx + WIDTH] : p;
+            const lumaD = ((pD & 0xff) * 77 + ((pD >> 8) & 0xff) * 150 + ((pD >> 16) & 0xff) * 29) >> 8;
+            diff = Math.abs(luma - lumaR) + Math.abs(luma - lumaD);
+            metric = Math.min(1.0, (diff * 2.5) / 255.0);
+          }
+
+          // Evaluate mask weight
+          let w;
+          if (isGlobal) {
+            w = 1.0;
+          } else if (metric >= highBound) {
+            w = 1.0;
+          } else if (metric <= lowBound) {
+            w = 0.0;
+          } else {
+            w = (metric - lowBound) * rangeInv;
+          }
+
+          if (invert) w = 1.0 - w;
+          w *= baseAlpha;
+          if (w <= 0.01) continue;
+
+          // Wireframe test
+          let isWire = false;
+          if (mode !== 'heatmap') {
+            if (wireStyle === 'grid') {
+              isWire = (x % wireStep < wireThick) || (y % wireStep < wireThick);
+            } else if (wireStyle === 'iso') {
+              isWire = ((x + y) % wireStep < wireThick) || (((x - y + 100000) % wireStep) < wireThick);
+            } else if (wireStyle === 'contour') {
+              const cStep = Math.max(8, wireStep * 2);
+              isWire = (luma % cStep < (wireThick * 2));
+            } else if (wireStyle === 'scanlines') {
+              isWire = (y % wireStep < wireThick);
+            }
+          }
+
+          let fxR, fxG, fxB;
+          if (mode === 'wireframe') {
+            if (!isWire) continue;
+            fxR = wireR;
+            fxG = wireG;
+            fxB = wireB;
+          } else if (mode === 'heatmap') {
+            const lutIndex = isContrast ? Math.min(255, (diff * 3) | 0) : (isDark ? (255 - luma) : luma);
+            const heatPixel = hwLUT[lutIndex];
+            fxR = heatPixel & 0xff;
+            fxG = (heatPixel >> 8) & 0xff;
+            fxB = (heatPixel >> 16) & 0xff;
+          } else {
+            // mode === 'both'
+            if (isWire) {
+              fxR = wireR;
+              fxG = wireG;
+              fxB = wireB;
+            } else {
+              const lutIndex = isContrast ? Math.min(255, (diff * 3) | 0) : (isDark ? (255 - luma) : luma);
+              const heatPixel = hwLUT[lutIndex];
+              fxR = heatPixel & 0xff;
+              fxG = (heatPixel >> 8) & 0xff;
+              fxB = (heatPixel >> 16) & 0xff;
+            }
+          }
+
+          const iw = (w * 256) | 0;
+          const invW = 256 - iw;
+
+          const outR = (r * invW + fxR * iw) >> 8;
+          const outG = (g * invW + fxG * iw) >> 8;
+          const outB = (b * invW + fxB * iw) >> 8;
+
+          data32[idx] = (outR & 0xff) | ((outG & 0xff) << 8) | ((outB & 0xff) << 16) | (0xff << 24);
+        }
+      }
+
+      targetCtx.putImageData(img, 0, 0);
+    }
+
     function applyDatamoshBlocks(targetCtx, mosh, tick) {
       // 1. Horizontal slice tear across text
       if (mosh.sliceShear > 0) {
@@ -3291,6 +3664,11 @@ RAW SIGNAL</textarea>
       // 4. Pixel Sort Pass (paused during active typing bursts for instant mobile typing)
       if (state.sort.active && !state.isTyping) {
         pixelSortPass(ctx, state.sort);
+      }
+
+      // 4b. Heatmap & Wireframe Pass
+      if (state.heatWire && state.heatWire.active && !state.isTyping) {
+        applyHeatmapWireframePass(ctx, state.heatWire);
       }
 
       // 5. Datamosh Slice & Codec macroblocks
@@ -4099,6 +4477,95 @@ RAW SIGNAL</textarea>
         });
       });
 
+      // Heatmap & Wireframe Controls
+      const heatWireActiveCheck = document.getElementById('heatWireActiveCheck');
+      if (heatWireActiveCheck) {
+        heatWireActiveCheck.addEventListener('change', (e) => state.heatWire.active = e.target.checked);
+      }
+
+      document.querySelectorAll('.hw-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.heatWire.mode = btn.dataset.hwmode;
+          state.heatWire.active = true;
+          if (heatWireActiveCheck) heatWireActiveCheck.checked = true;
+          document.querySelectorAll('.hw-mode-btn').forEach(b => {
+            b.className = b.dataset.hwmode === state.heatWire.mode
+              ? 'hw-mode-btn py-2 rounded bg-cyber-card border border-cyber-pink text-cyber-pink font-bold text-[10px] active:scale-95 transition'
+              : 'hw-mode-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] active:scale-95 transition';
+          });
+        });
+      });
+
+      const hwTriggerSelect = document.getElementById('hwTriggerSelect');
+      if (hwTriggerSelect) {
+        hwTriggerSelect.addEventListener('change', (e) => state.heatWire.trigger = e.target.value);
+      }
+
+      const hwInvertCheck = document.getElementById('hwInvertCheck');
+      if (hwInvertCheck) {
+        hwInvertCheck.addEventListener('change', (e) => state.heatWire.invert = e.target.checked);
+      }
+
+      bind('hwThresholdRange', state.heatWire, 'threshold', 'hwThresholdLabel', '%');
+      bind('hwFeatherRange', state.heatWire, 'feather', 'hwFeatherLabel', '%');
+      bind('hwOpacityRange', state.heatWire, 'opacity', 'hwOpacityLabel', '%');
+
+      document.querySelectorAll('.hw-pal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.heatWire.palette = btn.dataset.hwpal;
+          state.heatWire.active = true;
+          if (heatWireActiveCheck) heatWireActiveCheck.checked = true;
+          document.querySelectorAll('.hw-pal-btn').forEach(b => {
+            b.className = b.dataset.hwpal === state.heatWire.palette
+              ? 'hw-pal-btn py-1 px-1 rounded bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[9px] font-bold'
+              : 'hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
+          });
+          updateHeatmapLUT(state.heatWire.palette, state.heatWire.customColorA, state.heatWire.customColorB);
+        });
+      });
+
+      const hwCustomColorA = document.getElementById('hwCustomColorA');
+      const hwCustomColorB = document.getElementById('hwCustomColorB');
+      if (hwCustomColorA && hwCustomColorB) {
+        const updateCustom = () => {
+          state.heatWire.customColorA = hwCustomColorA.value;
+          state.heatWire.customColorB = hwCustomColorB.value;
+          if (state.heatWire.palette === 'custom') {
+            updateHeatmapLUT('custom', state.heatWire.customColorA, state.heatWire.customColorB);
+          }
+        };
+        hwCustomColorA.addEventListener('input', updateCustom);
+        hwCustomColorB.addEventListener('input', updateCustom);
+      }
+
+      const hwWireColor = document.getElementById('hwWireColor');
+      if (hwWireColor) {
+        hwWireColor.addEventListener('input', (e) => {
+          state.heatWire.wireColor = e.target.value;
+        });
+      }
+
+      document.querySelectorAll('.hw-wire-swatch').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.heatWire.wireColor = btn.dataset.wirecolor;
+          if (hwWireColor) hwWireColor.value = btn.dataset.wirecolor;
+        });
+      });
+
+      document.querySelectorAll('.hw-wire-style-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.heatWire.wireStyle = btn.dataset.wirestyle;
+          document.querySelectorAll('.hw-wire-style-btn').forEach(b => {
+            b.className = b.dataset.wirestyle === state.heatWire.wireStyle
+              ? 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan text-[9px] font-bold'
+              : 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
+          });
+        });
+      });
+
+      bind('hwWireStepRange', state.heatWire, 'wireStep', 'hwWireStepLabel', 'px');
+      bind('hwWireThickRange', state.heatWire, 'wireThick', 'hwWireThickLabel', 'px');
+
       // Mosh controls
       document.getElementById('moshActiveCheck').addEventListener('change', (e) => state.mosh.active = e.target.checked);
       bind('moshSmearRange', state.mosh, 'smear', 'moshSmearLabel', '%');
@@ -4905,12 +5372,33 @@ RAW SIGNAL</textarea>
         setSliderValue('chromaBleedRange', Math.floor(6 + Math.random() * 20));
         setSliderValue('rgbSplitRange', Math.floor(Math.random() * 30));
         setSliderValue('rgbAngleRange', Math.floor(Math.random() * 360));
+
+        if (state.heatWire && state.heatWire.active) {
+          const pals = ['thermal', 'cyber', 'acid', 'magma', 'rainbow'];
+          state.heatWire.palette = pals[Math.floor(Math.random() * pals.length)];
+          document.querySelectorAll('.hw-pal-btn').forEach(b => {
+            b.className = b.dataset.hwpal === state.heatWire.palette
+              ? 'hw-pal-btn py-1 px-1 rounded bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[9px] font-bold'
+              : 'hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
+          });
+          const styles = ['grid', 'iso', 'contour', 'scanlines'];
+          state.heatWire.wireStyle = styles[Math.floor(Math.random() * styles.length)];
+          document.querySelectorAll('.hw-wire-style-btn').forEach(b => {
+            b.className = b.dataset.wirestyle === state.heatWire.wireStyle
+              ? 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan text-[9px] font-bold'
+              : 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
+          });
+          setSliderValue('hwThresholdRange', Math.floor(35 + Math.random() * 45));
+          setSliderValue('hwWireStepRange', Math.floor(8 + Math.random() * 24));
+        }
       });
     }
 
     // ===== Synth Knob-ification: turn every <input type=range> into a tactile rotary knob =====
     function knobColorFor(input) {
       const id = input.id;
+      if (id.startsWith('hwWire')) return '#00ffcc';
+      if (id.startsWith('hw')) return '#ff0055';
       if (id.startsWith('sort')) return '#00ffcc';
       if (id.startsWith('mosh') || id.startsWith('motion') || id.startsWith('speed3D') || id.startsWith('vector') || id.startsWith('pframe') || id.startsWith('chroma')) return '#ff0055';
       if (id.startsWith('rgb') || id.startsWith('scanlines') || id.startsWith('noise')) return '#39ff14';
