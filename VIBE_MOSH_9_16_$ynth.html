@@ -632,6 +632,7 @@ RAW SIGNAL</textarea>
               <span id="mediaStatusName" class="text-slate-300 truncate">Clip.mp4</span>
             </div>
             <div class="flex items-center space-x-1 shrink-0">
+              <button id="mediaTrimBtn" type="button" class="hidden px-2 py-0.5 rounded bg-cyber-card border border-cyber-yellow text-cyber-yellow text-[10px] font-bold hover:text-white" title="Choose 9s Timeline Segment">✂️ Trim (9s)</button>
               <button id="mediaPlayPauseBtn" type="button" class="hidden px-2 py-0.5 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] hover:text-white" title="Play/Pause">⏸️</button>
               <button id="mediaMuteBtn" type="button" class="hidden px-2 py-0.5 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] hover:text-white" title="Mute/Unmute">🔇</button>
               <button id="mediaFlipCamBtn" type="button" class="hidden px-2 py-0.5 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px]" title="Flip Camera">🔄 Flip</button>
@@ -1032,6 +1033,84 @@ RAW SIGNAL</textarea>
     </div>
   </div>
 
+  <!-- Video Trimming & Timeline Segment Selector Modal (Max 9s) -->
+  <div id="videoTrimModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col justify-end sm:justify-center p-3 sm:p-4 transition-all duration-300">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 max-w-sm w-full mx-auto space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-cyber-border pb-2">
+        <div class="flex items-center space-x-1.5">
+          <span>✂️</span>
+          <h3 class="font-bold text-xs text-white">CHOOSE 9-SECOND TIMELINE SEGMENT</h3>
+        </div>
+        <button id="closeTrimModalBtn" class="text-slate-400 hover:text-white text-base px-2 py-0.5">✕</button>
+      </div>
+
+      <!-- Video Preview Player with Scrubbing Preview -->
+      <div class="relative w-full max-h-[36vh] aspect-9-16 mx-auto rounded-lg overflow-hidden border border-cyber-border bg-black flex items-center justify-center">
+        <video id="trimPreviewVid" class="w-full h-full object-contain" playsinline webkit-playsinline muted loop></video>
+        <button id="trimPlayToggleBtn" type="button" class="absolute bottom-2 right-2 px-2.5 py-1 rounded bg-black/80 border border-cyber-cyan text-cyber-cyan text-[10px] font-bold active:scale-95 transition">
+          ▶ Preview
+        </button>
+      </div>
+
+      <!-- Segment Duration & Time Readout -->
+      <div class="bg-cyber-black/80 rounded-lg p-2.5 border border-cyber-border space-y-2">
+        <div class="flex justify-between items-center text-[10px]">
+          <span class="text-slate-400">Total Video: <span id="trimTotalDurationText" class="text-white font-mono font-bold">00:00</span></span>
+          <span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-cyber-yellow/20 text-cyber-yellow border border-cyber-yellow/30">MAX 9.0 SECONDS</span>
+        </div>
+
+        <div class="flex justify-between items-center text-xs font-mono">
+          <div class="text-left">
+            <span class="text-[9px] text-slate-500 block">START</span>
+            <span id="trimStartTimeText" class="text-cyber-cyan font-bold">0.0s</span>
+          </div>
+          <div class="text-center px-2 py-0.5 rounded bg-cyber-dark border border-cyber-border">
+            <span id="trimSegmentLengthText" class="text-cyber-yellow font-bold text-[11px]">9.0s Segment</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[9px] text-slate-500 block">END</span>
+            <span id="trimEndTimeText" class="text-cyber-pink font-bold">9.0s</span>
+          </div>
+        </div>
+
+        <!-- Start Time Slider -->
+        <div class="space-y-1 pt-1">
+          <div class="flex justify-between text-[9px] text-slate-400">
+            <span>Timeline Position (Scrub)</span>
+            <span id="trimPositionPercentText" class="text-cyber-cyan">0%</span>
+          </div>
+          <input type="range" id="trimStartRange" min="0" max="100" step="0.1" value="0" class="w-full accent-cyber-cyan cursor-pointer">
+        </div>
+
+        <!-- Segment Length Slider (up to 9s) -->
+        <div class="space-y-1 pt-1 border-t border-white/5">
+          <div class="flex justify-between text-[9px] text-slate-400">
+            <span>Clip Duration (max 9s)</span>
+            <span id="trimLengthLabel" class="text-cyber-yellow">9.0s</span>
+          </div>
+          <input type="range" id="trimLengthRange" min="1" max="9" step="0.5" value="9" class="w-full accent-cyber-yellow cursor-pointer">
+        </div>
+
+        <!-- Quick Jump Buttons -->
+        <div class="grid grid-cols-3 gap-1.5 pt-1">
+          <button id="trimFirstBtn" type="button" class="py-1 px-1 rounded bg-cyber-dark border border-cyber-border text-slate-300 text-[9px] font-bold active:scale-95 hover:border-cyber-cyan">⏮️ Beginning</button>
+          <button id="trimMidBtn" type="button" class="py-1 px-1 rounded bg-cyber-dark border border-cyber-border text-slate-300 text-[9px] font-bold active:scale-95 hover:border-cyber-cyan">🎯 Middle</button>
+          <button id="trimLastBtn" type="button" class="py-1 px-1 rounded bg-cyber-dark border border-cyber-border text-slate-300 text-[9px] font-bold active:scale-95 hover:border-cyber-cyan">⏭️ End</button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex space-x-2 pt-1">
+        <button id="applyTrimBtn" type="button" class="flex-1 py-2.5 rounded-lg bg-cyber-cyan text-black font-bold text-xs text-center flex items-center justify-center space-x-1.5 shadow-[0_0_15px_rgba(0,255,204,0.4)] active:scale-95 transition">
+          <span>✂️ USE 9s SEGMENT</span>
+        </button>
+        <button id="cancelTrimBtn" type="button" class="px-4 py-2.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold active:scale-95 transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // --- 9:16 Canvas Buffer Native Resolution ---
     const WIDTH = 720;
@@ -1075,6 +1154,11 @@ RAW SIGNAL</textarea>
         isVideo: false,
         isLive: false,
         facingMode: 'environment',
+        startTime: 0,
+        endTime: 9,
+        segmentDuration: 9,
+        totalDuration: 0,
+        file: null,
         mode: 'ascii', // 'ascii', 'asciiOverlay', 'direct'
         colorMode: 'photo', // 'photo', 'matrix', 'neon', 'mono', 'amber'
         charSet: 'blocks', // 'blocks', 'standard', 'matrix', 'binary', 'katakana'
@@ -2696,6 +2780,15 @@ RAW SIGNAL</textarea>
       // 1. Render clean layers
       renderBackdropLayer(bgCtx, state.fx.bgMode, state.mosh.tick);
       renderTypographyLayer(textCtx, state.type, state.mosh.tick);
+      // Check video loop boundaries within chosen [startTime, endTime] segment (max 9s)
+      if (state.photo.isVideo && state.photo.video && !state.photo.isLive && state.photo.loaded) {
+        const vid = state.photo.video;
+        const start = state.photo.startTime || 0;
+        const end = state.photo.endTime || (start + 9);
+        if (vid.currentTime >= end || vid.currentTime < start - 0.15) {
+          vid.currentTime = start;
+        }
+      }
 
       if (state.photo.active && state.photo.loaded) {
         renderAsciiPhoto(photoCanvas, state.photo, state.mosh.tick);
@@ -3501,6 +3594,7 @@ RAW SIGNAL</textarea>
       const mediaStatusBox = document.getElementById('mediaStatusBox');
       const mediaStatusBadge = document.getElementById('mediaStatusBadge');
       const mediaStatusName = document.getElementById('mediaStatusName');
+      const mediaTrimBtn = document.getElementById('mediaTrimBtn');
       const mediaPlayPauseBtn = document.getElementById('mediaPlayPauseBtn');
       const mediaMuteBtn = document.getElementById('mediaMuteBtn');
       const mediaFlipCamBtn = document.getElementById('mediaFlipCamBtn');
@@ -3508,10 +3602,43 @@ RAW SIGNAL</textarea>
       const liveCameraIcon = document.getElementById('liveCameraIcon');
       const liveCameraText = document.getElementById('liveCameraText');
 
+      // Video Trimmer Modal Elements (Max 9s Segment)
+      const videoTrimModal = document.getElementById('videoTrimModal');
+      const trimPreviewVid = document.getElementById('trimPreviewVid');
+      const trimPlayToggleBtn = document.getElementById('trimPlayToggleBtn');
+      const trimTotalDurationText = document.getElementById('trimTotalDurationText');
+      const trimStartTimeText = document.getElementById('trimStartTimeText');
+      const trimEndTimeText = document.getElementById('trimEndTimeText');
+      const trimSegmentLengthText = document.getElementById('trimSegmentLengthText');
+      const trimPositionPercentText = document.getElementById('trimPositionPercentText');
+      const trimStartRange = document.getElementById('trimStartRange');
+      const trimLengthRange = document.getElementById('trimLengthRange');
+      const trimLengthLabel = document.getElementById('trimLengthLabel');
+      const trimFirstBtn = document.getElementById('trimFirstBtn');
+      const trimMidBtn = document.getElementById('trimMidBtn');
+      const trimLastBtn = document.getElementById('trimLastBtn');
+      const applyTrimBtn = document.getElementById('applyTrimBtn');
+      const cancelTrimBtn = document.getElementById('cancelTrimBtn');
+      const closeTrimModalBtn = document.getElementById('closeTrimModalBtn');
+
+      let trimCurrentFile = null;
+      let trimCurrentVideo = null;
+      let trimTotalDuration = 0;
+      let trimPreviewPlaying = false;
+
+      function formatTimeDisplay(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        const mm = String(Math.floor(sec / 60)).padStart(2, '0');
+        const ss = String(Math.floor(sec % 60)).padStart(2, '0');
+        const ms = Math.floor((sec % 1) * 10);
+        return `${mm}:${ss}.${ms}`;
+      }
+
       function updateMediaStatusUI(label, isVid, isLive) {
         if (!mediaStatusBox) return;
         if (!state.photo.loaded) {
           mediaStatusBox.classList.add('hidden');
+          if (mediaTrimBtn) mediaTrimBtn.classList.add('hidden');
           if (liveCameraIcon) liveCameraIcon.textContent = '🔴';
           if (liveCameraText) liveCameraText.textContent = 'Live Camera Feed';
           if (liveCameraBtn) liveCameraBtn.classList.remove('border-red-500', 'text-red-400');
@@ -3523,6 +3650,7 @@ RAW SIGNAL</textarea>
           mediaStatusBadge.className = 'px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse';
           mediaStatusBadge.textContent = 'LIVE FEED';
           mediaStatusName.textContent = label || 'Camera Stream';
+          if (mediaTrimBtn) mediaTrimBtn.classList.add('hidden');
           if (mediaPlayPauseBtn) mediaPlayPauseBtn.classList.add('hidden');
           if (mediaMuteBtn) mediaMuteBtn.classList.add('hidden');
           if (mediaFlipCamBtn) mediaFlipCamBtn.classList.remove('hidden');
@@ -3533,6 +3661,7 @@ RAW SIGNAL</textarea>
           mediaStatusBadge.className = 'px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-cyber-pink/20 text-cyber-pink border border-cyber-pink/40';
           mediaStatusBadge.textContent = 'VIDEO';
           mediaStatusName.textContent = label || 'Video Clip';
+          if (mediaTrimBtn) mediaTrimBtn.classList.remove('hidden');
           if (mediaPlayPauseBtn) {
             mediaPlayPauseBtn.classList.remove('hidden');
             mediaPlayPauseBtn.textContent = (state.photo.video && state.photo.video.paused) ? '▶️' : '⏸️';
@@ -3549,6 +3678,7 @@ RAW SIGNAL</textarea>
           mediaStatusBadge.className = 'px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-cyber-yellow/20 text-cyber-yellow border border-cyber-yellow/40';
           mediaStatusBadge.textContent = 'PHOTO';
           mediaStatusName.textContent = label || 'Photo Image';
+          if (mediaTrimBtn) mediaTrimBtn.classList.add('hidden');
           if (mediaPlayPauseBtn) mediaPlayPauseBtn.classList.add('hidden');
           if (mediaMuteBtn) mediaMuteBtn.classList.add('hidden');
           if (mediaFlipCamBtn) mediaFlipCamBtn.classList.add('hidden');
@@ -3581,6 +3711,10 @@ RAW SIGNAL</textarea>
         state.photo.active = false;
         state.photo.isVideo = false;
         state.photo.isLive = false;
+        state.photo.startTime = 0;
+        state.photo.endTime = 9;
+        state.photo.segmentDuration = 9;
+        state.photo.file = null;
         const photoActiveCheck = document.getElementById('photoActiveCheck');
         if (photoActiveCheck) photoActiveCheck.checked = false;
         const photoFileInput = document.getElementById('photoFileInput');
@@ -3592,6 +3726,205 @@ RAW SIGNAL</textarea>
         updateMediaStatusUI('', false, false);
       }
       window.stopCurrentMedia = stopCurrentMedia;
+
+      // Video Trimmer Functions
+      function openVideoTrimModal(file, videoElement, totalDuration) {
+        if (!videoTrimModal) return;
+        trimCurrentFile = file;
+        trimCurrentVideo = videoElement;
+        trimTotalDuration = totalDuration || videoElement.duration || 9;
+        if (!isFinite(trimTotalDuration) || trimTotalDuration <= 0) trimTotalDuration = 9;
+
+        if (trimPreviewVid) {
+          trimPreviewVid.src = videoElement.src;
+          trimPreviewVid.currentTime = (state.photo.startTime !== undefined) ? state.photo.startTime : 0;
+        }
+        if (trimTotalDurationText) {
+          trimTotalDurationText.textContent = formatTimeDisplay(trimTotalDuration);
+        }
+
+        const maxAllowedSeg = Math.min(9.0, trimTotalDuration);
+        if (trimLengthRange) {
+          trimLengthRange.max = maxAllowedSeg;
+          trimLengthRange.value = maxAllowedSeg;
+        }
+        if (trimLengthLabel) {
+          trimLengthLabel.textContent = maxAllowedSeg.toFixed(1) + 's';
+        }
+
+        const maxStart = Math.max(0, trimTotalDuration - maxAllowedSeg);
+        if (trimStartRange) {
+          trimStartRange.max = maxStart;
+          const initialStart = (state.photo.startTime !== undefined && state.photo.startTime <= maxStart) ? state.photo.startTime : 0;
+          trimStartRange.value = initialStart;
+        }
+
+        updateTrimUI();
+        videoTrimModal.classList.remove('hidden');
+      }
+      window.openVideoTrimModal = openVideoTrimModal;
+
+      function updateTrimUI() {
+        if (!trimStartRange || !trimLengthRange) return;
+        const start = Math.max(0, Math.min(trimTotalDuration, parseFloat(trimStartRange.value) || 0));
+        const len = Math.max(0.5, Math.min(9.0, parseFloat(trimLengthRange.value) || 9.0));
+        const end = Math.min(trimTotalDuration, start + len);
+
+        if (trimStartTimeText) trimStartTimeText.textContent = start.toFixed(1) + 's';
+        if (trimEndTimeText) trimEndTimeText.textContent = end.toFixed(1) + 's';
+        if (trimSegmentLengthText) trimSegmentLengthText.textContent = (end - start).toFixed(1) + 's Segment';
+        if (trimLengthLabel) trimLengthLabel.textContent = len.toFixed(1) + 's';
+        const pct = trimTotalDuration > 0 ? Math.round((start / trimTotalDuration) * 100) : 0;
+        if (trimPositionPercentText) trimPositionPercentText.textContent = `${pct}%`;
+
+        if (trimPreviewVid && !trimPreviewPlaying) {
+          try { trimPreviewVid.currentTime = start; } catch(e) {}
+        }
+      }
+
+      function playTrimPreview() {
+        if (!trimPreviewVid) return;
+        const start = parseFloat(trimStartRange.value) || 0;
+        trimPreviewVid.currentTime = start;
+        trimPreviewVid.play().then(() => {
+          trimPreviewPlaying = true;
+          if (trimPlayToggleBtn) trimPlayToggleBtn.textContent = '⏸ Pause';
+        }).catch(() => {});
+      }
+
+      function pauseTrimPreview() {
+        if (!trimPreviewVid) return;
+        trimPreviewVid.pause();
+        trimPreviewPlaying = false;
+        if (trimPlayToggleBtn) trimPlayToggleBtn.textContent = '▶ Preview';
+      }
+
+      if (trimStartRange) {
+        trimStartRange.addEventListener('input', () => {
+          if (trimPreviewPlaying) pauseTrimPreview();
+          updateTrimUI();
+        });
+      }
+
+      if (trimLengthRange) {
+        trimLengthRange.addEventListener('input', () => {
+          const len = parseFloat(trimLengthRange.value) || 9.0;
+          const maxStart = Math.max(0, trimTotalDuration - len);
+          trimStartRange.max = maxStart;
+          if (parseFloat(trimStartRange.value) > maxStart) {
+            trimStartRange.value = maxStart;
+          }
+          if (trimPreviewPlaying) pauseTrimPreview();
+          updateTrimUI();
+        });
+      }
+
+      if (trimFirstBtn) {
+        trimFirstBtn.addEventListener('click', () => {
+          if (trimStartRange) trimStartRange.value = 0;
+          if (trimPreviewPlaying) pauseTrimPreview();
+          updateTrimUI();
+        });
+      }
+
+      if (trimMidBtn) {
+        trimMidBtn.addEventListener('click', () => {
+          const len = parseFloat(trimLengthRange ? trimLengthRange.value : 9.0) || 9.0;
+          if (trimStartRange) trimStartRange.value = Math.max(0, (trimTotalDuration - len) / 2);
+          if (trimPreviewPlaying) pauseTrimPreview();
+          updateTrimUI();
+        });
+      }
+
+      if (trimLastBtn) {
+        trimLastBtn.addEventListener('click', () => {
+          const len = parseFloat(trimLengthRange ? trimLengthRange.value : 9.0) || 9.0;
+          if (trimStartRange) trimStartRange.value = Math.max(0, trimTotalDuration - len);
+          if (trimPreviewPlaying) pauseTrimPreview();
+          updateTrimUI();
+        });
+      }
+
+      if (trimPlayToggleBtn) {
+        trimPlayToggleBtn.addEventListener('click', () => {
+          if (trimPreviewPlaying) pauseTrimPreview();
+          else playTrimPreview();
+        });
+      }
+
+      if (trimPreviewVid) {
+        trimPreviewVid.addEventListener('timeupdate', () => {
+          if (!trimPreviewPlaying) return;
+          const start = parseFloat(trimStartRange ? trimStartRange.value : 0) || 0;
+          const len = parseFloat(trimLengthRange ? trimLengthRange.value : 9.0) || 9.0;
+          const end = Math.min(trimTotalDuration, start + len);
+          if (trimPreviewVid.currentTime >= end || trimPreviewVid.currentTime < start) {
+            trimPreviewVid.currentTime = start;
+          }
+        });
+      }
+
+      function closeTrimModal() {
+        pauseTrimPreview();
+        if (videoTrimModal) videoTrimModal.classList.add('hidden');
+        if (trimPreviewVid) {
+          trimPreviewVid.pause();
+          trimPreviewVid.src = '';
+        }
+      }
+
+      if (closeTrimModalBtn) closeTrimModalBtn.addEventListener('click', closeTrimModal);
+      if (cancelTrimBtn) {
+        cancelTrimBtn.addEventListener('click', () => {
+          closeTrimModal();
+          if (!state.photo.loaded) {
+            stopCurrentMedia();
+          }
+        });
+      }
+
+      if (applyTrimBtn) {
+        applyTrimBtn.addEventListener('click', () => {
+          const start = parseFloat(trimStartRange ? trimStartRange.value : 0) || 0;
+          const len = parseFloat(trimLengthRange ? trimLengthRange.value : 9.0) || 9.0;
+          const end = Math.min(trimTotalDuration, start + len);
+
+          state.photo.startTime = start;
+          state.photo.endTime = end;
+          state.photo.segmentDuration = end - start;
+          state.photo.totalDuration = trimTotalDuration;
+
+          const vid = trimCurrentVideo;
+          if (vid) {
+            state.photo.img = vid;
+            state.photo.video = vid;
+            state.photo.isVideo = true;
+            state.photo.isLive = false;
+            state.photo.loaded = true;
+            state.photo.active = true;
+            vid.currentTime = start;
+            vid.play().catch(() => {});
+            const photoActiveCheck = document.getElementById('photoActiveCheck');
+            if (photoActiveCheck) photoActiveCheck.checked = true;
+            const fname = (trimCurrentFile && trimCurrentFile.name) ? trimCurrentFile.name : 'Video Clip';
+            updateMediaStatusUI(`${fname} [${start.toFixed(1)}s - ${end.toFixed(1)}s]`, true, false);
+          }
+
+          closeTrimModal();
+        });
+      }
+
+      if (mediaTrimBtn) {
+        mediaTrimBtn.addEventListener('click', () => {
+          if (state.photo.video && !state.photo.isLive) {
+            openVideoTrimModal(
+              state.photo.file || { name: 'Video Clip' },
+              state.photo.video,
+              state.photo.totalDuration || state.photo.video.duration || 9
+            );
+          }
+        });
+      }
 
       function loadMediaFile(file) {
         if (!file) return;
@@ -3613,21 +3946,38 @@ RAW SIGNAL</textarea>
           video.src = url;
 
           const onReady = () => {
-            state.photo.img = video;
-            state.photo.video = video;
-            state.photo.isVideo = true;
-            state.photo.isLive = false;
-            state.photo.loaded = true;
-            state.photo.active = true;
-            const photoActiveCheck = document.getElementById('photoActiveCheck');
-            if (photoActiveCheck) photoActiveCheck.checked = true;
-            updateMediaStatusUI(file.name || 'Video Clip', true, false);
-            video.play().catch(err => console.warn('Video auto-play suppressed:', err));
+            const duration = video.duration || 0;
+            state.photo.file = file;
+            state.photo.totalDuration = duration;
+
+            if (duration > 9.0) {
+              // Automatically open trimmer modal so user can choose their 9s segment
+              openVideoTrimModal(file, video, duration);
+            } else {
+              // Video <= 9s: use full video
+              state.photo.startTime = 0;
+              state.photo.endTime = duration;
+              state.photo.segmentDuration = duration;
+              state.photo.img = video;
+              state.photo.video = video;
+              state.photo.isVideo = true;
+              state.photo.isLive = false;
+              state.photo.loaded = true;
+              state.photo.active = true;
+              const photoActiveCheck = document.getElementById('photoActiveCheck');
+              if (photoActiveCheck) photoActiveCheck.checked = true;
+              updateMediaStatusUI(`${file.name || 'Video Clip'} [0.0s - ${duration.toFixed(1)}s]`, true, false);
+              video.play().catch(err => console.warn('Video auto-play suppressed:', err));
+            }
           };
 
-          video.addEventListener('loadeddata', onReady, { once: true });
-          video.addEventListener('canplay', () => {
-            if (!state.photo.loaded) onReady();
+          video.addEventListener('loadedmetadata', onReady, { once: true });
+          video.addEventListener('loadeddata', () => {
+            if (!state.photo.loaded && videoTrimModal && !videoTrimModal.classList.contains('hidden')) {
+              // already opened
+            } else if (!state.photo.loaded) {
+              onReady();
+            }
           }, { once: true });
 
           video.addEventListener('error', (e) => {
@@ -3642,6 +3992,7 @@ RAW SIGNAL</textarea>
           reader.onload = (ev) => {
             const img = new Image();
             img.onload = () => {
+              state.photo.file = file;
               state.photo.img = img;
               state.photo.video = null;
               state.photo.isVideo = false;
