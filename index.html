@@ -161,6 +161,21 @@
       box-shadow: 0 0 18px #ff0055, 0 0 4px #fff;
     }
 
+    /* Vector Mosh mode crosshair: pulsing cyan/pink codec targeting reticle */
+    #touchCrosshair.mode-vector-mosh {
+      width: 32px;
+      height: 32px;
+      border: 2px dashed #00ffcc;
+      border-radius: 6px;
+      background: radial-gradient(circle, rgba(0,255,204,0.45), rgba(255,0,85,0.2) 60%, transparent 80%);
+      box-shadow: 0 0 20px #00ffcc, 0 0 10px #ff0055;
+      animation: pulseReticle 1s infinite alternate ease-in-out;
+    }
+    @keyframes pulseReticle {
+      0% { transform: translate(-50%, -50%) scale(0.9) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) scale(1.15) rotate(45deg); }
+    }
+
     /* ===== Synth Knob Component ===== */
     .synth-knob {
       display: flex;
@@ -794,47 +809,130 @@ RAW SIGNAL</textarea>
           </label>
         </div>
 
-        <!-- The performance pad now lives directly on the main screen -->
+        <!-- The performance pad shortcut -->
         <button id="jamModeShortcut" class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-cyber-pink/10 border border-cyber-pink/50 active:scale-95 transition">
-          <span class="text-[10px] text-left text-slate-300">🎛️ <strong class="text-cyber-pink">Jam Pad</strong> is live on the main screen — drag anywhere on the text to smear &amp; shear</span>
+          <span class="text-[10px] text-left text-slate-300">🎛️ <strong class="text-cyber-pink">Jam Pad &amp; Vector Mosh</strong> live on screen — drag anywhere on text/video to tear &amp; melt</span>
           <span class="text-cyber-pink text-xs shrink-0">▶</span>
         </button>
 
-        <!-- Smear & Persistence -->
-        <div class="space-y-0.5">
-          <div class="flex justify-between text-[10px] text-slate-400">
-            <span>P-Frame Feedback Smear</span>
-            <span id="moshSmearLabel" class="text-cyber-pink">48%</span>
+        <!-- P-FRAME CODEC VECTOR ENGINE (REF STYLE) -->
+        <div class="p-2.5 rounded-lg bg-[#070b12] border border-cyber-cyan/40 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-cyber-cyan flex items-center gap-1">
+              <span>🌊</span> P-FRAME CODEC VECTOR ENGINE
+            </span>
+            <label class="flex items-center space-x-1 text-[9px] text-slate-300">
+              <input type="checkbox" id="vectorMoshActiveCheck" checked class="accent-cyber-cyan">
+              <span>Enable</span>
+            </label>
           </div>
-          <input type="range" id="moshSmearRange" min="0" max="92" value="48">
-        </div>
 
-        <!-- Macroblock Displace & Slice -->
-        <div class="grid grid-cols-2 gap-3">
+          <!-- Style Presets (Reference Datamosh Styles) -->
+          <div class="grid grid-cols-3 gap-1.5">
+            <button class="pframe-mode-btn py-1 px-1.5 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-pink/20 border-cyber-pink text-cyber-pink" data-mode="melt">🌊 Liquid Melt</button>
+            <button class="pframe-mode-btn py-1 px-1.5 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-card border-cyber-border text-slate-300" data-mode="shear">⚡ Vector Shear</button>
+            <button class="pframe-mode-btn py-1 px-1.5 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-card border-cyber-border text-slate-300" data-mode="decay">🧊 Block Decay</button>
+          </div>
+
+          <!-- Keyframe Drop / Freeze Controls (Real Datamoshing I-frame Stripping) -->
+          <div class="grid grid-cols-2 gap-2 pt-0.5">
+            <button id="freezeIFrameBtn" class="py-1.5 px-2 rounded-lg bg-cyber-card border border-cyber-cyan/50 text-[10px] font-bold text-cyber-cyan active:scale-95 transition flex items-center justify-center gap-1 shadow-[0_0_8px_rgba(0,255,204,0.15)]">
+              <span id="freezeIFrameIcon">🧊</span>
+              <span id="freezeIFrameText">Freeze Keyframe</span>
+            </button>
+            <button id="freshKeyframeBtn" class="py-1.5 px-2 rounded-lg bg-cyber-card border border-cyber-border text-[10px] font-bold text-slate-300 active:scale-95 transition flex items-center justify-center gap-1">
+              <span>✨</span>
+              <span>Fresh Keyframe</span>
+            </button>
+          </div>
+
+          <!-- Vector Push Force & Macroblock Grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Vector Push Force</span>
+                <span id="vectorForceLabel" class="text-cyber-cyan">28</span>
+              </div>
+              <input type="range" id="vectorForceRange" min="0" max="60" value="28">
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Macroblock Grid</span>
+                <span id="pframeBlockLabel" class="text-cyber-cyan">16px</span>
+              </div>
+              <input type="range" id="pframeBlockRange" min="8" max="32" step="8" value="16">
+            </div>
+          </div>
+
+          <!-- Melt Persistence & Chroma Bleed -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Melt Persistence</span>
+                <span id="pframePersistenceLabel" class="text-cyber-cyan">95%</span>
+              </div>
+              <input type="range" id="pframePersistenceRange" min="60" max="98" value="95">
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Chroma Bleed</span>
+                <span id="chromaBleedLabel" class="text-cyber-cyan">12px</span>
+              </div>
+              <input type="range" id="chromaBleedRange" min="0" max="30" value="12">
+            </div>
+          </div>
+
+          <!-- Video Motion Coupling -->
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
-              <span>Macroblocks</span>
-              <span id="moshBlockLabel" class="text-cyber-pink">35</span>
+              <span>Video Motion Coupling</span>
+              <span id="videoCouplingLabel" class="text-cyber-cyan">60%</span>
             </div>
-            <input type="range" id="moshBlockRange" min="0" max="100" value="35">
-          </div>
-
-          <div class="space-y-0.5">
-            <div class="flex justify-between text-[10px] text-slate-400">
-              <span>Slice Shear</span>
-              <span id="moshSliceLabel" class="text-cyber-pink">24px</span>
-            </div>
-            <input type="range" id="moshSliceRange" min="0" max="70" value="24">
+            <input type="range" id="videoCouplingRange" min="0" max="100" value="60">
           </div>
         </div>
 
-        <!-- Kinetic Motion Speed -->
-        <div class="space-y-0.5">
-          <div class="flex justify-between text-[10px] text-slate-400">
-            <span>Kinetic Float / Pulse Speed</span>
-            <span id="motionSpeedLabel" class="text-cyber-pink">1.0x</span>
+        <!-- Classic Slice Shear & Feedback Smear -->
+        <div class="space-y-2 pt-1 border-t border-cyber-border">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Classic Glitch Controls</div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Feedback Smear</span>
+                <span id="moshSmearLabel" class="text-cyber-pink">48%</span>
+              </div>
+              <input type="range" id="moshSmearRange" min="0" max="95" value="48">
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Slice Shear</span>
+                <span id="moshSliceLabel" class="text-cyber-pink">24px</span>
+              </div>
+              <input type="range" id="moshSliceRange" min="0" max="70" value="24">
+            </div>
           </div>
-          <input type="range" id="motionSpeedRange" min="0" max="30" value="10">
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Random Blocks</span>
+                <span id="moshBlockLabel" class="text-cyber-pink">35</span>
+              </div>
+              <input type="range" id="moshBlockRange" min="0" max="100" value="35">
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Kinetic Speed</span>
+                <span id="motionSpeedLabel" class="text-cyber-pink">1.0x</span>
+              </div>
+              <input type="range" id="motionSpeedRange" min="0" max="30" value="10">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1186,7 +1284,21 @@ RAW SIGNAL</textarea>
         macroblocks: 35,
         sliceShear: 24,
         speed: 1.0,
-        tick: 0
+        tick: 0,
+        // P-Frame Codec Vector Engine (Reference Style)
+        vectorMoshActive: true,
+        pframeMode: 'melt', // 'melt' | 'shear' | 'decay'
+        blockSize: 16,
+        vectorForce: 28,
+        persistence: 95,
+        chromaBleed: 12,
+        freezeIFrame: false,
+        videoCoupling: 60,
+        touchVx: 0,
+        touchVy: 0,
+        touchX: 360,
+        touchY: 640,
+        isSwiping: false
       },
 
       // CRT & Analog FX
@@ -1211,9 +1323,9 @@ RAW SIGNAL</textarea>
         graphicOpacity: 85
       },
 
-      // Mobile Interaction Modes (Drag or Jam XY Pad)
+      // Mobile Interaction Modes (Drag, Jam XY Pad, or Vector Mosh)
       interaction: {
-        mode: 'drag', // 'drag' | 'jam'
+        mode: 'drag', // 'drag' | 'jam' | 'vectorMosh'
         isInteracting: false,
         lastX: 0,
         lastY: 0,
@@ -1308,31 +1420,31 @@ RAW SIGNAL</textarea>
       cyberHyper: {
         type: { fontFamily: "Syne, sans-serif", layout: 'stack', fontSize: 100, fillColor: '#ffffff', fillColor2: '#ffe600', strokeColor: '#ff0055', glowColor: '#00ffcc', radius3D: 260, speed3D: 1.0 },
         sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 20, thresholdHigh: 90, maxLength: 300 },
-        mosh: { active: true, smear: 50, macroblocks: 40, sliceShear: 28 },
+        mosh: { active: true, smear: 50, macroblocks: 40, sliceShear: 28, vectorMoshActive: true, pframeMode: 'melt', vectorForce: 30, persistence: 95, blockSize: 16, chromaBleed: 14 },
         fx: { active: true, rgbSplit: 18, rgbAngle: 15, scanlines: 45, noise: 25, bgMode: 'cyberGradient', customBg: false }
       },
       acidVapor: {
         type: { fontFamily: "Rubik Glitch, cursive", layout: 'spiral', fontSize: 95, fillColor: '#39ff14', fillColor2: '#ffe600', strokeColor: '#ffe600', glowColor: '#ffe600', radius3D: 280, speed3D: 1.2 },
         sort: { active: true, direction: 'vertical', criterion: 'saturation', thresholdLow: 15, thresholdHigh: 95, maxLength: 360 },
-        mosh: { active: true, smear: 40, macroblocks: 30, sliceShear: 32 },
+        mosh: { active: true, smear: 40, macroblocks: 30, sliceShear: 32, vectorMoshActive: true, pframeMode: 'shear', vectorForce: 38, persistence: 90, blockSize: 16, chromaBleed: 18 },
         fx: { active: true, rgbSplit: 22, rgbAngle: 90, scanlines: 35, noise: 35, bgMode: 'acidLime', customBg: false }
       },
       analogVhs: {
         type: { fontFamily: "Bebas Neue, sans-serif", layout: 'cube', fontSize: 130, fillColor: '#e2d5ff', fillColor2: '#ff0055', strokeColor: '#b026ff', glowColor: '#b026ff', radius3D: 240, speed3D: 0.8 },
         sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 30, thresholdHigh: 80, maxLength: 180 },
-        mosh: { active: true, smear: 75, macroblocks: 20, sliceShear: 20 },
+        mosh: { active: true, smear: 75, macroblocks: 20, sliceShear: 20, vectorMoshActive: true, pframeMode: 'melt', vectorForce: 24, persistence: 96, blockSize: 24, chromaBleed: 10 },
         fx: { active: true, rgbSplit: 24, rgbAngle: 0, scanlines: 75, noise: 55, bgMode: 'cyberGradient', customBg: false }
       },
       brutalRed: {
         type: { fontFamily: "Anton, sans-serif", layout: 'sphere', fontSize: 120, fillColor: '#ffffff', fillColor2: '#ff0055', strokeColor: '#ff0055', glowColor: '#ff0055', radius3D: 270, speed3D: 1.1 },
         sort: { active: true, direction: 'vertical', criterion: 'red', thresholdLow: 10, thresholdHigh: 90, maxLength: 320 },
-        mosh: { active: true, smear: 30, macroblocks: 50, sliceShear: 45 },
+        mosh: { active: true, smear: 30, macroblocks: 50, sliceShear: 45, vectorMoshActive: true, pframeMode: 'shear', vectorForce: 45, persistence: 88, blockSize: 8, chromaBleed: 22 },
         fx: { active: true, rgbSplit: 12, rgbAngle: 45, scanlines: 50, noise: 30, bgMode: 'monochrome', customBg: false }
       },
       meltVoid: {
         type: { fontFamily: "Space Mono, monospace", layout: 'marquee', fontSize: 75, fillColor: '#ffffff', fillColor2: '#00ffcc', strokeColor: '#00ffcc', glowColor: '#00ffcc', radius3D: 260, speed3D: 1.0 },
         sort: { active: true, direction: 'vertical', criterion: 'brightness', thresholdLow: 25, thresholdHigh: 90, maxLength: 400 },
-        mosh: { active: true, smear: 80, macroblocks: 25, sliceShear: 15 },
+        mosh: { active: true, smear: 80, macroblocks: 25, sliceShear: 15, vectorMoshActive: true, pframeMode: 'melt', vectorForce: 35, persistence: 98, blockSize: 16, chromaBleed: 16 },
         fx: { active: true, rgbSplit: 15, rgbAngle: 120, scanlines: 20, noise: 15, bgMode: 'deepVoid', customBg: false }
       }
     };
@@ -2708,6 +2820,126 @@ RAW SIGNAL</textarea>
       }
     }
 
+    // P-Frame Codec Vector Datamosh Engine (Reference Style: #datamoshing a kiss)
+    function applyPFrameVectorMosh(targetCtx, mosh, tick) {
+      if (!mosh.vectorMoshActive) return;
+
+      const blockSize = mosh.blockSize || 16;
+      const baseForce = mosh.vectorForce || 28;
+      const mode = mosh.pframeMode || 'melt';
+      const chroma = mosh.chromaBleed || 12;
+
+      // Motion vector field generation
+      const hasTouch = (Math.abs(mosh.touchVx) > 0.1 || Math.abs(mosh.touchVy) > 0.1);
+      const touchX = mosh.touchX || (WIDTH / 2);
+      const touchY = mosh.touchY || (HEIGHT / 2);
+
+      // Check if video is playing to couple video motion
+      const isVideoPlaying = (state.photo.active && state.photo.isVideo && state.photo.video && !state.photo.video.paused && !state.photo.isLive);
+      const videoCoupling = (mosh.videoCoupling || 60) / 100;
+      let vidFlowX = 0;
+      let vidFlowY = 0;
+      if (isVideoPlaying) {
+        const vidTime = state.photo.video.currentTime || 0;
+        vidFlowX = Math.sin(vidTime * 3.5) * baseForce * 0.8 * videoCoupling;
+        vidFlowY = Math.cos(vidTime * 2.2) * baseForce * 0.3 * videoCoupling;
+      }
+
+      // Base coherent directional flow (reference datamosh style: horizontal sweep with slight drift)
+      let globalVx = (Math.cos(tick * 0.06) * 0.35 + 0.65) * baseForce + vidFlowX;
+      let globalVy = (Math.sin(tick * 0.09) * 0.25) * baseForce + vidFlowY;
+
+      if (mode === 'shear') {
+        const phase = Math.sin(tick * 0.2);
+        globalVx = (phase > 0 ? 1 : -1) * baseForce * 1.4;
+        globalVy = (Math.random() - 0.5) * (baseForce * 0.2);
+      } else if (mode === 'decay') {
+        globalVx = 0;
+        globalVy = 0;
+      }
+
+      // Calculate number of displaced macroblocks
+      const numBlocks = Math.min(130, Math.floor(25 + baseForce * 2.0));
+
+      for (let i = 0; i < numBlocks; i++) {
+        let bx, by;
+
+        if (hasTouch && Math.random() < 0.72) {
+          // Cluster around user's active touch gesture
+          const angle = Math.random() * Math.PI * 2;
+          const dist = Math.pow(Math.random(), 0.6) * 240;
+          bx = Math.floor((touchX + Math.cos(angle) * dist) / blockSize) * blockSize;
+          by = Math.floor((touchY + Math.sin(angle) * dist) / blockSize) * blockSize;
+        } else {
+          // Screen-wide distribution across video/text canvas
+          bx = Math.floor(Math.random() * (WIDTH / blockSize)) * blockSize;
+          by = Math.floor(Math.random() * (HEIGHT / blockSize)) * blockSize;
+        }
+
+        if (bx < 0 || bx >= WIDTH - blockSize || by < 0 || by >= HEIGHT - blockSize) continue;
+
+        let vx = globalVx;
+        let vy = globalVy;
+
+        if (hasTouch) {
+          const dxToTouch = bx - touchX;
+          const dyToTouch = by - touchY;
+          const dist = Math.sqrt(dxToTouch * dxToTouch + dyToTouch * dyToTouch);
+          if (dist < 300) {
+            const influence = 1 - (dist / 300);
+            vx = vx * (1 - influence) + (mosh.touchVx * (baseForce / 12)) * influence;
+            vy = vy * (1 - influence) + (mosh.touchVy * (baseForce / 12)) * influence;
+          }
+        }
+
+        if (mode === 'decay') {
+          vx = (Math.floor(Math.random() * 5) - 2) * blockSize;
+          vy = (Math.floor(Math.random() * 3) - 1) * blockSize;
+        }
+
+        // Quantization: snap displacement to 4px multiples for crisp MPEG/H.264 macroblock edges
+        vx = Math.round(vx / 4) * 4;
+        vy = Math.round(vy / 4) * 4;
+
+        if (vx === 0 && vy === 0) continue;
+
+        // Cluster length: continuous horizontal or vertical melting bands (1 to 4 blocks)
+        const clusterLen = (mode === 'melt' && Math.random() < 0.65) ? Math.floor(Math.random() * 3) + 1 : 1;
+        const bw = Math.min(WIDTH - bx, blockSize * clusterLen);
+        const bh = blockSize;
+
+        const sx = bx;
+        const sy = by;
+        const dx = Math.max(0, Math.min(WIDTH - bw, bx + vx));
+        const dy = Math.max(0, Math.min(HEIGHT - bh, by + vy));
+
+        // P-Frame Displacement: copy macroblock from previous feedback buffer
+        targetCtx.drawImage(feedbackCanvas, sx, sy, bw, bh, dx, dy, bw, bh);
+
+        // YUV 4:2:0 Chroma Bleed / Subsampling fringe
+        if (chroma > 0 && Math.random() < 0.32) {
+          const cShiftX = Math.sign(vx || 1) * Math.min(chroma, Math.abs(vx) * 0.6 + 4);
+          targetCtx.save();
+          targetCtx.globalAlpha = 0.42;
+          targetCtx.globalCompositeOperation = (i % 2 === 0) ? 'screen' : 'difference';
+          targetCtx.drawImage(
+            feedbackCanvas,
+            sx, sy, bw, bh,
+            Math.max(0, Math.min(WIDTH - bw, dx + cShiftX)),
+            dy, bw, bh
+          );
+          targetCtx.restore();
+        }
+      }
+
+      // Smooth decay of touch velocity
+      mosh.touchVx *= 0.88;
+      mosh.touchVy *= 0.88;
+      if (Math.abs(mosh.touchVx) < 0.05) mosh.touchVx = 0;
+      if (Math.abs(mosh.touchVy) < 0.05) mosh.touchVy = 0;
+    }
+
+
     function applyAnalogAndCrt(targetCtx, fx) {
       if (!fx.active) return;
       if (fx.rgbSplit === 0 && fx.scanlines === 0 && fx.noise === 0) return;
@@ -2859,12 +3091,21 @@ RAW SIGNAL</textarea>
       // 3. Datamosh smear feedback
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      if (state.mosh.active && state.mosh.smear > 0) {
-        const smearAlpha = 1 - (state.mosh.smear / 100);
+      if (state.mosh.freezeIFrame) {
+        // Drop I-Frames: Do not redraw incoming clean composite!
+        // The feedback canvas frame is frozen and continuously displaced by P-frame vectors
         ctx.drawImage(feedbackCanvas, 0, 0);
-        ctx.globalAlpha = smearAlpha;
-        ctx.drawImage(cleanCompositeCanvas, 0, 0);
-        ctx.globalAlpha = 1.0;
+      } else if (state.mosh.active) {
+        const persistence = (state.mosh.vectorMoshActive ? (state.mosh.persistence || 95) : state.mosh.smear) || 48;
+        if (persistence > 0) {
+          const smearAlpha = Math.max(0.015, 1 - (persistence / 100));
+          ctx.drawImage(feedbackCanvas, 0, 0);
+          ctx.globalAlpha = smearAlpha;
+          ctx.drawImage(cleanCompositeCanvas, 0, 0);
+          ctx.globalAlpha = 1.0;
+        } else {
+          ctx.drawImage(cleanCompositeCanvas, 0, 0);
+        }
       } else {
         ctx.drawImage(cleanCompositeCanvas, 0, 0);
       }
@@ -2877,6 +3118,9 @@ RAW SIGNAL</textarea>
       // 5. Datamosh Slice & Codec macroblocks
       if (state.mosh.active) {
         applyDatamoshBlocks(ctx, state.mosh, state.mosh.tick);
+        if (state.mosh.vectorMoshActive) {
+          applyPFrameVectorMosh(ctx, state.mosh, state.mosh.tick);
+        }
       }
 
       // 6. Analog CRT & Chromatic pass (paused during active typing bursts for 0ms latency)
@@ -3285,7 +3529,7 @@ RAW SIGNAL</textarea>
         };
       }
 
-      // Jam mode: dragging directly on the text screen modulates Smear (Y) x Slice Shear (X) live
+      // Jam mode: dragging directly on the text screen modulates Smear/Persistence (Y) x Slice Shear/Vector Force (X) live
       function jamAt(cx, cy) {
         const rect = box.getBoundingClientRect();
         const nx = Math.min(1, Math.max(0, (cx - rect.left) / rect.width));
@@ -3293,11 +3537,28 @@ RAW SIGNAL</textarea>
 
         const shearInput = document.getElementById('moshSliceRange');
         const smearInput = document.getElementById('moshSmearRange');
-        const shearMax = parseFloat(shearInput.max);
-        const smearMax = parseFloat(smearInput.max);
+        if (shearInput) {
+          const shearMax = parseFloat(shearInput.max) || 70;
+          setSliderValue('moshSliceRange', Math.round(nx * shearMax));
+        }
+        if (smearInput) {
+          const smearMax = parseFloat(smearInput.max) || 95;
+          setSliderValue('moshSmearRange', Math.round((1 - ny) * smearMax));
+        }
 
-        setSliderValue('moshSliceRange', Math.round(nx * shearMax));
-        setSliderValue('moshSmearRange', Math.round((1 - ny) * smearMax));
+        // Modulation of Vector Mosh Force (X) and Melt Persistence (Y)
+        const vectorForceInput = document.getElementById('vectorForceRange');
+        if (vectorForceInput) {
+          const vMax = parseFloat(vectorForceInput.max) || 60;
+          setSliderValue('vectorForceRange', Math.round(nx * vMax));
+        }
+        const persistInput = document.getElementById('pframePersistenceRange');
+        if (persistInput) {
+          const pMin = parseFloat(persistInput.min) || 60;
+          const pMax = parseFloat(persistInput.max) || 98;
+          const pVal = Math.round(pMin + (1 - ny) * (pMax - pMin));
+          setSliderValue('pframePersistenceRange', pVal);
+        }
       }
 
       function onStart(cx, cy) {
@@ -3305,13 +3566,20 @@ RAW SIGNAL</textarea>
         const p = getCanvasCoords(cx, cy);
         state.interaction.lastX = p.x;
         state.interaction.lastY = p.y;
+        state.mosh.touchX = p.x;
+        state.mosh.touchY = p.y;
+        state.mosh.touchVx = 0;
+        state.mosh.touchVy = 0;
+        state.mosh.isSwiping = true;
 
-        if (state.interaction.mode === 'jam') {
+        if (state.interaction.mode === 'jam' || state.interaction.mode === 'vectorMosh') {
           crosshair.style.left = `${cx}px`;
           crosshair.style.top = `${cy}px`;
           crosshair.classList.remove('hidden');
           jamGrid.style.opacity = '1';
-          jamAt(cx, cy);
+          if (state.interaction.mode === 'jam') {
+            jamAt(cx, cy);
+          }
         } else {
           // Drag typography position
           state.type.x = p.x;
@@ -3323,19 +3591,29 @@ RAW SIGNAL</textarea>
         if (!state.interaction.isInteracting) return;
         const p = getCanvasCoords(cx, cy);
 
-        if (state.interaction.mode === 'jam') {
+        // Calculate touch velocity vector for P-Frame codec displacement
+        const vx = p.x - state.interaction.lastX;
+        const vy = p.y - state.interaction.lastY;
+        state.mosh.touchVx = vx;
+        state.mosh.touchVy = vy;
+        state.mosh.touchX = p.x;
+        state.mosh.touchY = p.y;
+        state.interaction.lastX = p.x;
+        state.interaction.lastY = p.y;
+
+        if (state.interaction.mode === 'jam' || state.interaction.mode === 'vectorMosh') {
           crosshair.style.left = `${cx}px`;
           crosshair.style.top = `${cy}px`;
-          jamAt(cx, cy);
+          if (state.interaction.mode === 'jam') {
+            jamAt(cx, cy);
+          }
         } else {
           // Drag mode: if 3D layout, rotate 3D object on screen!
           if (['spiral', 'cube', 'sphere'].includes(state.type.layout)) {
-            const dx = (p.x - state.interaction.lastX) * 0.012;
-            const dy = (p.y - state.interaction.lastY) * 0.012;
+            const dx = vx * 0.012;
+            const dy = vy * 0.012;
             state.type.rotY += dx;
             state.type.rotX -= dy;
-            state.interaction.lastX = p.x;
-            state.interaction.lastY = p.y;
           } else {
             state.type.x = p.x;
             state.type.y = p.y;
@@ -3345,6 +3623,7 @@ RAW SIGNAL</textarea>
 
       function onEnd() {
         state.interaction.isInteracting = false;
+        state.mosh.isSwiping = false;
         crosshair.classList.add('hidden');
         jamGrid.style.opacity = '0';
       }
@@ -3385,7 +3664,7 @@ RAW SIGNAL</textarea>
         }
       });
 
-      // Cycle touch interaction: Drag <-> Jam Pad
+      // Cycle touch interaction: Drag <-> Jam Pad <-> Vector Mosh
       const modeToggle = document.getElementById('touchModeToggle');
       const modeIcon = document.getElementById('brushIcon');
       const modeText = document.getElementById('brushBtnText');
@@ -3397,11 +3676,15 @@ RAW SIGNAL</textarea>
           btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-300 flex items-center space-x-1 active:scale-95 transition'
         },
         jam: {
-          icon: '🎛️', text: 'Mode: Jam', label: '🎛️ Touch: Jam Pad (Smear × Shear)',
+          icon: '🎛️', text: 'Mode: Jam', label: '🎛️ Touch: Jam XY (Vector × Persistence + Push)',
           btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-pink/20 border border-cyber-pink text-xs text-cyber-pink flex items-center space-x-1 active:scale-95 transition'
+        },
+        vectorMosh: {
+          icon: '🌊', text: 'Mode: Vector Mosh', label: '🌊 Touch: Codec Macroblock Rip & Melt',
+          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-cyan/20 border border-cyber-cyan text-xs text-cyber-cyan font-bold flex items-center space-x-1 active:scale-95 transition shadow-[0_0_10px_rgba(0,255,204,0.2)]'
         }
       };
-      const ORDER = ['drag', 'jam'];
+      const ORDER = ['drag', 'jam', 'vectorMosh'];
 
       function applyMode() {
         const m = MODES[state.interaction.mode] || MODES.drag;
@@ -3412,8 +3695,9 @@ RAW SIGNAL</textarea>
         touchModeLabel.textContent = (state.interaction.mode === 'drag' && is3D)
           ? '👆 Touch: Rotate 3D Model'
           : m.label;
-        crosshair.classList.remove('mode-jam', 'mode-brush');
+        crosshair.classList.remove('mode-jam', 'mode-brush', 'mode-vector-mosh');
         if (state.interaction.mode === 'jam') crosshair.classList.add('mode-jam');
+        if (state.interaction.mode === 'vectorMosh') crosshair.classList.add('mode-vector-mosh');
       }
       window.applyTouchMode = applyMode;
       applyMode();
@@ -3589,6 +3873,83 @@ RAW SIGNAL</textarea>
       bind('moshBlockRange', state.mosh, 'macroblocks', 'moshBlockLabel');
       bind('moshSliceRange', state.mosh, 'sliceShear', 'moshSliceLabel', 'px');
       bind('motionSpeedRange', state.mosh, 'speed', 'motionSpeedLabel', 'x', 0.1);
+
+      // P-Frame Codec Vector Mosh Controls
+      const vectorMoshCheck = document.getElementById('vectorMoshActiveCheck');
+      if (vectorMoshCheck) {
+        vectorMoshCheck.addEventListener('change', (e) => state.mosh.vectorMoshActive = e.target.checked);
+      }
+      bind('vectorForceRange', state.mosh, 'vectorForce', 'vectorForceLabel');
+      bind('pframeBlockRange', state.mosh, 'blockSize', 'pframeBlockLabel', 'px');
+      bind('pframePersistenceRange', state.mosh, 'persistence', 'pframePersistenceLabel', '%');
+      bind('chromaBleedRange', state.mosh, 'chromaBleed', 'chromaBleedLabel', 'px');
+      bind('videoCouplingRange', state.mosh, 'videoCoupling', 'videoCouplingLabel', '%');
+
+      // Keyframe Freeze & Fresh Keyframe (I-frame Stripping)
+      const freezeIFrameBtn = document.getElementById('freezeIFrameBtn');
+      const freezeIFrameIcon = document.getElementById('freezeIFrameIcon');
+      const freezeIFrameText = document.getElementById('freezeIFrameText');
+      if (freezeIFrameBtn) {
+        freezeIFrameBtn.addEventListener('click', () => {
+          state.mosh.freezeIFrame = !state.mosh.freezeIFrame;
+          if (state.mosh.freezeIFrame) {
+            freezeIFrameBtn.classList.remove('bg-cyber-card', 'border-cyber-cyan/50', 'text-cyber-cyan');
+            freezeIFrameBtn.classList.add('bg-cyber-pink/30', 'border-cyber-pink', 'text-cyber-pink', 'animate-pulse');
+            if (freezeIFrameIcon) freezeIFrameIcon.textContent = '❄️';
+            if (freezeIFrameText) freezeIFrameText.textContent = 'Keyframe Dropped';
+          } else {
+            freezeIFrameBtn.classList.add('bg-cyber-card', 'border-cyber-cyan/50', 'text-cyber-cyan');
+            freezeIFrameBtn.classList.remove('bg-cyber-pink/30', 'border-cyber-pink', 'text-cyber-pink', 'animate-pulse');
+            if (freezeIFrameIcon) freezeIFrameIcon.textContent = '🧊';
+            if (freezeIFrameText) freezeIFrameText.textContent = 'Freeze Keyframe';
+          }
+        });
+      }
+
+      const freshKeyframeBtn = document.getElementById('freshKeyframeBtn');
+      if (freshKeyframeBtn) {
+        freshKeyframeBtn.addEventListener('click', () => {
+          feedbackCtx.clearRect(0, 0, WIDTH, HEIGHT);
+          feedbackCtx.drawImage(cleanCompositeCanvas, 0, 0);
+          state.mosh.freezeIFrame = false;
+          if (freezeIFrameBtn) {
+            freezeIFrameBtn.classList.add('bg-cyber-card', 'border-cyber-cyan/50', 'text-cyber-cyan');
+            freezeIFrameBtn.classList.remove('bg-cyber-pink/30', 'border-cyber-pink', 'text-cyber-pink', 'animate-pulse');
+            if (freezeIFrameIcon) freezeIFrameIcon.textContent = '🧊';
+            if (freezeIFrameText) freezeIFrameText.textContent = 'Freeze Keyframe';
+          }
+        });
+      }
+
+      // Datamosh Style Presets
+      document.querySelectorAll('.pframe-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mode = btn.dataset.mode;
+          state.mosh.pframeMode = mode;
+          document.querySelectorAll('.pframe-mode-btn').forEach(b => {
+            b.className = 'pframe-mode-btn py-1 px-1.5 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-card border-cyber-border text-slate-300';
+          });
+          btn.className = 'pframe-mode-btn py-1 px-1.5 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-pink/20 border-cyber-pink text-cyber-pink';
+
+          if (mode === 'melt') {
+            setSliderValue('vectorForceRange', 32);
+            setSliderValue('pframeBlockRange', 16);
+            setSliderValue('pframePersistenceRange', 96);
+            setSliderValue('chromaBleedRange', 14);
+          } else if (mode === 'shear') {
+            setSliderValue('vectorForceRange', 42);
+            setSliderValue('pframeBlockRange', 16);
+            setSliderValue('pframePersistenceRange', 88);
+            setSliderValue('chromaBleedRange', 20);
+          } else if (mode === 'decay') {
+            setSliderValue('vectorForceRange', 24);
+            setSliderValue('pframeBlockRange', 24);
+            setSliderValue('pframePersistenceRange', 94);
+            setSliderValue('chromaBleedRange', 16);
+          }
+        });
+      });
+
 
       // Media (Photo, Video & Live Camera) controls
       const mediaStatusBox = document.getElementById('mediaStatusBox');
@@ -4205,6 +4566,11 @@ RAW SIGNAL</textarea>
           setSliderValue('moshSmearRange', state.mosh.smear);
           setSliderValue('moshSliceRange', state.mosh.sliceShear);
           setSliderValue('moshBlockRange', state.mosh.macroblocks);
+          if (state.mosh.vectorForce !== undefined) setSliderValue('vectorForceRange', state.mosh.vectorForce);
+          if (state.mosh.blockSize !== undefined) setSliderValue('pframeBlockRange', state.mosh.blockSize);
+          if (state.mosh.persistence !== undefined) setSliderValue('pframePersistenceRange', state.mosh.persistence);
+          if (state.mosh.chromaBleed !== undefined) setSliderValue('chromaBleedRange', state.mosh.chromaBleed);
+          if (state.mosh.videoCoupling !== undefined) setSliderValue('videoCouplingRange', state.mosh.videoCoupling);
           setSliderValue('rgbSplitRange', state.fx.rgbSplit);
           setSliderValue('rgbAngleRange', state.fx.rgbAngle);
           setSliderValue('scanlinesRange', state.fx.scanlines);
@@ -4288,6 +4654,9 @@ RAW SIGNAL</textarea>
         setSliderValue('sortLengthRange', Math.floor(80 + Math.random() * 450));
         setSliderValue('moshSmearRange', Math.floor(Math.random() * 75));
         setSliderValue('moshSliceRange', Math.floor(Math.random() * 45));
+        setSliderValue('vectorForceRange', Math.floor(15 + Math.random() * 40));
+        setSliderValue('pframePersistenceRange', Math.floor(86 + Math.random() * 12));
+        setSliderValue('chromaBleedRange', Math.floor(6 + Math.random() * 20));
         setSliderValue('rgbSplitRange', Math.floor(Math.random() * 30));
         setSliderValue('rgbAngleRange', Math.floor(Math.random() * 360));
       });
@@ -4297,7 +4666,7 @@ RAW SIGNAL</textarea>
     function knobColorFor(input) {
       const id = input.id;
       if (id.startsWith('sort')) return '#00ffcc';
-      if (id.startsWith('mosh') || id.startsWith('motion') || id.startsWith('speed3D')) return '#ff0055';
+      if (id.startsWith('mosh') || id.startsWith('motion') || id.startsWith('speed3D') || id.startsWith('vector') || id.startsWith('pframe') || id.startsWith('chroma')) return '#ff0055';
       if (id.startsWith('rgb') || id.startsWith('scanlines') || id.startsWith('noise')) return '#39ff14';
       if (id.startsWith('ascii') || id.startsWith('photo')) return '#ffe600';
       if (id.startsWith('vibe')) return '#00ffcc';
