@@ -414,7 +414,7 @@
         <span class="text-sm leading-none">🔤</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">TEXT</span>
       </button>
       <button data-tab="photo" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
-        <span class="text-sm leading-none">📷</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">PHOTO</span>
+        <span class="text-sm leading-none">🎬</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">MEDIA</span>
       </button>
       <button data-tab="glitch" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
         <span class="text-sm leading-none">🌀</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">GLITCH</span>
@@ -578,11 +578,11 @@ RAW SIGNAL</textarea>
         </div>
       </div>
 
-      <!-- ==================== TAB 2: PHOTO & ASCII ENGINE ==================== -->
+      <!-- ==================== TAB 2: MEDIA (PHOTO & VIDEO) & ASCII ==================== -->
       <div id="tabPhoto" class="tab-content hidden space-y-2.5">
         <div class="flex items-center justify-between border-b border-cyber-border pb-1">
           <div class="flex items-center space-x-1.5">
-            <span class="text-cyber-yellow font-bold text-[11px]">PHOTO ASCII &amp; MOSH ENGINE</span>
+            <span class="text-cyber-yellow font-bold text-[11px]">MEDIA (PHOTO / VIDEO) &amp; MOSH</span>
           </div>
           <label class="flex items-center space-x-1 text-[10px] text-slate-300">
             <input type="checkbox" id="photoActiveCheck" class="accent-cyber-yellow">
@@ -590,35 +590,51 @@ RAW SIGNAL</textarea>
           </label>
         </div>
 
-        <!-- Photo Upload & Presets -->
+        <!-- Camera, Video & Gallery Media Source Controls -->
         <div class="space-y-1.5">
           <div class="grid grid-cols-3 gap-2">
-            <label class="tap-btn py-2 px-1.5 rounded-lg bg-cyber-yellow/20 border border-cyber-yellow text-cyber-yellow font-bold text-xs flex items-center justify-center space-x-1 cursor-pointer active:scale-95 transition hover:bg-cyber-yellow hover:text-black">
-              <span>📸 Camera</span>
+            <!-- Gallery: Photos & Videos -->
+            <label class="tap-btn py-2 px-1 rounded-lg bg-cyber-card border border-cyber-border text-slate-200 font-bold text-[11px] flex items-center justify-center space-x-1 cursor-pointer active:scale-95 transition hover:border-cyber-yellow hover:text-cyber-yellow text-center">
+              <span>🖼️ Gallery</span>
+              <input type="file" id="photoFileInput" accept="image/*,video/*" class="hidden">
+            </label>
+
+            <!-- Video Cam: Record with camera -->
+            <label class="tap-btn py-2 px-1 rounded-lg bg-cyber-yellow/20 border border-cyber-yellow text-cyber-yellow font-bold text-[11px] flex items-center justify-center space-x-1 cursor-pointer active:scale-95 transition hover:bg-cyber-yellow hover:text-black text-center">
+              <span>🎥 Video Cam</span>
+              <input type="file" id="videoCameraInput" accept="video/*" capture="environment" class="hidden">
+            </label>
+
+            <!-- Photo Cam: Snap with camera -->
+            <label class="tap-btn py-2 px-1 rounded-lg bg-cyber-card border border-cyber-border text-slate-200 font-bold text-[11px] flex items-center justify-center space-x-1 cursor-pointer active:scale-95 transition hover:border-cyber-yellow hover:text-cyber-yellow text-center">
+              <span>📸 Photo Cam</span>
               <input type="file" id="photoCameraInput" accept="image/*" capture="environment" class="hidden">
             </label>
-            <label class="tap-btn py-2 px-1.5 rounded-lg bg-cyber-card border border-cyber-border text-slate-200 font-bold text-xs flex items-center justify-center space-x-1 cursor-pointer active:scale-95 transition hover:border-cyber-yellow hover:text-cyber-yellow">
-              <span>🖼️ Gallery</span>
-              <input type="file" id="photoFileInput" accept="image/*" class="hidden">
-            </label>
-            <button id="photoClearBtn" class="tap-btn px-2 py-2 rounded-lg bg-cyber-card border border-cyber-border text-xs text-slate-400 active:scale-95 transition hover:text-white">
-              ✕ Clear
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <!-- Live Camera Feed Toggle -->
+            <button id="liveCameraBtn" type="button" class="py-1.5 px-2 rounded-lg bg-cyber-card border border-cyber-cyan/50 text-cyber-cyan font-bold text-[10px] flex items-center justify-center space-x-1 active:scale-95 transition hover:bg-cyber-cyan/10">
+              <span id="liveCameraIcon">🔴</span>
+              <span id="liveCameraText">Live Camera Feed</span>
+            </button>
+
+            <!-- Clear Button -->
+            <button id="photoClearBtn" type="button" class="py-1.5 px-2 rounded-lg bg-cyber-card border border-cyber-border text-slate-400 font-bold text-[10px] flex items-center justify-center space-x-1 active:scale-95 transition hover:text-white">
+              <span>✕ Clear Media</span>
             </button>
           </div>
 
-          <!-- Quick Sample Photos -->
-          <div>
-            <div class="text-[9px] text-slate-400 mb-1">QUICK SAMPLE GRAPHICS:</div>
-            <div class="grid grid-cols-3 gap-1.5">
-              <button data-sample="skull" class="sample-photo-btn py-1.5 px-2 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] font-bold active:scale-95 transition hover:border-cyber-yellow">
-                💀 Cyber Skull
-              </button>
-              <button data-sample="mech" class="sample-photo-btn py-1.5 px-2 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] font-bold active:scale-95 transition hover:border-cyber-yellow">
-                🤖 Neo Mech
-              </button>
-              <button data-sample="statue" class="sample-photo-btn py-1.5 px-2 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] font-bold active:scale-95 transition hover:border-cyber-yellow">
-                🗿 Vapor Statue
-              </button>
+          <!-- Active Media Status & Controls Bar (hidden when no media is loaded) -->
+          <div id="mediaStatusBox" class="hidden bg-cyber-black/70 border border-cyber-border/70 rounded p-1.5 flex items-center justify-between text-[10px]">
+            <div class="flex items-center space-x-1.5 truncate mr-2">
+              <span id="mediaStatusBadge" class="px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-cyber-yellow/20 text-cyber-yellow">MEDIA</span>
+              <span id="mediaStatusName" class="text-slate-300 truncate">Clip.mp4</span>
+            </div>
+            <div class="flex items-center space-x-1 shrink-0">
+              <button id="mediaPlayPauseBtn" type="button" class="hidden px-2 py-0.5 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] hover:text-white" title="Play/Pause">⏸️</button>
+              <button id="mediaMuteBtn" type="button" class="hidden px-2 py-0.5 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[10px] hover:text-white" title="Mute/Unmute">🔇</button>
+              <button id="mediaFlipCamBtn" type="button" class="hidden px-2 py-0.5 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px]" title="Flip Camera">🔄 Flip</button>
             </div>
           </div>
         </div>
@@ -629,15 +645,15 @@ RAW SIGNAL</textarea>
             <label class="block text-[10px] text-slate-400 mb-0.5">RENDER MODE</label>
             <select id="photoRenderModeSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
               <option value="ascii">Pure ASCII Art</option>
-              <option value="asciiOverlay">ASCII + Photo Underlay</option>
-              <option value="direct">Direct Photo (Raw Mosh)</option>
+              <option value="asciiOverlay">ASCII + Media Underlay</option>
+              <option value="direct">Direct Media (Raw Video/Photo Mosh)</option>
             </select>
           </div>
 
           <div>
             <label class="block text-[10px] text-slate-400 mb-0.5">ASCII COLOR MODE</label>
             <select id="asciiColorModeSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
-              <option value="photo">Original Photo Colors</option>
+              <option value="photo">Original Photo/Video Colors</option>
               <option value="matrix">Matrix Phosphor Green</option>
               <option value="neon">Cyber Neon Duo (Cyan/Pink)</option>
               <option value="mono">Monochrome High-Key</option>
@@ -662,9 +678,9 @@ RAW SIGNAL</textarea>
           <div>
             <label class="block text-[10px] text-slate-400 mb-0.5">LAYER BLEND</label>
             <select id="photoBlendSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
-              <option value="behind">Image Behind Text (Basic)</option>
-              <option value="inFront">Image In Front (Invert / Luminance Pass)</option>
-              <option value="photoOnly">Image Only</option>
+              <option value="behind">Media Behind Text (Basic)</option>
+              <option value="inFront">Media In Front (Invert / Luminance Pass)</option>
+              <option value="photoOnly">Media Only (Video/Photo)</option>
             </select>
           </div>
         </div>
@@ -1049,11 +1065,16 @@ RAW SIGNAL</textarea>
         rotZ: 0
       },
 
-      // Photo & ASCII Engine
+      // Media (Photo & Video) ASCII Engine
       photo: {
         active: false,
         loaded: false,
         img: null,
+        video: null,
+        stream: null,
+        isVideo: false,
+        isLive: false,
+        facingMode: 'environment',
         mode: 'ascii', // 'ascii', 'asciiOverlay', 'direct'
         colorMode: 'photo', // 'photo', 'matrix', 'neon', 'mono', 'amber'
         charSet: 'blocks', // 'blocks', 'standard', 'matrix', 'binary', 'katakana'
@@ -1593,17 +1614,26 @@ RAW SIGNAL</textarea>
       });
     }
 
-    // ==================== PHOTO ASCII ENGINE ====================
+    // ==================== MEDIA (PHOTO & VIDEO) ASCII ENGINE ====================
     function renderAsciiPhoto(targetCanvas, pState, tick) {
       if (!pState.img) return;
 
       const pCtx = targetCanvas.getContext('2d');
       pCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      // Draw original image into photoSourceCanvas with aspect fill (cover)
-      photoSourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
       const img = pState.img;
-      const imgAspect = img.width / img.height;
+      const isVid = (img instanceof HTMLVideoElement) || pState.isVideo;
+
+      // If video, ensure readyState has decoded frames
+      if (isVid && img.readyState < 2) {
+        return; // waiting for video frame data
+      }
+
+      const imgW = img.videoWidth || img.width || 0;
+      const imgH = img.videoHeight || img.height || 0;
+      if (imgW === 0 || imgH === 0) return;
+
+      const imgAspect = imgW / imgH;
       const canvasAspect = WIDTH / HEIGHT;
 
       let drawW, drawH, drawX, drawY;
@@ -1619,6 +1649,7 @@ RAW SIGNAL</textarea>
         drawY = (HEIGHT - drawH) / 2;
       }
 
+      photoSourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
       photoSourceCtx.drawImage(img, drawX, drawY, drawW, drawH);
 
       if (pState.mode === 'direct') {
@@ -1698,100 +1729,6 @@ RAW SIGNAL</textarea>
           pCtx.fillText(char, drawPx, drawPy);
         }
       }
-    }
-
-    // Procedural Sample Graphic Generator
-    function generateSampleGraphic(type) {
-      const c = document.createElement('canvas');
-      c.width = WIDTH; c.height = HEIGHT;
-      const g = c.getContext('2d');
-
-      if (type === 'skull') {
-        const grad = g.createRadialGradient(WIDTH/2, HEIGHT*0.45, 60, WIDTH/2, HEIGHT*0.45, 500);
-        grad.addColorStop(0, '#2b003b');
-        grad.addColorStop(1, '#05020a');
-        g.fillStyle = grad;
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-
-        g.strokeStyle = '#00ffcc';
-        g.lineWidth = 14;
-        g.shadowColor = '#00ffcc';
-        g.shadowBlur = 30;
-
-        g.fillStyle = '#ffffff';
-        g.beginPath();
-        g.arc(WIDTH/2, HEIGHT*0.42, 190, Math.PI * 0.85, Math.PI * 2.15);
-        g.lineTo(WIDTH/2 + 130, HEIGHT*0.58);
-        g.lineTo(WIDTH/2 + 75, HEIGHT*0.65);
-        g.lineTo(WIDTH/2 - 75, HEIGHT*0.65);
-        g.lineTo(WIDTH/2 - 130, HEIGHT*0.58);
-        g.closePath();
-        g.fill();
-        g.stroke();
-
-        g.fillStyle = '#05020a';
-        g.shadowColor = '#ff0055';
-        g.shadowBlur = 20;
-        g.beginPath();
-        g.ellipse(WIDTH/2 - 65, HEIGHT*0.45, 42, 52, -0.15, 0, Math.PI * 2);
-        g.ellipse(WIDTH/2 + 65, HEIGHT*0.45, 42, 52, 0.15, 0, Math.PI * 2);
-        g.fill();
-
-        g.fillStyle = '#ff0055';
-        for (let i = -3; i <= 3; i++) {
-          g.fillRect(WIDTH/2 + i * 22 - 7, HEIGHT*0.67, 14, 28);
-        }
-      } else if (type === 'mech') {
-        const grad = g.createLinearGradient(0, 0, WIDTH, HEIGHT);
-        grad.addColorStop(0, '#001a14');
-        grad.addColorStop(1, '#000000');
-        g.fillStyle = grad;
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-
-        g.strokeStyle = '#39ff14';
-        g.lineWidth = 10;
-        g.shadowColor = '#39ff14';
-        g.shadowBlur = 25;
-
-        g.strokeRect(WIDTH*0.2, HEIGHT*0.3, WIDTH*0.6, HEIGHT*0.35);
-        g.fillStyle = '#103022';
-        g.fillRect(WIDTH*0.2, HEIGHT*0.3, WIDTH*0.6, HEIGHT*0.35);
-
-        g.fillStyle = '#ffe600';
-        g.shadowColor = '#ffe600';
-        g.shadowBlur = 40;
-        g.fillRect(WIDTH*0.25, HEIGHT*0.42, WIDTH*0.5, 45);
-
-        g.strokeStyle = '#00ffcc';
-        g.lineWidth = 4;
-        g.beginPath();
-        g.moveTo(WIDTH*0.1, HEIGHT*0.2); g.lineTo(WIDTH*0.9, HEIGHT*0.2);
-        g.moveTo(WIDTH*0.1, HEIGHT*0.75); g.lineTo(WIDTH*0.9, HEIGHT*0.75);
-        g.stroke();
-      } else {
-        const grad = g.createLinearGradient(0, 0, 0, HEIGHT);
-        grad.addColorStop(0, '#ff007f');
-        grad.addColorStop(0.5, '#7928ca');
-        grad.addColorStop(1, '#00f0ff');
-        g.fillStyle = grad;
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-
-        g.fillStyle = '#ffe600';
-        g.shadowColor = '#ffe600';
-        g.shadowBlur = 50;
-        g.beginPath();
-        g.arc(WIDTH/2, HEIGHT*0.45, 180, 0, Math.PI * 2);
-        g.fill();
-
-        g.fillStyle = '#0b0416';
-        g.shadowBlur = 0;
-        g.beginPath();
-        g.arc(WIDTH/2, HEIGHT*0.4, 110, 0, Math.PI * 2);
-        g.rect(WIDTH*0.25, HEIGHT*0.52, WIDTH*0.5, HEIGHT*0.35);
-        g.fill();
-      }
-
-      return c;
     }
 
     // ==================== CYBERPUNK & ORIENTAL VECTOR GRAPHIC ENGINE ====================
@@ -3560,61 +3497,281 @@ RAW SIGNAL</textarea>
       bind('moshSliceRange', state.mosh, 'sliceShear', 'moshSliceLabel', 'px');
       bind('motionSpeedRange', state.mosh, 'speed', 'motionSpeedLabel', 'x', 0.1);
 
-      // Photo & ASCII controls
-      function loadPhotoFile(file) {
-        if (!file || !file.type.startsWith('image/')) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const img = new Image();
-          img.onload = () => {
-            state.photo.img = img;
+      // Media (Photo, Video & Live Camera) controls
+      const mediaStatusBox = document.getElementById('mediaStatusBox');
+      const mediaStatusBadge = document.getElementById('mediaStatusBadge');
+      const mediaStatusName = document.getElementById('mediaStatusName');
+      const mediaPlayPauseBtn = document.getElementById('mediaPlayPauseBtn');
+      const mediaMuteBtn = document.getElementById('mediaMuteBtn');
+      const mediaFlipCamBtn = document.getElementById('mediaFlipCamBtn');
+      const liveCameraBtn = document.getElementById('liveCameraBtn');
+      const liveCameraIcon = document.getElementById('liveCameraIcon');
+      const liveCameraText = document.getElementById('liveCameraText');
+
+      function updateMediaStatusUI(label, isVid, isLive) {
+        if (!mediaStatusBox) return;
+        if (!state.photo.loaded) {
+          mediaStatusBox.classList.add('hidden');
+          if (liveCameraIcon) liveCameraIcon.textContent = '🔴';
+          if (liveCameraText) liveCameraText.textContent = 'Live Camera Feed';
+          if (liveCameraBtn) liveCameraBtn.classList.remove('border-red-500', 'text-red-400');
+          return;
+        }
+
+        mediaStatusBox.classList.remove('hidden');
+        if (isLive) {
+          mediaStatusBadge.className = 'px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse';
+          mediaStatusBadge.textContent = 'LIVE FEED';
+          mediaStatusName.textContent = label || 'Camera Stream';
+          if (mediaPlayPauseBtn) mediaPlayPauseBtn.classList.add('hidden');
+          if (mediaMuteBtn) mediaMuteBtn.classList.add('hidden');
+          if (mediaFlipCamBtn) mediaFlipCamBtn.classList.remove('hidden');
+          if (liveCameraIcon) liveCameraIcon.textContent = '⏹️';
+          if (liveCameraText) liveCameraText.textContent = 'Stop Live Feed';
+          if (liveCameraBtn) liveCameraBtn.classList.add('border-red-500', 'text-red-400');
+        } else if (isVid) {
+          mediaStatusBadge.className = 'px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-cyber-pink/20 text-cyber-pink border border-cyber-pink/40';
+          mediaStatusBadge.textContent = 'VIDEO';
+          mediaStatusName.textContent = label || 'Video Clip';
+          if (mediaPlayPauseBtn) {
+            mediaPlayPauseBtn.classList.remove('hidden');
+            mediaPlayPauseBtn.textContent = (state.photo.video && state.photo.video.paused) ? '▶️' : '⏸️';
+          }
+          if (mediaMuteBtn) {
+            mediaMuteBtn.classList.remove('hidden');
+            mediaMuteBtn.textContent = (state.photo.video && !state.photo.video.muted) ? '🔊' : '🔇';
+          }
+          if (mediaFlipCamBtn) mediaFlipCamBtn.classList.add('hidden');
+          if (liveCameraIcon) liveCameraIcon.textContent = '🔴';
+          if (liveCameraText) liveCameraText.textContent = 'Live Camera Feed';
+          if (liveCameraBtn) liveCameraBtn.classList.remove('border-red-500', 'text-red-400');
+        } else {
+          mediaStatusBadge.className = 'px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-cyber-yellow/20 text-cyber-yellow border border-cyber-yellow/40';
+          mediaStatusBadge.textContent = 'PHOTO';
+          mediaStatusName.textContent = label || 'Photo Image';
+          if (mediaPlayPauseBtn) mediaPlayPauseBtn.classList.add('hidden');
+          if (mediaMuteBtn) mediaMuteBtn.classList.add('hidden');
+          if (mediaFlipCamBtn) mediaFlipCamBtn.classList.add('hidden');
+          if (liveCameraIcon) liveCameraIcon.textContent = '🔴';
+          if (liveCameraText) liveCameraText.textContent = 'Live Camera Feed';
+          if (liveCameraBtn) liveCameraBtn.classList.remove('border-red-500', 'text-red-400');
+        }
+      }
+
+      function stopCurrentMedia() {
+        if (state.photo.stream) {
+          try {
+            state.photo.stream.getTracks().forEach(t => t.stop());
+          } catch(e) {}
+          state.photo.stream = null;
+        }
+        if (state.photo.video) {
+          try {
+            state.photo.video.pause();
+            if (state.photo.video.src && state.photo.video.src.startsWith('blob:')) {
+              URL.revokeObjectURL(state.photo.video.src);
+            }
+            state.photo.video.srcObject = null;
+            state.photo.video.src = '';
+          } catch(e) {}
+          state.photo.video = null;
+        }
+        state.photo.img = null;
+        state.photo.loaded = false;
+        state.photo.active = false;
+        state.photo.isVideo = false;
+        state.photo.isLive = false;
+        const photoActiveCheck = document.getElementById('photoActiveCheck');
+        if (photoActiveCheck) photoActiveCheck.checked = false;
+        const photoFileInput = document.getElementById('photoFileInput');
+        if (photoFileInput) photoFileInput.value = '';
+        const photoCameraInput = document.getElementById('photoCameraInput');
+        if (photoCameraInput) photoCameraInput.value = '';
+        const videoCameraInput = document.getElementById('videoCameraInput');
+        if (videoCameraInput) videoCameraInput.value = '';
+        updateMediaStatusUI('', false, false);
+      }
+      window.stopCurrentMedia = stopCurrentMedia;
+
+      function loadMediaFile(file) {
+        if (!file) return;
+        stopCurrentMedia();
+
+        const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|webm|m4v|ogv|mkv)$/i.test(file.name || '');
+        const isImage = file.type.startsWith('image/');
+
+        if (isVideo) {
+          const video = document.createElement('video');
+          video.setAttribute('playsinline', '');
+          video.setAttribute('webkit-playsinline', '');
+          video.muted = true;
+          video.loop = true;
+          video.autoplay = true;
+          video.crossOrigin = 'anonymous';
+
+          const url = URL.createObjectURL(file);
+          video.src = url;
+
+          const onReady = () => {
+            state.photo.img = video;
+            state.photo.video = video;
+            state.photo.isVideo = true;
+            state.photo.isLive = false;
             state.photo.loaded = true;
             state.photo.active = true;
-            document.getElementById('photoActiveCheck').checked = true;
+            const photoActiveCheck = document.getElementById('photoActiveCheck');
+            if (photoActiveCheck) photoActiveCheck.checked = true;
+            updateMediaStatusUI(file.name || 'Video Clip', true, false);
+            video.play().catch(err => console.warn('Video auto-play suppressed:', err));
           };
-          img.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-      window.loadPhotoFile = loadPhotoFile;
 
-      document.getElementById('photoActiveCheck').addEventListener('change', (e) => state.photo.active = e.target.checked);
-      document.getElementById('photoFileInput').addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-          loadPhotoFile(e.target.files[0]);
+          video.addEventListener('loadeddata', onReady, { once: true });
+          video.addEventListener('canplay', () => {
+            if (!state.photo.loaded) onReady();
+          }, { once: true });
+
+          video.addEventListener('error', (e) => {
+            console.error('Video load error:', e);
+            alert('Could not decode video file. Please ensure it is a supported video format (MP4/MOV/WebM).');
+          });
+
+          video.load();
+
+        } else if (isImage) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+              state.photo.img = img;
+              state.photo.video = null;
+              state.photo.isVideo = false;
+              state.photo.isLive = false;
+              state.photo.loaded = true;
+              state.photo.active = true;
+              const photoActiveCheck = document.getElementById('photoActiveCheck');
+              if (photoActiveCheck) photoActiveCheck.checked = true;
+              updateMediaStatusUI(file.name || 'Photo Image', false, false);
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
         }
-      });
+      }
+      window.loadMediaFile = loadMediaFile;
+      window.loadPhotoFile = loadMediaFile; // backward compatibility
+
+      async function startLiveCamera(facing = 'environment') {
+        try {
+          stopCurrentMedia();
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('Live camera streaming is not supported by this browser. Please use the Video/Photo Cam buttons.');
+            return;
+          }
+          const constraints = {
+            video: {
+              facingMode: { ideal: facing },
+              width: { ideal: 1080 },
+              height: { ideal: 1920 }
+            },
+            audio: false
+          };
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          const video = document.createElement('video');
+          video.setAttribute('playsinline', '');
+          video.setAttribute('webkit-playsinline', '');
+          video.muted = true;
+          video.autoplay = true;
+          video.srcObject = stream;
+          await video.play();
+
+          state.photo.stream = stream;
+          state.photo.video = video;
+          state.photo.img = video;
+          state.photo.facingMode = facing;
+          state.photo.isVideo = true;
+          state.photo.isLive = true;
+          state.photo.loaded = true;
+          state.photo.active = true;
+          const photoActiveCheck = document.getElementById('photoActiveCheck');
+          if (photoActiveCheck) photoActiveCheck.checked = true;
+          updateMediaStatusUI(`Live Feed (${facing === 'user' ? 'Front' : 'Rear'})`, true, true);
+        } catch (err) {
+          console.warn('Camera stream error:', err);
+          alert('Camera stream unavailable: ' + (err.message || err.name) + '. Please check browser camera permissions.');
+        }
+      }
+      window.startLiveCamera = startLiveCamera;
+
+      // Event listeners for file and camera inputs
+      document.getElementById('photoActiveCheck').addEventListener('change', (e) => state.photo.active = e.target.checked);
+
+      const photoFileInput = document.getElementById('photoFileInput');
+      if (photoFileInput) {
+        photoFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            loadMediaFile(e.target.files[0]);
+          }
+        });
+      }
+
+      const videoCameraInput = document.getElementById('videoCameraInput');
+      if (videoCameraInput) {
+        videoCameraInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            loadMediaFile(e.target.files[0]);
+          }
+        });
+      }
+
       const photoCameraInput = document.getElementById('photoCameraInput');
       if (photoCameraInput) {
         photoCameraInput.addEventListener('change', (e) => {
           if (e.target.files && e.target.files[0]) {
-            loadPhotoFile(e.target.files[0]);
+            loadMediaFile(e.target.files[0]);
           }
         });
       }
-      document.getElementById('photoClearBtn').addEventListener('click', () => {
-        state.photo.img = null;
-        state.photo.loaded = false;
-        state.photo.active = false;
-        document.getElementById('photoActiveCheck').checked = false;
-        document.getElementById('photoFileInput').value = '';
-        if (photoCameraInput) photoCameraInput.value = '';
-      });
 
-      document.querySelectorAll('.sample-photo-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const sampleType = btn.dataset.sample;
-          const canvasSample = generateSampleGraphic(sampleType);
-          const img = new Image();
-          img.onload = () => {
-            state.photo.img = img;
-            state.photo.loaded = true;
-            state.photo.active = true;
-            document.getElementById('photoActiveCheck').checked = true;
-          };
-          img.src = canvasSample.toDataURL();
+      if (liveCameraBtn) {
+        liveCameraBtn.addEventListener('click', () => {
+          if (state.photo.isLive) {
+            stopCurrentMedia();
+          } else {
+            startLiveCamera(state.photo.facingMode || 'environment');
+          }
         });
-      });
+      }
+
+      if (mediaPlayPauseBtn) {
+        mediaPlayPauseBtn.addEventListener('click', () => {
+          if (!state.photo.video || state.photo.isLive) return;
+          if (state.photo.video.paused) {
+            state.photo.video.play();
+            mediaPlayPauseBtn.textContent = '⏸️';
+          } else {
+            state.photo.video.pause();
+            mediaPlayPauseBtn.textContent = '▶️';
+          }
+        });
+      }
+
+      if (mediaMuteBtn) {
+        mediaMuteBtn.addEventListener('click', () => {
+          if (!state.photo.video || state.photo.isLive) return;
+          state.photo.video.muted = !state.photo.video.muted;
+          mediaMuteBtn.textContent = state.photo.video.muted ? '🔇' : '🔊';
+        });
+      }
+
+      if (mediaFlipCamBtn) {
+        mediaFlipCamBtn.addEventListener('click', () => {
+          if (!state.photo.isLive) return;
+          const nextFacing = (state.photo.facingMode === 'user') ? 'environment' : 'user';
+          startLiveCamera(nextFacing);
+        });
+      }
+
+      document.getElementById('photoClearBtn').addEventListener('click', stopCurrentMedia);
 
       document.getElementById('photoRenderModeSelect').addEventListener('change', (e) => state.photo.mode = e.target.value);
       document.getElementById('asciiColorModeSelect').addEventListener('change', (e) => state.photo.colorMode = e.target.value);
