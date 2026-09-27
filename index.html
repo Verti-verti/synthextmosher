@@ -101,10 +101,15 @@
       padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
     }
     .app-footer-panels {
-      max-height: 40vh;
-      padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+      max-height: 50vh;
+      padding-bottom: max(6.5rem, calc(env(safe-area-inset-bottom, 0px) + 5.5rem));
       transition: max-height 0.28s ease, opacity 0.22s ease;
       opacity: 1;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab-content {
+      padding-bottom: 2rem;
     }
     #controlSheet.sheet-collapsed .app-footer-panels {
       max-height: 0;
@@ -737,6 +742,63 @@ RAW SIGNAL</textarea>
             </label>
           </div>
         </div>
+
+        <!-- Exposure, Brightness & Gamma -->
+        <div class="grid grid-cols-2 gap-3 pt-1 border-t border-cyber-border/60">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>☀️ Media Brightness</span>
+              <span id="photoBrightnessLabel" class="text-cyber-yellow">115%</span>
+            </div>
+            <input type="range" id="photoBrightnessRange" min="50" max="220" value="115">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>⚡ Gamma / Lift</span>
+              <span id="photoGammaLabel" class="text-cyber-yellow">1.0x</span>
+            </div>
+            <input type="range" id="photoGammaRange" min="5" max="25" value="10">
+          </div>
+        </div>
+
+        <!-- Zoom & Re-frame (Scale & Pan) -->
+        <div class="p-2 rounded bg-cyber-bg/60 border border-cyber-border space-y-2">
+          <div class="flex items-center justify-between text-[10px]">
+            <span class="text-cyber-yellow font-bold flex items-center gap-1">
+              <span>🔍</span> RE-FRAME &amp; ZOOM
+            </span>
+            <button id="photoResetTransformBtn" type="button" class="px-2 py-0.5 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] hover:text-cyber-yellow active:scale-95 transition">
+              ↺ Center &amp; Reset
+            </button>
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Zoom / Scale (or 2-Finger Pinch)</span>
+              <span id="photoScaleLabel" class="text-cyber-yellow">1.0x</span>
+            </div>
+            <input type="range" id="photoScaleRange" min="50" max="300" value="100">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Pan X (Horizontal)</span>
+                <span id="photoPanXLabel" class="text-cyber-yellow">0px</span>
+              </div>
+              <input type="range" id="photoPanXRange" min="-400" max="400" value="0">
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Pan Y (Vertical)</span>
+                <span id="photoPanYLabel" class="text-cyber-yellow">0px</span>
+              </div>
+              <input type="range" id="photoPanYRange" min="-600" max="600" value="0">
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ==================== TAB 2: PIXEL SORTING ==================== -->
@@ -978,8 +1040,9 @@ RAW SIGNAL</textarea>
           </div>
 
           <!-- Graphic Selector Buttons -->
-          <div class="grid grid-cols-3 gap-1.5">
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
             <button data-graphic="none" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold">🚫 None</button>
+            <button data-graphic="asciiSkull" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">💀 ASCII Skull</button>
             <button data-graphic="cyberHeart" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">💖 Cyber Heart</button>
             <button data-graphic="circuitTraces" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">⚡ Circuit Traces</button>
             <button data-graphic="sakuraSumiE" class="vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold">🌸 Ink Sakura</button>
@@ -1262,6 +1325,11 @@ RAW SIGNAL</textarea>
         charSet: 'blocks', // 'blocks', 'standard', 'matrix', 'binary', 'katakana'
         cellSize: 12,
         contrast: 1.2,
+        brightness: 115, // Brightness boost % (50 to 220, default 115)
+        gamma: 1.0,      // Gamma midtone lift (0.5 to 2.5, default 1.0)
+        scale: 1.0,      // Zoom / scale (0.5 to 3.0, default 1.0)
+        panX: 0,         // Pan X offset (-400 to +400, default 0)
+        panY: 0,         // Pan Y offset (-600 to +600, default 0)
         opacity: 100,
         invert: false,
         blend: 'behind' // 'behind', 'inFront', 'photoOnly'
@@ -1832,21 +1900,21 @@ RAW SIGNAL</textarea>
       const imgAspect = imgW / imgH;
       const canvasAspect = WIDTH / HEIGHT;
 
-      let drawW, drawH, drawX, drawY;
-      if (imgAspect > canvasAspect) {
-        drawH = HEIGHT;
-        drawW = HEIGHT * imgAspect;
-        drawX = (WIDTH - drawW) / 2;
-        drawY = 0;
-      } else {
-        drawW = WIDTH;
-        drawH = WIDTH / imgAspect;
-        drawX = 0;
-        drawY = (HEIGHT - drawH) / 2;
-      }
+      const baseW = (imgAspect > canvasAspect) ? HEIGHT * imgAspect : WIDTH;
+      const baseH = (imgAspect > canvasAspect) ? HEIGHT : WIDTH / imgAspect;
+      const scale = pState.scale || 1.0;
+      const drawW = baseW * scale;
+      const drawH = baseH * scale;
+      const drawX = (WIDTH - drawW) / 2 + (pState.panX || 0);
+      const drawY = (HEIGHT - drawH) / 2 + (pState.panY || 0);
+
+      const bVal = pState.brightness || 115;
+      const cVal = Math.round((pState.contrast || 1.2) * 100);
 
       photoSourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      photoSourceCtx.filter = `brightness(${bVal}%) contrast(${cVal}%)`;
       photoSourceCtx.drawImage(img, drawX, drawY, drawW, drawH);
+      photoSourceCtx.filter = 'none';
 
       if (pState.mode === 'direct') {
         pCtx.drawImage(photoSourceCanvas, 0, 0);
@@ -1855,7 +1923,7 @@ RAW SIGNAL</textarea>
 
       if (pState.mode === 'asciiOverlay') {
         pCtx.drawImage(photoSourceCanvas, 0, 0);
-        pCtx.fillStyle = 'rgba(0,0,0,0.55)';
+        pCtx.fillStyle = 'rgba(0,0,0,0.35)';
         pCtx.fillRect(0, 0, WIDTH, HEIGHT);
       }
 
@@ -1894,6 +1962,10 @@ RAW SIGNAL</textarea>
           // Luminance
           let lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
           if (pState.invert) lum = 1 - lum;
+          const gamma = pState.gamma || 1.0;
+          if (gamma !== 1.0) {
+            lum = Math.pow(Math.max(0, Math.min(1, lum)), 1 / gamma);
+          }
           lum = Math.min(1, Math.max(0, lum));
 
           const charIdx = Math.floor(lum * (rampLen - 1));
@@ -2454,6 +2526,103 @@ RAW SIGNAL</textarea>
       ctx.restore();
     }
 
+    // Reference Image: Underground BBS / ANSI Cyber ASCII Terminal Skull (media_1790475618220.png)
+    const ASCII_SKULL_DATA = [
+      "        ,g$$$$Sk.        ",
+      "      ,d$$$$$$$$$k.      ",
+      "    ,?^?$7°'  '?$$$$L.   ",
+      "   ,?  $SL._  ,d$iiS$$$SL",
+      "  j$Su%.%S$$$$$$?:iiS$$$b",
+      " :?°?^4$S$$\"?°?$L:iiS$SI:",
+      " :'   '/'?$'.   '?LiS$$SI:",
+      "  '   '          ?kiSSI? ",
+      "   :.     $k _   '?Si?   ",
+      "   .,_._  i$S%7·:i?'     ",
+      " ?%uS%uod$$?'.?ª'        ",
+      " S$$$$$$$$i              ",
+      "  ·?$$S?                 "
+    ];
+
+    function renderAsciiSkull(ctx, color, tick, layer = 'background') {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
+
+      const cx = WIDTH / 2;
+      const isFrame = layer === 'frame';
+
+      if (isFrame) {
+        // High-tech terminal boundary frame with ASCII corners
+        const m = 32;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        // Top-left
+        ctx.moveTo(m, m + 44); ctx.lineTo(m, m); ctx.lineTo(m + 64, m);
+        // Top-right
+        ctx.moveTo(WIDTH - m - 64, m); ctx.lineTo(WIDTH - m, m); ctx.lineTo(WIDTH - m, m + 44);
+        // Bottom-left
+        ctx.moveTo(m, HEIGHT - m - 44); ctx.lineTo(m, HEIGHT - m); ctx.lineTo(m + 64, HEIGHT - m);
+        // Bottom-right
+        ctx.moveTo(WIDTH - m - 64, HEIGHT - m); ctx.lineTo(WIDTH - m, HEIGHT - m); ctx.lineTo(WIDTH - m, HEIGHT - m - 44);
+        ctx.stroke();
+
+        // Terminal telemetry labels
+        ctx.font = '700 10px "Space Mono", monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText("┌──[ 💀 CORE_CORRUPTION_V4 ]", m + 8, m - 8);
+        ctx.textAlign = 'right';
+        ctx.fillText("[ 0xDEADBEEF ]──┐", WIDTH - m - 8, m - 8);
+
+        ctx.textAlign = 'left';
+        ctx.fillText("└──[ STATUS: MOSH_ACTIVE ]", m + 8, HEIGHT - m + 18);
+        ctx.textAlign = 'right';
+        ctx.fillText("[ VIBE: 9:16 ]──┘", WIDTH - m - 8, HEIGHT - m + 18);
+      }
+
+      // ASCII Skull Typography Rendering
+      const fontSize = isFrame ? 22 : 26;
+      const lineHeight = fontSize * 1.28;
+      ctx.font = `900 ${fontSize}px "Space Mono", monospace`;
+      ctx.textAlign = 'center';
+
+      // Subtle float
+      const startY = isFrame ? (HEIGHT * 0.28 + Math.sin(tick * 0.08) * 6) : (HEIGHT * 0.30 + Math.sin(tick * 0.05) * 10);
+
+      // Draw each ASCII line
+      ASCII_SKULL_DATA.forEach((line, idx) => {
+        let textLine = line;
+
+        // Subtle digital flicker on random line
+        if (Math.sin(tick * 4 + idx * 5) > 0.96) {
+          textLine = textLine.replace(/\$/g, Math.random() < 0.5 ? '§' : '%');
+        }
+
+        ctx.fillText(textLine, cx, startY + idx * lineHeight);
+      });
+
+      // Animated terminal block cursor (jawline position)
+      const blink = Math.floor(tick * 2.5) % 2 === 0;
+      if (blink) {
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 12;
+        const cursorX = cx - (fontSize * 1.15);
+        const cursorY = startY + 10 * lineHeight - (fontSize * 0.88);
+        ctx.fillRect(cursorX, cursorY, fontSize * 0.65, fontSize);
+      }
+
+      // Terminal header & prompt
+      ctx.font = '700 11px "Space Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = color;
+      ctx.shadowBlur = 6;
+      ctx.fillText("> ROOT@CYBER_BBS // DAEMON_REAP", cx, startY - 24);
+
+      ctx.restore();
+    }
+
     // Master Vector Graphic Renderer
     function renderVibeGraphic(targetCtx, vibeState, tick) {
       if (!vibeState || vibeState.graphic === 'none') return;
@@ -2474,6 +2643,8 @@ RAW SIGNAL</textarea>
         renderNeoTokyoPoster(targetCtx, color, tick);
       } else if (vibeState.graphic === 'mechaHudGlyphs') {
         renderMechaHudGlyphs(targetCtx, color, tick);
+      } else if (vibeState.graphic === 'asciiSkull') {
+        renderAsciiSkull(targetCtx, color, tick, vibeState.graphicLayer);
       }
 
       targetCtx.restore();
@@ -2964,6 +3135,7 @@ RAW SIGNAL</textarea>
       const oy = Math.round(Math.sin(rad) * fx.rgbSplit);
 
       const scanFactor = 1 - (fx.scanlines / 100) * 0.45;
+      const scanBoost = 1 + (fx.scanlines / 100) * 0.22; // Luma compensation to keep overall image bright
       const noiseAmp = (fx.noise / 100) * 70;
 
       for (let y = 0; y < HEIGHT; y++) {
@@ -2983,11 +3155,17 @@ RAW SIGNAL</textarea>
             d[idx + 2] = crtCopyBuffer[(by * WIDTH + bx) * 4 + 2]; // Blue channel
           }
 
-          // Scanline Dim
-          if (isScan) {
-            d[idx] *= scanFactor;
-            d[idx + 1] *= scanFactor;
-            d[idx + 2] *= scanFactor;
+          // Scanline with Luma Compensation
+          if (doScan) {
+            if (isScan) {
+              d[idx] *= scanFactor;
+              d[idx + 1] *= scanFactor;
+              d[idx + 2] *= scanFactor;
+            } else {
+              d[idx] = Math.min(255, d[idx] * scanBoost);
+              d[idx + 1] = Math.min(255, d[idx + 1] * scanBoost);
+              d[idx + 2] = Math.min(255, d[idx + 2] * scanBoost);
+            }
           }
 
           // VHS Grain
@@ -3628,9 +3806,31 @@ RAW SIGNAL</textarea>
         jamGrid.style.opacity = '0';
       }
 
+      let pinchStartDist = 0;
+      let pinchStartScale = 1.0;
+      let pinchStartMidX = 0;
+      let pinchStartMidY = 0;
+      let pinchStartPanX = 0;
+      let pinchStartPanY = 0;
+      let isPinching = false;
+
       // Touch Events -- ignore touches that start on knobs/controls living on the canvas
       box.addEventListener('touchstart', (e) => {
         if (e.target.closest('.synth-knob')) return;
+        if (e.touches.length === 2 && state.photo.active && state.photo.loaded) {
+          e.preventDefault();
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          pinchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          pinchStartScale = state.photo.scale || 1.0;
+          pinchStartMidX = (t1.clientX + t2.clientX) / 2;
+          pinchStartMidY = (t1.clientY + t2.clientY) / 2;
+          pinchStartPanX = state.photo.panX || 0;
+          pinchStartPanY = state.photo.panY || 0;
+          isPinching = true;
+          crosshair.classList.add('hidden');
+          return;
+        }
         if (e.touches.length > 0) {
           e.preventDefault();
           onStart(e.touches[0].clientX, e.touches[0].clientY);
@@ -3638,14 +3838,46 @@ RAW SIGNAL</textarea>
       }, { passive: false });
 
       box.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && isPinching && state.photo.active && state.photo.loaded) {
+          e.preventDefault();
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          const midX = (t1.clientX + t2.clientX) / 2;
+          const midY = (t1.clientY + t2.clientY) / 2;
+
+          const ratio = dist / Math.max(10, pinchStartDist);
+          const newScale = Math.min(3.0, Math.max(0.5, pinchStartScale * ratio));
+          state.photo.scale = newScale;
+          setSliderValue('photoScaleRange', Math.round(newScale * 100));
+
+          const rect = moshCanvas.getBoundingClientRect();
+          const scaleX = WIDTH / rect.width;
+          const scaleY = HEIGHT / rect.height;
+          const dX = (midX - pinchStartMidX) * scaleX;
+          const dY = (midY - pinchStartMidY) * scaleY;
+          const newPanX = Math.min(400, Math.max(-400, pinchStartPanX + dX));
+          const newPanY = Math.min(600, Math.max(-600, pinchStartPanY + dY));
+          state.photo.panX = newPanX;
+          state.photo.panY = newPanY;
+          setSliderValue('photoPanXRange', Math.round(newPanX));
+          setSliderValue('photoPanYRange', Math.round(newPanY));
+          return;
+        }
         if (e.touches.length > 0) {
           e.preventDefault();
           onMove(e.touches[0].clientX, e.touches[0].clientY);
         }
       }, { passive: false });
 
-      box.addEventListener('touchend', onEnd);
-      box.addEventListener('touchcancel', onEnd);
+      box.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) isPinching = false;
+        if (e.touches.length === 0) onEnd();
+      });
+      box.addEventListener('touchcancel', (e) => {
+        isPinching = false;
+        onEnd();
+      });
 
       // Mouse fallback for desktop simulation
       box.addEventListener('mousedown', (e) => {
@@ -4494,6 +4726,20 @@ RAW SIGNAL</textarea>
       bind('asciiCellSizeRange', state.photo, 'cellSize', 'asciiCellSizeLabel', 'px');
       bind('photoContrastRange', state.photo, 'contrast', 'photoContrastLabel', 'x', 0.1);
       bind('photoOpacityRange', state.photo, 'opacity', 'photoOpacityLabel', '%');
+      bind('photoBrightnessRange', state.photo, 'brightness', 'photoBrightnessLabel', '%');
+      bind('photoGammaRange', state.photo, 'gamma', 'photoGammaLabel', 'x', 0.1);
+      bind('photoScaleRange', state.photo, 'scale', 'photoScaleLabel', 'x', 0.01);
+      bind('photoPanXRange', state.photo, 'panX', 'photoPanXLabel', 'px');
+      bind('photoPanYRange', state.photo, 'panY', 'photoPanYLabel', 'px');
+
+      const photoResetTransformBtn = document.getElementById('photoResetTransformBtn');
+      if (photoResetTransformBtn) {
+        photoResetTransformBtn.addEventListener('click', () => {
+          setSliderValue('photoScaleRange', 100);
+          setSliderValue('photoPanXRange', 0);
+          setSliderValue('photoPanYRange', 0);
+        });
+      }
 
       // CRT & FX controls
       document.getElementById('fxActiveCheck').addEventListener('change', (e) => state.fx.active = e.target.checked);
