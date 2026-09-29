@@ -406,15 +406,23 @@
       </button>
     </div>
 
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-1.5">
       <!-- SNAP HIGH-RES PNG -->
-      <button id="snapPicBtn" class="tap-btn px-3 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-bold text-xs flex items-center space-x-1.5 shadow-[0_0_12px_rgba(0,255,204,0.25)] active:scale-95 transition hover:bg-cyber-cyan hover:text-black">
+      <button id="snapPicBtn" class="tap-btn px-2.5 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-bold text-xs flex items-center space-x-1 shadow-[0_0_12px_rgba(0,255,204,0.25)] active:scale-95 transition hover:bg-cyber-cyan hover:text-black">
         <span>📸</span>
-        <span>SNAP PNG</span>
+        <span>SNAP</span>
       </button>
 
+      <!-- EXPORT SPEED SELECTOR (1x Real-time / Kin to Original) -->
+      <select id="recSpeedSelect" class="bg-cyber-black border border-cyber-pink/60 rounded px-1.5 py-1.5 text-cyber-pink font-bold text-[10px] outline-none cursor-pointer active:scale-95 transition" title="Export Video Speed">
+        <option value="1.0" selected>⚡ 1x Real</option>
+        <option value="1.5">⚡ 1.5x</option>
+        <option value="2.0">⚡ 2x Hyper</option>
+        <option value="0.5">⚡ 0.5x Slow</option>
+      </select>
+
       <!-- RECORD 9:16 VIDEO -->
-      <button id="recVideoBtn" class="tap-btn px-3 py-1.5 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink font-bold text-xs flex items-center space-x-1.5 shadow-[0_0_12px_rgba(255,0,85,0.25)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
+      <button id="recVideoBtn" class="tap-btn px-2.5 py-1.5 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink font-bold text-xs flex items-center space-x-1.5 shadow-[0_0_12px_rgba(255,0,85,0.25)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
         <span id="recBtnDot" class="w-2 h-2 rounded-full bg-cyber-pink"></span>
         <span id="recBtnLabel">REC MP4</span>
       </button>
@@ -1560,8 +1568,11 @@ RAW SIGNAL</textarea>
         recorder: null,
         chunks: [],
         startTime: 0,
+        recordStartTime: 0,
         lastFrameTime: 0,
+        lastTimestampUs: 0,
         frameIndex: 0,
+        exportSpeed: 1.0,
         timerInterval: null
       },
 
@@ -3840,22 +3851,30 @@ RAW SIGNAL</textarea>
         return;
       }
       const now = performance.now();
-      if (!state.recording.lastFrameTime) {
+      if (!state.recording.recordStartTime) {
+        state.recording.recordStartTime = now;
         state.recording.lastFrameTime = now;
+        state.recording.lastTimestampUs = 0;
       }
       const delta = now - state.recording.lastFrameTime;
-      // Record at steady 30 FPS (~33.3ms)
-      if (delta >= 31) {
+      // Record steady frames throttled to max ~35-40 FPS (~26ms)
+      if (delta >= 26) {
+        const speed = state.recording.exportSpeed || 1.0;
+        const elapsedRealMs = now - state.recording.recordStartTime;
+        // True presentation timestamp scaled by exportSpeed (1.0 = exact match to original media!)
+        const timestampUs = Math.round((elapsedRealMs / speed) * 1000);
+        const durationUs = Math.max(16666, timestampUs - (state.recording.lastTimestampUs || 0));
+        state.recording.lastTimestampUs = timestampUs;
         state.recording.lastFrameTime = now;
+
         if (state.recording.videoEncoder.encodeQueueSize <= 4) {
           const fIdx = state.recording.frameIndex++;
-          const timestampUs = Math.round(fIdx * (1_000_000 / 30));
           const keyFrame = (fIdx % 30 === 0);
 
           try {
             const frame = new VideoFrame(moshCanvas, {
               timestamp: timestampUs,
-              duration: 33333
+              duration: durationUs
             });
             state.recording.videoEncoder.encode(frame, { keyFrame });
             frame.close();
@@ -3955,7 +3974,10 @@ RAW SIGNAL</textarea>
             state.recording.muxer = muxer;
             state.recording.videoEncoder = videoEncoder;
             state.recording.frameIndex = 0;
+            state.recording.recordStartTime = performance.now();
             state.recording.lastFrameTime = 0;
+            state.recording.lastTimestampUs = 0;
+            state.recording.exportSpeed = parseFloat(document.getElementById('recSpeedSelect')?.value) || 1.0;
             state.recording.isRecording = true;
             state.recording.startTime = Date.now();
 
@@ -3967,7 +3989,8 @@ RAW SIGNAL</textarea>
               const elapsed = Math.floor((Date.now() - state.recording.startTime) / 1000);
               const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
               const ss = String(elapsed % 60).padStart(2, '0');
-              recTimerText.textContent = `REC ${mm}:${ss} (MP4)`;
+              const spd = state.recording.exportSpeed !== 1.0 ? ` (${state.recording.exportSpeed}x)` : '';
+              recTimerText.textContent = `REC ${mm}:${ss}${spd} (MP4)`;
             }, 500);
 
             return;
@@ -4758,11 +4781,16 @@ RAW SIGNAL</textarea>
         if (state.photo.video) {
           try {
             state.photo.video.pause();
+            state.photo.video.onerror = null;
+            state.photo.video.onloadedmetadata = null;
+            state.photo.video.onloadeddata = null;
+            state.photo.video.oncanplay = null;
             if (state.photo.video.src && state.photo.video.src.startsWith('blob:')) {
               URL.revokeObjectURL(state.photo.video.src);
             }
             state.photo.video.srcObject = null;
-            state.photo.video.src = '';
+            state.photo.video.removeAttribute('src');
+            state.photo.video.load();
           } catch(e) {}
           state.photo.video = null;
         }
@@ -4929,7 +4957,10 @@ RAW SIGNAL</textarea>
         if (videoTrimModal) videoTrimModal.classList.add('hidden');
         if (trimPreviewVid) {
           trimPreviewVid.pause();
-          trimPreviewVid.src = '';
+          trimPreviewVid.onerror = null;
+          trimPreviewVid.onloadedmetadata = null;
+          trimPreviewVid.removeAttribute('src');
+          try { trimPreviewVid.load(); } catch(e) {}
         }
       }
 
@@ -4997,16 +5028,27 @@ RAW SIGNAL</textarea>
           const video = document.createElement('video');
           video.setAttribute('playsinline', '');
           video.setAttribute('webkit-playsinline', '');
+          video.setAttribute('muted', '');
+          video.defaultMuted = true;
           video.muted = true;
           video.loop = true;
           video.autoplay = true;
-          video.crossOrigin = 'anonymous';
+          video.preload = 'auto';
+          // CRITICAL: DO NOT set video.crossOrigin = 'anonymous' on local blob URLs!
+          // In Android Chrome / mobile WebKit, setting crossOrigin on a blob: URL causes MediaCodec
+          // and Chromium's demuxer to reject the stream or fail decoding with MEDIA_ERR_SRC_NOT_SUPPORTED or MEDIA_ERR_DECODE!
+          // Local blobs never taint the canvas anyway.
 
           const url = URL.createObjectURL(file);
           video.src = url;
 
+          let isReady = false;
           const onReady = () => {
+            if (isReady) return;
             const duration = video.duration || 0;
+            if (!isFinite(duration) || duration <= 0) return;
+            isReady = true;
+
             state.photo.file = file;
             state.photo.totalDuration = duration;
 
@@ -5031,18 +5073,32 @@ RAW SIGNAL</textarea>
             }
           };
 
-          video.addEventListener('loadedmetadata', onReady, { once: true });
+          video.addEventListener('loadedmetadata', onReady);
           video.addEventListener('loadeddata', () => {
-            if (!state.photo.loaded && videoTrimModal && !videoTrimModal.classList.contains('hidden')) {
-              // already opened
-            } else if (!state.photo.loaded) {
-              onReady();
-            }
-          }, { once: true });
+            if (!isReady) onReady();
+          });
+          video.addEventListener('canplay', () => {
+            if (!isReady) onReady();
+          });
 
           video.addEventListener('error', (e) => {
-            console.error('Video load error:', e);
-            alert('Could not decode video file. Please ensure it is a supported video format (MP4/MOV/WebM).');
+            // Ignore if src was cleared or revoked by stopCurrentMedia()
+            if (!video.src || video.src === window.location.href || video.src === 'about:blank') return;
+            console.error('Video load error:', e, video.error);
+            const errCode = video.error ? video.error.code : 0;
+            const errMsg = video.error ? (video.error.message || '') : '';
+            stopCurrentMedia();
+
+            let helpText = 'Could not decode video file (' + (file.name || 'video') + ').';
+            if (errCode === 3 || errCode === 4) {
+              helpText += '\n\nNote: If this is an Android screen recording, your phone may have recorded it using the HEVC (H.265) format, which mobile browsers cannot decode.\n\nFix: In your phone\'s Screen Recorder Settings, set "Video format" to standard "H.264" (AVC), or convert the clip to standard MP4.';
+            } else {
+              helpText += '\n\nPlease ensure it is a valid video format (MP4/MOV/WebM) with supported H.264/AVC encoding.';
+            }
+            if (errMsg) {
+              helpText += '\n[Details: ' + errMsg + ']';
+            }
+            alert(helpText);
           });
 
           video.load();
@@ -5122,6 +5178,7 @@ RAW SIGNAL</textarea>
           if (e.target.files && e.target.files[0]) {
             loadMediaFile(e.target.files[0]);
           }
+          e.target.value = '';
         });
       }
 
@@ -5131,6 +5188,7 @@ RAW SIGNAL</textarea>
           if (e.target.files && e.target.files[0]) {
             loadMediaFile(e.target.files[0]);
           }
+          e.target.value = '';
         });
       }
 
@@ -5140,6 +5198,14 @@ RAW SIGNAL</textarea>
           if (e.target.files && e.target.files[0]) {
             loadMediaFile(e.target.files[0]);
           }
+          e.target.value = '';
+        });
+      }
+
+      const recSpeedSelect = document.getElementById('recSpeedSelect');
+      if (recSpeedSelect) {
+        recSpeedSelect.addEventListener('change', (e) => {
+          state.recording.exportSpeed = parseFloat(e.target.value) || 1.0;
         });
       }
 
