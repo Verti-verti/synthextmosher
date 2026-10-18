@@ -96,21 +96,28 @@
       border: 1px solid #ffffff;
     }
 
-    /* Safe-area aware header/footer & lifted base deck above bottom badges/bars */
+    /* Safe-area aware header/footer & dedicated bottom safe zone for 'Powered by Netlify' */
     #topBar {
       padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
     }
     #baseDeck {
-      /* Lifted higher so knobs clear 'Powered by Netlify' badge & OS gesture bars comfortably */
-      padding-bottom: max(3.6rem, calc(env(safe-area-inset-bottom, 0px) + 2.85rem));
+      padding-bottom: 0;
+    }
+    #bottomSafeZone {
+      /* Dedicated no-controls safe zone matching the vertical band of 'Powered by Netlify' + OS home bar */
+      min-height: 68px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));
     }
 
     /* Responsive tuning for compact smartphones (e.g. Motorola / iPhone SE / landscape) */
     @media (max-height: 740px) {
       #baseDeck {
-        padding-top: 0.4rem;
-        padding-bottom: max(2.9rem, calc(env(safe-area-inset-bottom, 0px) + 2.2rem));
-        gap: 0.35rem;
+        padding-top: 0.35rem;
+        gap: 0.3rem;
+      }
+      #bottomSafeZone {
+        min-height: 62px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
       }
       .side-wing-btn {
         width: 38px !important;
@@ -120,8 +127,9 @@
 
     /* Responsive tuning for iPad Pro & Tablets */
     @media (min-width: 768px) and (min-height: 820px) {
-      #baseDeck {
-        padding-bottom: max(3.8rem, calc(env(safe-area-inset-bottom, 0px) + 3rem));
+      #bottomSafeZone {
+        min-height: 74px;
+        padding-bottom: max(18px, env(safe-area-inset-bottom, 18px));
       }
       .side-wing-btn {
         width: 50px;
@@ -889,7 +897,7 @@ RAW SIGNAL</textarea>
     </div>
 
     <!-- Floating Sub-Engine Popover Menu (Directly above subEngineBtn) -->
-    <div id="subEngineMenu" class="hidden absolute bottom-44 inset-x-3 max-w-sm mx-auto z-40 bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3 shadow-2xl space-y-2">
+    <div id="subEngineMenu" class="hidden absolute bottom-60 inset-x-3 max-w-sm mx-auto z-40 bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3 shadow-2xl space-y-2">
       <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
         <span class="text-[10px] font-bold text-white tracking-wider flex items-center gap-1">
           <span>⚡</span>
@@ -900,8 +908,8 @@ RAW SIGNAL</textarea>
       <div id="subEngineMenuList" class="grid grid-cols-2 gap-1.5 text-xs"></div>
     </div>
 
-    <!-- Bottom row: Exactly 3 Primary Rotary Knobs Bound to Active Sub-Engine -->
-    <div id="baseKnobsRow" class="w-full max-w-md grid grid-cols-3 gap-2 sm:gap-4 items-center justify-items-center">
+    <!-- Middle row: Exactly 3 Primary Rotary Knobs Bound to Active Sub-Engine (Strictly ABOVE the Netlify Safe Zone) -->
+    <div id="baseKnobsRow" class="w-full max-w-md grid grid-cols-3 gap-2 sm:gap-4 items-center justify-items-center pb-1.5">
       <!-- Dynamic Knob 1 -->
       <div id="vmKnob1Box" class="flex flex-col items-center select-none w-full">
         <span id="vmKnob1Label" class="text-[9px] font-bold text-slate-400 tracking-wider mb-1 truncate max-w-full text-center">FONT SIZE</span>
@@ -943,6 +951,18 @@ RAW SIGNAL</textarea>
         </div>
         <span id="vmKnob3Value" class="text-[10px] font-mono text-cyber-yellow font-bold mt-1">1.0x</span>
       </div>
+    </div>
+
+    <!-- Bottom Safe Zone: Reserved exclusively for VMOSH App Logo on the left + 'Powered by Netlify' badge on the right -->
+    <div id="bottomSafeZone" class="w-full max-w-md border-t border-white/10 pt-2 flex items-center justify-between pointer-events-none select-none">
+      <!-- VMOSH App Logo Pill (sits beside the 'Powered by Netlify' button) -->
+      <div id="vmoshBottomLogo" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/90 border border-cyber-cyan/40 shadow-[0_0_12px_rgba(0,255,204,0.18)]">
+        <span class="w-2 h-2 rounded-full bg-cyber-cyan shadow-[0_0_8px_#00ffcc] animate-pulse"></span>
+        <span class="font-black text-[11px] tracking-widest text-white">VMOSH</span>
+        <span class="text-[9px] font-bold text-cyber-cyan/80 tracking-wider border-l border-white/15 pl-1.5">$YNTH</span>
+      </div>
+      <!-- Right side intentionally kept empty as the 'Powered by Netlify' safe zone -->
+      <div class="w-40 h-9" aria-hidden="true"></div>
     </div>
   </footer>
 
