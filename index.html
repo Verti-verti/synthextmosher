@@ -97,64 +97,169 @@
     }
 
     /* Safe-area aware header/footer */
-    .app-header {
-      padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+    #topBar {
+      padding-top: max(0.4rem, env(safe-area-inset-top, 0px));
     }
-    .app-footer-panels {
-      max-height: 50vh;
-      padding-bottom: max(6.5rem, calc(env(safe-area-inset-bottom, 0px) + 5.5rem));
-      transition: max-height 0.28s ease, opacity 0.22s ease;
-      opacity: 1;
-      overscroll-behavior-y: contain;
-      -webkit-overflow-scrolling: touch;
+    #baseDeck {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
     }
-    .tab-content {
-      padding-bottom: 2rem;
-    }
-    #controlSheet.sheet-collapsed .app-footer-panels {
-      max-height: 0;
-      opacity: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      overflow: hidden;
-    }
-    #sheetHandle { cursor: pointer; }
 
-    /* Knobs integrated directly onto the canvas / text screen - rock-solid proportional anchor */
-    #canvasKnobDock {
+    /* Module ribbon buttons */
+    .mod-ribbon-btn {
+      padding: 4px 10px;
+      border-radius: 9px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+    }
+    .mod-ribbon-btn:active {
+      transform: scale(0.94);
+    }
+    .mod-ribbon-btn.active {
+      background: rgba(0, 255, 204, 0.18);
+      border-color: #00ffcc;
+      color: #00ffcc;
+      box-shadow: 0 0 12px rgba(0, 255, 204, 0.35);
+    }
+
+    /* Side wing floating buttons */
+    .side-wing-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(10, 14, 23, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .side-wing-btn:active {
+      transform: scale(0.9);
+    }
+    .side-wing-btn.active {
+      border-color: #00ffcc;
+      color: #00ffcc;
+      box-shadow: 0 0 14px rgba(0, 255, 204, 0.45);
+    }
+
+    /* Floating side popover card */
+    .side-popover {
       position: absolute;
-      left: 50%;
-      bottom: 3.5%;
-      transform: translateX(-50%);
-      width: -moz-fit-content;
-      width: fit-content;
-      max-width: 92%;
+      z-index: 45;
+      background: rgba(8, 12, 20, 0.96);
+      border: 1px solid rgba(0, 255, 204, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.9), 0 0 18px rgba(0, 255, 204, 0.25);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 10px;
+      max-height: 65vh;
+      overflow-y: auto;
+      transition: all 0.18s ease-out;
+    }
+
+    /* Diamond Drag/Jam button */
+    .diamond-btn {
+      width: 40px;
+      height: 40px;
+      transform: rotate(45deg);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: clamp(8px, 2.2vw, 16px);
-      padding: clamp(4px, 1vh, 8px) clamp(10px, 3vw, 20px);
-      border-radius: 9999px;
-      background: rgba(6, 8, 14, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.9);
-      z-index: 30;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      user-select: none;
+    }
+    .diamond-btn > * {
+      transform: rotate(-45deg);
+    }
+    .diamond-btn.mode-jam {
+      background: rgba(255, 0, 85, 0.25);
+      border: 2px solid #ff0055;
+      box-shadow: 0 0 14px rgba(255, 0, 85, 0.5);
+      color: #ff0055;
+    }
+    .diamond-btn.mode-drag {
+      background: rgba(0, 255, 204, 0.2);
+      border: 2px solid #00ffcc;
+      box-shadow: 0 0 14px rgba(0, 255, 204, 0.4);
+      color: #00ffcc;
+    }
+
+    /* Chamfered hexagon node style matching reference diagram */
+    .chamfer-node-btn {
+      clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0% 50%);
+      transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .pipeline-node-btn {
+      background: rgba(12, 17, 28, 0.92);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      color: #94a3b8;
+      cursor: pointer;
+      user-select: none;
+    }
+    .pipeline-node-btn:hover {
+      border-color: rgba(0, 255, 204, 0.6);
+      color: #e2e8f0;
+    }
+    .pipeline-node-btn.active {
+      background: rgba(0, 255, 204, 0.24);
+      border-color: #00ffcc;
+      color: #00ffcc;
+      box-shadow: 0 0 16px rgba(0, 255, 204, 0.5);
+      font-weight: 900;
+    }
+
+    .base-knob-dial {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #222b3d, #0b0e15 75%);
+      border: 1px solid #1f2738;
+      cursor: grab;
+      touch-action: none;
+    }
+    .base-knob-dial::after {
+      content: '';
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
       pointer-events: auto;
-      transition: bottom 0.25s ease, opacity 0.2s ease;
     }
-    .dock-knob .knob-body {
-      width: clamp(34px, 5.5vh, 44px);
-      height: clamp(34px, 5.5vh, 44px);
+    .base-knob-dial.active {
+      box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.18);
+      cursor: grabbing;
     }
-    .dock-knob .knob-dial { inset: 5px; }
-    .dock-knob .knob-indicator { top: 4px; height: 10px; transform-origin: 50% 14px; }
-    .dock-knob-label {
-      font-size: 8px;
-      letter-spacing: 0.06em;
-      color: rgba(226, 232, 240, 0.85);
-      font-weight: 700;
+    .base-knob-indicator {
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      width: 2.5px;
+      height: 12px;
+      background: var(--knob-color, #ff0055);
+      border-radius: 2px;
+      transform-origin: 50% 16px;
+      box-shadow: 0 0 6px var(--knob-color, #ff0055);
     }
 
     /* Jam-mode crosshair: bigger pink performance dot, matches the pad feel */
@@ -332,42 +437,139 @@
   </style>
 </head>
 
-<body class="flex flex-col h-full bg-cyber-black text-slate-200 font-mono overflow-hidden select-none">
+<body class="bg-black text-slate-100 h-screen h-[100dvh] w-screen overflow-hidden flex flex-col relative select-none font-mono">
 
-  <header class="app-header shrink-0 z-30 bg-cyber-dark/95 border-b border-cyber-border px-3 py-2 flex items-center justify-between">
-    <div class="flex items-center space-x-2">
-      <div class="w-6 h-6 rounded bg-gradient-to-tr from-cyber-pink via-cyber-purple to-cyber-cyan flex items-center justify-center font-bold text-[10px] text-black">
-        9:16
+  <!-- ==================== FLOATING TOP BAR & MODULAR PIPELINE ==================== -->
+  <header id="topBar" class="absolute top-0 inset-x-0 z-30 pointer-events-none p-1.5 sm:p-2 flex flex-col items-center gap-1.5">
+    <!-- Top row: Identity & Module Selector & Capture / Export Controls -->
+    <div class="w-full max-w-lg pointer-events-auto flex items-center justify-between gap-1.5 bg-black/85 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
+      <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 pr-1.5 border-r border-white/10">
+          <span class="w-2 h-2 rounded-full bg-cyber-cyan shadow-[0_0_8px_#00ffcc] animate-pulse"></span>
+          <span class="font-black text-xs tracking-wider text-white">VMOSH</span>
+        </div>
+        <button id="holdCleanBtn" type="button" class="tap-btn px-2 py-0.5 rounded bg-white/5 active:bg-cyber-cyan/20 active:text-cyber-cyan border border-white/10 text-[9px] text-slate-400 font-bold transition" title="Hold to preview clean unmoshed frame">
+          Clean
+        </button>
       </div>
-      <div>
-        <div class="flex items-center space-x-1.5 leading-none">
-          <span class="font-extrabold tracking-wider text-xs sm:text-sm text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-white to-cyber-pink">VIBE//MOSH</span>
-          <span class="text-[8px] bg-cyber-cyan/15 text-cyber-cyan px-1 py-0.2 rounded border border-cyber-cyan/30">MOBILE 9:16</span>
+
+
+      <!-- Right: Snap, Speed, REC MP4 -->
+      <div class="flex items-center gap-1.5">
+        <button id="snapPicBtn" type="button" class="tap-btn px-2 py-1 rounded-lg bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold text-[10px] flex items-center gap-1 shadow-[0_0_10px_rgba(0,255,204,0.3)] active:scale-95 transition hover:bg-cyber-cyan hover:text-black">
+          <span>📸</span>
+          <span>SNAP</span>
+        </button>
+
+        <select id="recSpeedSelect" class="bg-black/90 border border-cyber-pink/70 rounded px-1.5 py-1 text-cyber-pink font-bold text-[9px] outline-none cursor-pointer active:scale-95 transition" title="Export Video Speed">
+          <option value="1.0" selected>⚡ 1x Real</option>
+          <option value="1.5">⚡ 1.5x</option>
+          <option value="2.0">⚡ 2x</option>
+          <option value="0.5">⚡ 0.5x</option>
+        </select>
+
+        <button id="recVideoBtn" type="button" class="tap-btn px-2.5 py-1 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink font-bold text-[10px] flex items-center gap-1.5 shadow-[0_0_10px_rgba(255,0,85,0.3)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
+          <span id="recBtnDot" class="w-1.5 h-1.5 rounded-full bg-cyber-pink"></span>
+          <span id="recBtnLabel">REC MP4</span>
+        </button>
+
+        <div id="recHUD" class="hidden flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[9px] font-bold">
+          <div class="w-1.5 h-1.5 rounded-full bg-cyber-pink rec-pulsing"></div>
+          <span id="recTimerText">00:00</span>
         </div>
       </div>
     </div>
 
-    <!-- Top Action Bar: Random Slogan, Palette & Chaos -->
-    <div class="flex items-center space-x-1.5">
-      <button id="paletteBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs flex items-center space-x-1 hover:border-cyber-cyan active:scale-95 transition text-cyber-cyan" title="Cycle color palette">
-        <span>🎨 Palette</span>
+    <!-- Second row: Module Selector (below the logo / REC safe zone) -->
+    <div class="w-full max-w-lg pointer-events-auto flex items-center justify-center">
+      <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[200px] py-1.5 px-5 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition" title="Open Module Pipeline Flow">
+        <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Modulos:</span>
+        <span id="activeModuleIcon">🔤</span>
+        <span id="activeModuleLabel" class="truncate font-black">Text</span>
+        <span class="text-[9px] text-slate-400">▾</span>
       </button>
-      <button id="sloganRandomBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs flex items-center space-x-1 hover:border-cyber-yellow active:scale-95 transition text-cyber-yellow" title="Generate viral slogan">
-        <span>⚡ Quote</span>
-      </button>
-      <button id="chaosBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs flex items-center space-x-1 hover:border-cyber-pink active:scale-95 transition text-cyber-pink" title="Randomize glitch">
-        <span>🎲 Chaos</span>
-      </button>
+    </div>
+
+    <!-- Floating Interactive Module Flow Modal (Opens when moduleSelectorBtn is clicked) -->
+    <div id="moduleFlowModal" class="hidden fixed top-24 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 max-w-sm w-full z-50 pointer-events-auto bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3.5 shadow-2xl space-y-2.5">
+      <div class="flex items-center justify-between border-b border-white/10 pb-2">
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs">⚡</span>
+          <span class="font-black text-[11px] text-white tracking-wider">MODULOS PIPELINE ROUTING</span>
+        </div>
+        <button id="closeModuleFlowBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
+      </div>
+
+      <!-- Exact 2-Column S-Curve Routing Flow from Reference Diagram -->
+      <div class="grid grid-cols-2 gap-x-4 gap-y-2 relative py-2 px-1">
+        <!-- Column 1: Text -> Media -> Pixel Sorting -->
+        <div class="flex flex-col items-center gap-2 z-10">
+          <button type="button" data-module="text" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+            <span>🔤</span><span>Text</span>
+          </button>
+          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
+          <button type="button" data-module="photo" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+            <span>🎬</span><span>media</span>
+          </button>
+          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
+          <button type="button" data-module="sort" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+            <span>🌊</span><span>pixel sorting</span>
+          </button>
+        </div>
+
+        <!-- Column 2: CRT -> Mosh -> Heatmap - Wire -> Vibe -->
+        <div class="flex flex-col items-center gap-2 z-10">
+          <button type="button" data-module="fx" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+            <span>📡</span><span>crt</span>
+          </button>
+          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
+          <button type="button" data-module="mosh" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+            <span>📼</span><span>Mosh</span>
+          </button>
+          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
+          <button type="button" data-module="glitch" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+            <span>🌀</span><span class="truncate">heatmap - wire...</span>
+          </button>
+          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
+          <button type="button" data-module="vibe" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+            <span>⛩️</span><span>vibe</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Step Navigation -->
+      <div class="flex items-center justify-between border-t border-white/10 pt-2 text-[10px]">
+        <button id="prevModuleBtn" type="button" class="tap-btn px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-300 font-bold active:scale-95 transition hover:bg-white/10">◀ PREV</button>
+        <span class="text-[9px] text-slate-400 font-mono tracking-wider">PIPELINE: 1 ➔ 7</span>
+        <button id="nextModuleBtn" type="button" class="tap-btn px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-300 font-bold active:scale-95 transition hover:bg-white/10">NEXT ▶</button>
+      </div>
+    </div>
+
+    <!-- Legacy Hidden Ribbon for DOM Compatibility -->
+    <div id="moduleRibbon" class="hidden">
+      <button type="button" data-module="photo" class="mod-ribbon-btn"><span>🎬</span><span>MEDIA</span></button>
+      <button type="button" data-module="text" class="mod-ribbon-btn active"><span>🔤</span><span>TEXT</span></button>
+      <button type="button" data-module="mosh" class="mod-ribbon-btn"><span>📼</span><span>MOSH</span></button>
+      <button type="button" data-module="glitch" class="mod-ribbon-btn"><span>🌀</span><span>HEAT/WIRE</span></button>
+      <button type="button" data-module="sort" class="mod-ribbon-btn"><span>🌊</span><span>PIXEL SORT</span></button>
+      <button type="button" data-module="fx" class="mod-ribbon-btn"><span>📡</span><span>CRT/FX</span></button>
+      <button type="button" data-module="vibe" class="mod-ribbon-btn"><span>⛩️</span><span>VIBES</span></button>
+    </div>
+
+    <!-- CONTEXTUAL TOP TEXT INPUT CAPSULE (Shown when Text module is active) -->
+    <div id="textQuickInputBox" class="w-full max-w-sm pointer-events-auto flex items-center gap-1.5 bg-black/90 backdrop-blur-md px-3 py-1 rounded-full border border-cyber-cyan/60 shadow-[0_0_12px_rgba(0,255,204,0.25)] transition-all">
+      <span class="text-xs">✏️</span>
+      <input type="text" id="topTextInput" class="bg-transparent border-0 text-white font-mono text-xs w-full outline-none placeholder-slate-500" value="VIBE//MOSH&#10;RAW SIGNAL" placeholder="Edit text on screen...">
+      <button id="clearTopTextBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
     </div>
   </header>
 
-  <main class="flex-1 relative flex flex-col items-center justify-center p-1 min-h-0 bg-[#040508] overflow-hidden">
-    
-    <!-- 9:16 Canvas Box Container -->
-    <div id="canvasBox" class="relative max-h-full max-w-full aspect-9-16 crt-overlay rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.85)] border border-cyber-border flex items-center justify-center bg-black touch-none">
-      
+  <!-- ==================== FULLSCREEN CANVAS VIEWPORT ==================== -->
+  <main class="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden z-0 bg-[#040508]">
+    <!-- 9:16 Fullscreen Canvas Box -->
+    <div id="canvasBox" class="relative w-full h-full flex items-center justify-center crt-overlay overflow-hidden touch-none">
       <!-- Primary Canvas (Native 720 x 1280 9:16) -->
-      <canvas id="moshCanvas" width="720" height="1280" class="w-full h-full object-contain cursor-crosshair block"></canvas>
+      <canvas id="moshCanvas" width="720" height="1280" class="max-h-full max-w-full aspect-9-16 object-contain cursor-crosshair block shadow-[0_0_40px_rgba(0,0,0,0.95)]"></canvas>
 
       <!-- Jam Mode grid flash: appears while performing directly on the screen -->
       <div id="canvasJamGrid" class="xy-pad-grid pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-150 z-10"></div>
@@ -375,91 +577,314 @@
       <!-- Visual Touch Drag / Brush / Jam Crosshair Indicator -->
       <div id="touchCrosshair" class="pointer-events-none absolute w-8 h-8 rounded-full border border-cyber-cyan/80 -translate-x-1/2 -translate-y-1/2 hidden shadow-[0_0_12px_#00ffcc] z-20"></div>
 
-      <!-- Live Recording HUD Overlay -->
-      <div id="recHUD" class="hidden absolute top-3 right-3 z-30 bg-black/85 backdrop-blur border border-cyber-pink/70 px-2 py-1 rounded-full flex items-center space-x-1.5 shadow-lg">
-        <div class="w-2.5 h-2.5 rounded-full bg-cyber-pink rec-pulsing"></div>
-        <span class="text-[10px] font-bold text-cyber-pink tracking-wider" id="recTimerText">REC 00:00</span>
-      </div>
-
       <!-- Touch Mode Badge -->
-      <div class="absolute top-3 left-3 z-30 pointer-events-none bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] text-slate-400 border border-white/10 flex items-center space-x-1">
-        <span id="touchModeLabel">👆 Touch: Drag Text</span>
+      <div class="absolute top-[9.5rem] left-3 z-20 pointer-events-none bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] text-slate-400 border border-white/10 flex items-center space-x-1">
+        <span id="touchModeLabel">👆 Drag Mode Active</span>
       </div>
 
-      <!-- Integrated Knob Dock: live controls proportionally anchored safely above bottom edge -->
-      <div id="canvasKnobDock"></div>
+      <!-- Temporary Quick Gesture Toast Notification -->
+      <div id="gestureToast" class="pointer-events-none absolute top-[11.5rem] inset-x-0 mx-auto w-max px-3 py-1 rounded-full bg-black/90 border border-cyber-cyan text-cyber-cyan text-[10px] font-bold opacity-0 transition-opacity duration-200 z-30 shadow-xl"></div>
     </div>
-
   </main>
 
-  <div class="shrink-0 bg-[#090c12] border-t border-cyber-border px-3 py-2 flex items-center justify-between gap-2 z-20">
-    <div class="flex items-center space-x-2">
-      <!-- Touch Interaction Cycle: Drag / Brush / Jam Pad -->
-      <button id="touchModeToggle" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-300 flex items-center space-x-1 active:scale-95 transition">
-        <span id="brushIcon">👆</span>
-        <span id="brushBtnText" class="font-semibold text-[11px]">Mode: Drag</span>
+  <!-- ==================== FLOATING SIDE WINGS & CONTEXTUAL MENUS ==================== -->
+  <!-- LEFT SIDE WING (Docked vertically on left edge) -->
+  <aside id="leftSideWing" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-30 pointer-events-auto flex flex-col gap-2">
+    <!-- Text Module Tools: Font & Animation -->
+    <div id="wingGroupTextLeft" class="flex flex-col gap-2">
+      <button id="sideFontBtn" type="button" class="side-wing-btn" title="Choose Font">
+        <span class="text-sm">🔤</span>
+        <span class="text-[8px] font-bold text-slate-300">FONT</span>
       </button>
+      <button id="sideAnimBtn" type="button" class="side-wing-btn" title="Motion Animation">
+        <span class="text-sm">✨</span>
+        <span class="text-[8px] font-bold text-slate-300">ANIM</span>
+      </button>
+    </div>
 
-      <!-- Hold Clean Button -->
-      <button id="holdCleanBtn" class="tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-400 active:bg-cyber-cyan/20 active:text-cyber-cyan active:border-cyber-cyan transition">
-        Hold Clean
+    <!-- Mosh Module Tools: Mode & Freeze -->
+    <div id="wingGroupMoshLeft" class="hidden flex flex-col gap-2">
+      <button id="sideMoshModeBtn" type="button" class="side-wing-btn" title="P-Frame Mode">
+        <span class="text-sm">🌊</span>
+        <span id="sideMoshModeLabel" class="text-[8px] font-bold text-slate-300">MELT</span>
+      </button>
+      <button id="sideFreezeBtn" type="button" class="side-wing-btn" title="Freeze I-Frame">
+        <span class="text-sm">❄️</span>
+        <span class="text-[8px] font-bold text-slate-300">FREEZE</span>
       </button>
     </div>
 
-    <div class="flex items-center space-x-1.5">
-      <!-- SNAP HIGH-RES PNG -->
-      <button id="snapPicBtn" class="tap-btn px-2.5 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-bold text-xs flex items-center space-x-1 shadow-[0_0_12px_rgba(0,255,204,0.25)] active:scale-95 transition hover:bg-cyber-cyan hover:text-black">
-        <span>📸</span>
-        <span>SNAP</span>
+    <!-- Heat/Wire Module Tools: Mode & Trigger -->
+    <div id="wingGroupGlitchLeft" class="hidden flex flex-col gap-2">
+      <button id="sideHwModeBtn" type="button" class="side-wing-btn" title="Heat/Wire Mode">
+        <span class="text-sm">🎭</span>
+        <span class="text-[8px] font-bold text-slate-300">MODE</span>
       </button>
-
-      <!-- EXPORT SPEED SELECTOR (1x Real-time / Kin to Original) -->
-      <select id="recSpeedSelect" class="bg-cyber-black border border-cyber-pink/60 rounded px-1.5 py-1.5 text-cyber-pink font-bold text-[10px] outline-none cursor-pointer active:scale-95 transition" title="Export Video Speed">
-        <option value="1.0" selected>⚡ 1x Real</option>
-        <option value="1.5">⚡ 1.5x</option>
-        <option value="2.0">⚡ 2x Hyper</option>
-        <option value="0.5">⚡ 0.5x Slow</option>
-      </select>
-
-      <!-- RECORD 9:16 VIDEO -->
-      <button id="recVideoBtn" class="tap-btn px-2.5 py-1.5 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink font-bold text-xs flex items-center space-x-1.5 shadow-[0_0_12px_rgba(255,0,85,0.25)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
-        <span id="recBtnDot" class="w-2 h-2 rounded-full bg-cyber-pink"></span>
-        <span id="recBtnLabel">REC MP4</span>
+      <button id="sideHwTriggerBtn" type="button" class="side-wing-btn" title="Trigger Mask">
+        <span class="text-sm">🎯</span>
+        <span class="text-[8px] font-bold text-slate-300">MASK</span>
       </button>
     </div>
+
+    <!-- Pixel Sort Module Tools: Direction -->
+    <div id="wingGroupSortLeft" class="hidden flex flex-col gap-2">
+      <button id="sideSortDirBtn" type="button" class="side-wing-btn" title="Sort Direction">
+        <span id="sideSortDirIcon" class="text-sm">💧</span>
+        <span id="sideSortDirLabel" class="text-[8px] font-bold text-slate-300">DOWN</span>
+      </button>
+    </div>
+
+    <!-- CRT/FX Module Tools: CRT Overlay & Sync Suppression -->
+    <div id="wingGroupFxLeft" class="hidden flex flex-col gap-2">
+      <button id="sideFxToggleBtn" type="button" class="side-wing-btn active" title="CRT Effect On/Off">
+        <span class="text-sm">📺</span>
+        <span class="text-[8px] font-bold text-slate-300">CRT</span>
+      </button>
+      <button id="sideSyncToggleBtn" type="button" class="side-wing-btn" title="Sync Suppression On/Off">
+        <span class="text-sm">⚡</span>
+        <span class="text-[8px] font-bold text-slate-300">SYNC</span>
+      </button>
+      <button id="sideSyncDirBtn" type="button" class="side-wing-btn" title="Sync Roll Direction">
+        <span class="text-sm">🧭</span>
+        <span id="sideSyncDirLabel" class="text-[8px] font-bold text-slate-300">HORIZ</span>
+      </button>
+    </div>
+
+    <!-- Media Module Tools: Sources & Live/Playback Controls -->
+    <div id="wingGroupPhotoLeft" class="hidden flex flex-col gap-2">
+      <label class="side-wing-btn cursor-pointer" title="Import from Gallery">
+        <span class="text-sm">🖼️</span>
+        <span class="text-[8px] font-bold text-slate-300">FILE</span>
+        <input type="file" id="sideGalleryInput" accept="image/*,video/*" class="hidden">
+      </label>
+      <label class="side-wing-btn cursor-pointer" title="Record with Video Camera">
+        <span class="text-sm">🎥</span>
+        <span class="text-[8px] font-bold text-slate-300">CAM</span>
+        <input type="file" id="sideCamInput" accept="video/*" capture="environment" class="hidden">
+      </label>
+      <button id="sideMediaCtrlBtn" type="button" class="side-wing-btn" title="Live Camera, Trim & Playback Controls">
+        <span class="text-sm">📹</span>
+        <span class="text-[8px] font-bold text-slate-300">CTRL</span>
+      </button>
+    </div>
+
+    <!-- Vibes Module Tools: Frame Selection & Layer Placement -->
+    <div id="wingGroupVibeLeft" class="hidden flex flex-col gap-2">
+      <button id="sideVibeGraphicBtn" type="button" class="side-wing-btn" title="Cyber & Oriental Frame">
+        <span class="text-sm">⛩️</span>
+        <span class="text-[8px] font-bold text-slate-300">FRAME</span>
+      </button>
+      <button id="sideVibeLayerBtn" type="button" class="side-wing-btn" title="Toggle Layer: Front Frame / Back Art">
+        <span class="text-sm">🖼️</span>
+        <span id="sideVibeLayerLabel" class="text-[8px] font-bold text-slate-300">FRONT</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- RIGHT SIDE WING (Docked vertically on right edge) -->
+  <aside id="rightSideWing" class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-30 pointer-events-auto flex flex-col gap-2">
+    <!-- Text Module: Color & Alignment & Chaos -->
+    <div id="wingGroupTextRight" class="flex flex-col gap-2">
+      <button id="sideColorBtn" type="button" class="side-wing-btn" title="Colors & Gradients">
+        <span class="text-sm">🎨</span>
+        <span class="text-[8px] font-bold text-slate-300">COLOR</span>
+      </button>
+      <button id="sideAlignBtn" type="button" class="side-wing-btn" title="Cycle Alignment (Left / Center / Right)">
+        <span id="sideAlignIcon" class="text-sm">⏸️</span>
+        <span id="sideAlignLabel" class="text-[8px] font-bold text-slate-300">MID</span>
+      </button>
+      <button id="sideChaosBtn" type="button" class="side-wing-btn" title="Zine / Ransom Chaos (2-Finger Tap)">
+        <span class="text-sm">🎲</span>
+        <span class="text-[8px] font-bold text-slate-300">CHAOS</span>
+      </button>
+    </div>
+
+    <!-- Mosh Module: Video Coupling & Buffer Clear -->
+    <div id="wingGroupMoshRight" class="hidden flex flex-col gap-2">
+      <button id="sideVideoCouplingBtn" type="button" class="side-wing-btn" title="Toggle Motion Coupling with Video">
+        <span class="text-sm">🔗</span>
+        <span class="text-[8px] font-bold text-slate-300">LINK</span>
+      </button>
+      <button id="sideClearMoshBtn" type="button" class="side-wing-btn" title="Clear Mosh Buffer">
+        <span class="text-sm">🧹</span>
+        <span class="text-[8px] font-bold text-slate-300">CLEAR</span>
+      </button>
+    </div>
+
+    <!-- Heat/Wire Module: Palettes & Wire Style -->
+    <div id="wingGroupGlitchRight" class="hidden flex flex-col gap-2">
+      <button id="sideHwPaletteBtn" type="button" class="side-wing-btn" title="Heatmap Palette">
+        <span class="text-sm">🔥</span>
+        <span class="text-[8px] font-bold text-slate-300">PAL</span>
+      </button>
+      <button id="sideHwWireStyleBtn" type="button" class="side-wing-btn" title="Wireframe Mesh Style">
+        <span class="text-sm">📐</span>
+        <span class="text-[8px] font-bold text-slate-300">MESH</span>
+      </button>
+    </div>
+
+    <!-- Pixel Sort Module: Criterion & Active Toggle -->
+    <div id="wingGroupSortRight" class="hidden flex flex-col gap-2">
+      <button id="sideSortCritBtn" type="button" class="side-wing-btn" title="Sort Criterion">
+        <span class="text-sm">📊</span>
+        <span id="sideSortCritLabel" class="text-[8px] font-bold text-slate-300">LUMA</span>
+      </button>
+      <button id="sideSortPowerBtn" type="button" class="side-wing-btn active" title="Toggle Pixel Sort Engine">
+        <span class="text-sm">⏻</span>
+        <span class="text-[8px] font-bold text-slate-300">SORT</span>
+      </button>
+    </div>
+
+    <!-- CRT/FX Module: Backdrop, Tint & Sync Bar/Tear -->
+    <div id="wingGroupFxRight" class="hidden flex flex-col gap-2">
+      <button id="sideBgModeBtn" type="button" class="side-wing-btn" title="Backdrop Style">
+        <span class="text-sm">🌈</span>
+        <span class="text-[8px] font-bold text-slate-300">BG</span>
+      </button>
+      <button id="sideCustomBgBtn" type="button" class="side-wing-btn" title="Toggle Custom Colors">
+        <span class="text-sm">🎨</span>
+        <span class="text-[8px] font-bold text-slate-300">TINT</span>
+      </button>
+      <button id="sideSyncColorBtn" type="button" class="side-wing-btn" title="Sync Bar Color & Palette">
+        <span class="text-sm">⬛</span>
+        <span class="text-[8px] font-bold text-slate-300">BAR</span>
+      </button>
+      <button id="sideSyncNoiseBtn" type="button" class="side-wing-btn" title="Sync Noise Hash & Edge Tearing">
+        <span class="text-sm">📻</span>
+        <span class="text-[8px] font-bold text-slate-300">TEAR</span>
+      </button>
+    </div>
+
+    <!-- Media Module: ASCII Mode & Reset -->
+    <div id="wingGroupPhotoRight" class="hidden flex flex-col gap-2">
+      <button id="sideAsciiModeBtn" type="button" class="side-wing-btn" title="ASCII & Render Menu">
+        <span class="text-sm">🔠</span>
+        <span class="text-[8px] font-bold text-slate-300">ASCII</span>
+      </button>
+      <button id="sideResetTransformBtn" type="button" class="side-wing-btn" title="Center & Reset Zoom/Pan">
+        <span class="text-sm">↺</span>
+        <span class="text-[8px] font-bold text-slate-300">RESET</span>
+      </button>
+    </div>
+
+    <!-- Vibes Module: Presets & Shuffle -->
+    <div id="wingGroupVibeRight" class="hidden flex flex-col gap-2">
+      <button id="sideVibePresetBtn" type="button" class="side-wing-btn" title="1-Tap Aesthetic Presets">
+        <span class="text-sm">🎚️</span>
+        <span class="text-[8px] font-bold text-slate-300">PRESET</span>
+      </button>
+      <button id="sidePaletteShuffleBtn" type="button" class="side-wing-btn" title="Shuffle Global Color Palette">
+        <span class="text-sm">🎨</span>
+        <span class="text-[8px] font-bold text-slate-300">SHUFFLE</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ==================== FLOATING SIDE POPOVER FLYOUTS ==================== -->
+  <!-- Left Side Popover Container -->
+  <div id="leftPopoverCard" class="hidden side-popover left-14 sm:left-16 top-1/2 -translate-y-1/2 w-56 text-xs">
+    <div class="flex items-center justify-between border-b border-cyber-border pb-1 mb-2">
+      <span id="leftPopoverTitle" class="font-bold text-[10px] text-white tracking-wider">SELECT FONT</span>
+      <button type="button" class="close-popover-btn text-slate-400 hover:text-white px-1">✕</button>
+    </div>
+    <div id="leftPopoverContent" class="space-y-1 max-h-[65vh] overflow-y-auto pr-0.5"></div>
   </div>
 
-  <footer id="controlSheet" class="sheet-collapsed shrink-0 bg-cyber-dark border-t border-cyber-border flex flex-col z-20 flex-none">
+  <!-- Right Side Popover Container (e.g. Color Palette Strips) -->
+  <div id="rightPopoverCard" class="hidden side-popover right-14 sm:right-16 top-1/2 -translate-y-1/2 w-64 text-xs">
+    <div class="flex items-center justify-between border-b border-cyber-border pb-1 mb-2">
+      <span id="rightPopoverTitle" class="font-bold text-[10px] text-white tracking-wider">COLOR CONTROLS</span>
+      <button type="button" class="close-popover-btn text-slate-400 hover:text-white px-1">✕</button>
+    </div>
+    <div id="rightPopoverContent" class="space-y-2 max-h-[65vh] overflow-y-auto pr-0.5"></div>
+  </div>
 
-    <!-- Drag Handle: tap or swipe to expand/collapse the control sheet -->
-    <button id="sheetHandle" class="w-full flex flex-col items-center justify-center py-1 active:bg-white/5 transition" aria-label="Toggle controls">
-      <span class="w-9 h-1 rounded-full bg-cyber-border"></span>
-    </button>
+  <!-- ==================== BASE DECK (3 KNOBS + SUB-ENGINE SELECTOR) ==================== -->
+  <footer id="baseDeck" class="absolute bottom-0 inset-x-0 z-30 pointer-events-auto bg-gradient-to-t from-black via-black/90 to-transparent pt-3 pb-3 px-3 sm:px-6 flex flex-col items-center gap-2.5 backdrop-blur-md border-t border-white/10">
+    
+    <!-- Top row: Diamond Drag/Jam + Sub-Engine Selector + Circular REC Button -->
+    <div class="w-full max-w-md flex items-center justify-between gap-3 px-1">
+      <!-- Diamond Drag or Jam Toggle Button -->
+      <button id="dragJamToggleBtn" type="button" class="diamond-btn mode-drag tap-btn shrink-0" title="Toggle Drag / Jam Mode">
+        <div class="flex flex-col items-center justify-center pointer-events-none">
+          <span id="dragJamIcon" class="text-xs">👆</span>
+          <span id="dragJamText" class="text-[7.5px] font-black uppercase tracking-tighter">DRAG</span>
+        </div>
+      </button>
 
-    <!-- Tab Navigation Bar -->
-    <div class="grid grid-cols-6 border-b border-cyber-border text-[10px] sm:text-[11px] font-bold text-center bg-[#07090e]">
-      <button data-tab="text" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-cyber-cyan border-b-2 border-cyber-cyan transition active:scale-95">
-        <span class="text-sm leading-none">🔤</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">TEXT</span>
+      <!-- Center Sub-Engine / Param Selector Button -->
+      <button id="subEngineBtn" type="button" class="tap-btn flex-1 py-1.5 px-3 rounded-full bg-cyber-card/90 border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.3)] active:scale-95 transition" title="Choose Active Engine Parameters">
+        <span id="subEngineIcon">📐</span>
+        <span id="subEngineLabel" class="truncate">2D: STACK</span>
+        <span class="text-[9px] text-slate-400">▾</span>
       </button>
-      <button data-tab="photo" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
-        <span class="text-sm leading-none">🎬</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">MEDIA</span>
-      </button>
-      <button data-tab="glitch" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
-        <span class="text-sm leading-none">🌀</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">GLITCH</span>
-      </button>
-      <button data-tab="mosh" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
-        <span class="text-sm leading-none">📼</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">MOSH</span>
-      </button>
-      <button data-tab="vibe" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
-        <span class="text-sm leading-none">🎛️</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">VIBE</span>
-      </button>
-      <button data-tab="fx" class="tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95">
-        <span class="text-sm leading-none">📡</span><span class="text-[8.5px] sm:text-[9.5px] tracking-wide">CRT/FX</span>
+
+      <!-- Circular REC MP4 Button -->
+      <button id="deckRecBtn" type="button" class="tap-btn w-10 h-10 rounded-full bg-cyber-pink/20 border-2 border-cyber-pink text-cyber-pink font-black text-xs flex items-center justify-center shadow-[0_0_12px_rgba(255,0,85,0.4)] active:scale-90 transition hover:bg-cyber-pink hover:text-black shrink-0" title="Record 9:16 Video">
+        <span id="deckRecDot" class="w-3.5 h-3.5 rounded-full bg-cyber-pink"></span>
       </button>
     </div>
 
-    <!-- Panels Container -->
-    <div id="footerPanels" class="app-footer-panels overflow-y-auto p-3 text-xs space-y-3 custom-scroll">
+    <!-- Floating Sub-Engine Popover Menu (Directly above subEngineBtn) -->
+    <div id="subEngineMenu" class="hidden absolute bottom-28 inset-x-3 max-w-sm mx-auto z-40 bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3 shadow-2xl space-y-2">
+      <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+        <span class="text-[10px] font-bold text-white tracking-wider flex items-center gap-1">
+          <span>⚡</span>
+          <span>SELECT CONTROLLER / PARAMS</span>
+        </span>
+        <button id="closeSubEngineMenuBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
+      </div>
+      <div id="subEngineMenuList" class="grid grid-cols-2 gap-1.5 text-xs"></div>
+    </div>
+
+    <!-- Bottom row: Exactly 3 Primary Rotary Knobs Bound to Active Sub-Engine -->
+    <div id="baseKnobsRow" class="w-full max-w-md grid grid-cols-3 gap-2 sm:gap-4 items-center justify-items-center">
+      <!-- Dynamic Knob 1 -->
+      <div id="vmKnob1Box" class="flex flex-col items-center select-none w-full">
+        <span id="vmKnob1Label" class="text-[9px] font-bold text-slate-400 tracking-wider mb-1 truncate max-w-full text-center">FONT SIZE</span>
+        <div id="vmKnob1Container" class="relative cursor-pointer touch-none flex items-center justify-center w-[54px] h-[54px]">
+          <div id="vmKnob1Body" class="knob-body w-[52px] h-[52px]">
+            <div id="vmKnob1Ring" class="knob-ring"></div>
+            <div id="vmKnob1Dial" class="base-knob-dial">
+              <div id="vmKnob1Indicator" class="base-knob-indicator"></div>
+            </div>
+          </div>
+        </div>
+        <span id="vmKnob1Value" class="text-[10px] font-mono text-cyber-cyan font-bold mt-1">95px</span>
+      </div>
+
+      <!-- Dynamic Knob 2 -->
+      <div id="vmKnob2Box" class="flex flex-col items-center select-none w-full">
+        <span id="vmKnob2Label" class="text-[9px] font-bold text-slate-400 tracking-wider mb-1 truncate max-w-full text-center">TRACKING</span>
+        <div id="vmKnob2Container" class="relative cursor-pointer touch-none flex items-center justify-center w-[54px] h-[54px]">
+          <div id="vmKnob2Body" class="knob-body w-[52px] h-[52px]">
+            <div id="vmKnob2Ring" class="knob-ring"></div>
+            <div id="vmKnob2Dial" class="base-knob-dial">
+              <div id="vmKnob2Indicator" class="base-knob-indicator"></div>
+            </div>
+          </div>
+        </div>
+        <span id="vmKnob2Value" class="text-[10px] font-mono text-cyber-cyan font-bold mt-1">4px</span>
+      </div>
+
+      <!-- Dynamic Knob 3 -->
+      <div id="vmKnob3Box" class="flex flex-col items-center select-none w-full">
+        <span id="vmKnob3Label" class="text-[9px] font-bold text-slate-400 tracking-wider mb-1 truncate max-w-full text-center">MOTION SPD</span>
+        <div id="vmKnob3Container" class="relative cursor-pointer touch-none flex items-center justify-center w-[54px] h-[54px]">
+          <div id="vmKnob3Body" class="knob-body w-[52px] h-[52px]">
+            <div id="vmKnob3Ring" class="knob-ring"></div>
+            <div id="vmKnob3Dial" class="base-knob-dial">
+              <div id="vmKnob3Indicator" class="base-knob-indicator"></div>
+            </div>
+          </div>
+        </div>
+        <span id="vmKnob3Value" class="text-[10px] font-mono text-cyber-yellow font-bold mt-1">1.0x</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== ALL CORE ENGINE INPUTS (Hidden Preserved for Backward Compatibility & Direct DSP State) ==================== -->
+  <div id="allEngineInputs" class="hidden">
       
       <!-- ==================== TAB 1: TEXT ENGINE ==================== -->
       <div id="tabText" class="tab-content space-y-2.5">
@@ -809,8 +1234,8 @@ RAW SIGNAL</textarea>
         </div>
       </div>
 
-      <!-- ==================== TAB 2: PIXEL SORTING ==================== -->
-      <div id="tabGlitch" class="tab-content hidden space-y-2.5">
+      <!-- ==================== TAB 3: PIXEL SORTING ==================== -->
+      <div id="tabSort" class="tab-content hidden space-y-2.5">
         <div class="flex items-center justify-between border-b border-cyber-border pb-1">
           <span class="text-cyber-cyan font-bold text-[11px]">PIXEL SORT ENGINE</span>
           <label class="flex items-center space-x-1 text-[10px] text-slate-300">
@@ -867,9 +1292,11 @@ RAW SIGNAL</textarea>
             <input type="range" id="sortHighRange" min="0" max="100" value="90">
           </div>
         </div>
+      </div>
 
-        <!-- ==================== LUMA HEATMAP & WIREFRAME MESH ==================== -->
-        <div class="p-2.5 rounded-lg bg-[#070b12] border border-cyber-pink/40 space-y-2.5 mt-2">
+      <!-- ==================== TAB 4: LUMA HEATMAP & WIREFRAME MESH ==================== -->
+      <div id="tabGlitch" class="tab-content hidden space-y-2.5">
+        <div class="p-2.5 rounded-lg bg-[#070b12] border border-cyber-pink/40 space-y-2.5">
           <div class="flex items-center justify-between border-b border-cyber-border/70 pb-1">
             <span class="text-cyber-pink font-bold text-[11px] flex items-center gap-1.5">
               <span>🌡️</span> LUMA HEATMAP &amp; WIREFRAME
@@ -1295,10 +1722,120 @@ RAW SIGNAL</textarea>
             </div>
           </div>
         </div>
+
+        <!-- Sync Suppression & Roll Engine -->
+        <div class="space-y-1.5 pt-1.5 border-t border-cyber-border/60">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-cyber-yellow uppercase tracking-wider">⚡ SYNC SUPPRESSION &amp; ROLL</span>
+            <label class="flex items-center space-x-1 text-[10px] text-slate-300">
+              <input type="checkbox" id="syncActiveCheck" class="accent-cyber-yellow">
+              <span>Sync Drop</span>
+            </label>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">DIRECTION</label>
+              <select id="syncDirectionSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+                <option value="horizontal">Horizontal (V-Roll / Blanking)</option>
+                <option value="vertical">Vertical (H-Roll / Drift)</option>
+                <option value="diagonal">Diagonal (45° S-Tear)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[9px] text-slate-400 mb-0.5">BAR COLOR</label>
+              <input type="color" id="syncColorInput" value="#000000" class="w-full h-6 rounded bg-transparent cursor-pointer border border-cyber-border">
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] text-slate-400">
+                <span>Band Width</span>
+                <span id="syncWidthLabel" class="text-cyber-yellow">18%</span>
+              </div>
+              <input type="range" id="syncWidthRange" min="2" max="60" value="18">
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] text-slate-400">
+                <span>Roll Speed</span>
+                <span id="syncSpeedLabel" class="text-cyber-yellow">1.2x</span>
+              </div>
+              <input type="range" id="syncSpeedRange" min="-50" max="50" value="12">
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] text-slate-400">
+                <span>Noise Hash</span>
+                <span id="syncNoiseLabel" class="text-cyber-yellow">65%</span>
+              </div>
+              <input type="range" id="syncNoiseRange" min="0" max="100" value="65">
+            </div>
+          </div>
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[9px] text-slate-400">
+              <span>Edge Tear / Loss of Sync Jitter</span>
+              <span id="syncTearLabel" class="text-cyber-yellow">45%</span>
+            </div>
+            <input type="range" id="syncTearRange" min="0" max="100" value="45">
+          </div>
+        </div>
       </div>
 
     </div>
-  </footer>
+  </div>
+
+  <!-- ==================== SLIDE-UP PRESETS & VIBES DRAWER ==================== -->
+  <div id="presetsDrawer" class="hidden fixed inset-x-0 bottom-0 z-40 bg-black/92 backdrop-blur-2xl border-t border-cyber-yellow/40 rounded-t-2xl shadow-2xl flex flex-col max-h-[48vh] transition-all duration-300">
+    <div class="flex items-center justify-between p-3 border-b border-white/10 shrink-0">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🎚️</span>
+        <span class="font-black text-xs text-white tracking-wider">AESTHETIC PRESETS &amp; CHAOS</span>
+      </div>
+      <button id="closePresetsDrawerBtn" type="button" class="text-slate-400 hover:text-white px-2 py-0.5 text-base">✕</button>
+    </div>
+    <div class="overflow-y-auto p-3.5 space-y-3 custom-scroll flex-1">
+      <!-- Quick Action Buttons -->
+      <div class="grid grid-cols-3 gap-2">
+        <button id="paletteBtn" type="button" class="tap-btn py-2 px-1.5 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[10px] font-black flex items-center justify-center gap-1 active:scale-95 transition hover:bg-cyber-pink hover:text-black shadow-[0_0_8px_rgba(255,0,85,0.25)]">
+          <span>🎨</span>
+          <span>PALETTE</span>
+        </button>
+        <button id="chaosBtn" type="button" class="tap-btn py-2 px-1.5 rounded-lg bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan text-[10px] font-black flex items-center justify-center gap-1 active:scale-95 transition hover:bg-cyber-cyan hover:text-black shadow-[0_0_8px_rgba(0,255,204,0.25)]">
+          <span>🎲</span>
+          <span>CHAOS</span>
+        </button>
+        <button id="sloganRandomBtn" type="button" class="tap-btn py-2 px-1.5 rounded-lg bg-cyber-yellow/20 border border-cyber-yellow text-cyber-yellow text-[10px] font-black flex items-center justify-center gap-1 active:scale-95 transition hover:bg-cyber-yellow hover:text-black shadow-[0_0_8px_rgba(255,230,0,0.25)]">
+          <span>⚡</span>
+          <span>SLOGAN</span>
+        </button>
+      </div>
+
+      <!-- Presets Matrix -->
+      <div class="space-y-1.5 pt-1 border-t border-cyber-border/60">
+        <label class="block text-[10px] text-slate-400 font-bold">1-TAP AESTHETIC PRESETS</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button data-vibe="cyberHyper" class="vibe-card p-2 rounded-xl bg-cyber-card border border-cyber-border text-left active:scale-95 transition hover:border-cyber-cyan">
+            <div class="text-[11px] font-bold text-cyber-cyan">CYBER HYPER</div>
+            <div class="text-[9px] text-slate-400">Neon cyan, tear sort &amp; chromatic drift</div>
+          </button>
+          <button data-vibe="acidVapor" class="vibe-card p-2 rounded-xl bg-cyber-card border border-cyber-border text-left active:scale-95 transition hover:border-cyber-yellow">
+            <div class="text-[11px] font-bold text-cyber-yellow">ACID VAPOR</div>
+            <div class="text-[9px] text-slate-400">Toxic lime dripping, high-key saturation</div>
+          </button>
+          <button data-vibe="analogVhs" class="vibe-card p-2 rounded-xl bg-cyber-card border border-cyber-border text-left active:scale-95 transition hover:border-cyber-purple">
+            <div class="text-[11px] font-bold text-cyber-purple">ANALOG VHS</div>
+            <div class="text-[9px] text-slate-400">Heavy tape scanlines, P-frame melt</div>
+          </button>
+          <button data-vibe="brutalRed" class="vibe-card p-2 rounded-xl bg-cyber-card border border-cyber-border text-left active:scale-95 transition hover:border-cyber-pink">
+            <div class="text-[11px] font-bold text-cyber-pink">BRUTAL RED</div>
+            <div class="text-[9px] text-slate-400">Editorial poster, jagged slice shears</div>
+          </button>
+          <button data-vibe="meltVoid" class="vibe-card p-2 rounded-xl bg-black border border-white/20 text-left active:scale-95 transition hover:border-cyber-cyan col-span-2">
+            <div class="text-[11px] font-bold text-slate-300">🌌 MELT VOID</div>
+            <div class="text-[9px] text-slate-400">Transparent pure drift feedback</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="exportModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex flex-col justify-end p-4 transition-all duration-300">
     <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 max-w-sm w-full mx-auto space-y-3 shadow-2xl">
@@ -1539,7 +2076,18 @@ RAW SIGNAL</textarea>
         customBg: false,
         bgColor1: '#04020a',
         bgColor2: '#ff0055',
-        bgAccent: '#00ffcc'
+        bgAccent: '#00ffcc',
+        // Sync Suppression & Roll
+        sync: {
+          active: false,
+          direction: 'horizontal', // 'horizontal' | 'vertical' | 'diagonal'
+          width: 18,               // 2 - 60%
+          speed: 12,               // -50 to +50
+          pos: 0.35,               // 0.0 - 1.0
+          color: '#000000',        // bar color
+          noise: 65,               // 0 - 100%
+          tear: 45                 // 0 - 100%
+        }
       },
 
       // Cyber & Oriental Vector Graphics (Vibe module)
@@ -3564,6 +4112,214 @@ RAW SIGNAL</textarea>
 
       targetCtx.putImageData(img, 0, 0);
     }
+
+    // ==================== CRT SYNC SUPPRESSION & ROLL ENGINE ====================
+    let syncNoiseCanvas = null;
+    let syncNoiseCtx = null;
+
+    function getSyncNoiseCanvas() {
+      if (!syncNoiseCanvas) {
+        syncNoiseCanvas = document.createElement('canvas');
+        syncNoiseCanvas.width = 256;
+        syncNoiseCanvas.height = 256;
+        syncNoiseCtx = syncNoiseCanvas.getContext('2d');
+        const imgData = syncNoiseCtx.createImageData(256, 256);
+        const data32 = new Uint32Array(imgData.data.buffer);
+        for (let i = 0; i < data32.length; i++) {
+          const v = (Math.random() * 255) | 0;
+          data32[i] = (255 << 24) | (v << 16) | (v << 8) | v;
+        }
+        syncNoiseCtx.putImageData(imgData, 0, 0);
+      }
+      return syncNoiseCanvas;
+    }
+
+    function applySyncSuppression(targetCtx, sync, tick) {
+      if (!sync || !sync.active) return;
+
+      // 1. Step position
+      const spd = (sync.speed !== undefined ? sync.speed : 12) * 0.0015;
+      sync.pos = ((sync.pos || 0) + spd);
+      if (sync.pos > 1) sync.pos -= 1;
+      if (sync.pos < 0) sync.pos += 1;
+
+      const direction = sync.direction || 'horizontal';
+      const widthPct = Math.min(60, Math.max(2, sync.width || 18)) / 100;
+      const color = sync.color || '#000000';
+      const isInvert = (color === 'invert' || color === '#difference');
+      const noiseLevel = Math.min(100, Math.max(0, sync.noise !== undefined ? sync.noise : 65)) / 100;
+      const tearLevel = Math.min(100, Math.max(0, sync.tear !== undefined ? sync.tear : 45)) / 100;
+
+      targetCtx.save();
+
+      if (direction === 'horizontal') {
+        // Vertical Roll / Horizontal Blanking Band
+        const bandH = Math.round(HEIGHT * widthPct);
+        const bandY = Math.round(sync.pos * HEIGHT) - Math.round(bandH / 2);
+
+        // Pre-tear & Post-tear scanline jitter along the sync edges
+        if (tearLevel > 0) {
+          const maxJitter = tearLevel * 75;
+          const tearCount = Math.floor(10 + tearLevel * 25);
+          for (let i = 0; i < tearCount; i++) {
+            const spread = (Math.random() - 0.5) * (bandH * 1.6);
+            let sy = Math.round(bandY + bandH / 2 + spread);
+            if (sy < 0) sy += HEIGHT;
+            sy %= HEIGHT;
+            const sh = Math.floor(Math.random() * 5) + 2;
+            const shift = (Math.random() - 0.5) * maxJitter;
+            targetCtx.drawImage(targetCtx.canvas, 0, sy, WIDTH, sh, shift, sy, WIDTH, sh);
+          }
+        }
+
+        // Draw blanking bar across wrapped coordinates
+        const drawHorizontalBarAt = (yPos) => {
+          if (isInvert) {
+            targetCtx.save();
+            targetCtx.globalCompositeOperation = 'difference';
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.fillRect(0, yPos, WIDTH, bandH);
+            targetCtx.restore();
+          } else {
+            targetCtx.save();
+            targetCtx.fillStyle = color;
+            targetCtx.fillRect(0, yPos, WIDTH, bandH);
+
+            // Classic analog sync pulse stripe inside the blanking interval
+            targetCtx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+            targetCtx.fillRect(0, yPos + Math.round(bandH * 0.42), WIDTH, Math.max(2, Math.round(bandH * 0.16)));
+            targetCtx.restore();
+          }
+
+          // Raster Noise Hash overlay
+          if (noiseLevel > 0) {
+            targetCtx.save();
+            targetCtx.globalAlpha = noiseLevel * 0.7;
+            targetCtx.globalCompositeOperation = isInvert ? 'difference' : 'screen';
+            const noiseCanvas = getSyncNoiseCanvas();
+            const offX = Math.floor((tick * 83) % 256);
+            const offY = Math.floor((tick * 97) % 256);
+            for (let ny = yPos; ny < yPos + bandH; ny += 256) {
+              for (let nx = 0; nx < WIDTH; nx += 256) {
+                targetCtx.drawImage(noiseCanvas, offX, offY, 128, 128, nx, ny, 256, 256);
+              }
+            }
+            targetCtx.restore();
+          }
+        };
+
+        drawHorizontalBarAt(bandY);
+        if (bandY < 0) drawHorizontalBarAt(bandY + HEIGHT);
+        if (bandY + bandH > HEIGHT) drawHorizontalBarAt(bandY - HEIGHT);
+
+      } else if (direction === 'vertical') {
+        // Horizontal Drift / Vertical Blanking Band
+        const bandW = Math.round(WIDTH * widthPct);
+        const bandX = Math.round(sync.pos * WIDTH) - Math.round(bandW / 2);
+
+        if (tearLevel > 0) {
+          const maxJitter = tearLevel * 60;
+          const tearCount = Math.floor(10 + tearLevel * 25);
+          for (let i = 0; i < tearCount; i++) {
+            const spread = (Math.random() - 0.5) * (bandW * 1.6);
+            let sx = Math.round(bandX + bandW / 2 + spread);
+            if (sx < 0) sx += WIDTH;
+            sx %= WIDTH;
+            const sw = Math.floor(Math.random() * 5) + 2;
+            const shift = (Math.random() - 0.5) * maxJitter;
+            targetCtx.drawImage(targetCtx.canvas, sx, 0, sw, HEIGHT, sx, shift, sw, HEIGHT);
+          }
+        }
+
+        const drawVerticalBarAt = (xPos) => {
+          if (isInvert) {
+            targetCtx.save();
+            targetCtx.globalCompositeOperation = 'difference';
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.fillRect(xPos, 0, bandW, HEIGHT);
+            targetCtx.restore();
+          } else {
+            targetCtx.save();
+            targetCtx.fillStyle = color;
+            targetCtx.fillRect(xPos, 0, bandW, HEIGHT);
+
+            targetCtx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+            targetCtx.fillRect(xPos + Math.round(bandW * 0.42), 0, Math.max(2, Math.round(bandW * 0.16)), HEIGHT);
+            targetCtx.restore();
+          }
+
+          if (noiseLevel > 0) {
+            targetCtx.save();
+            targetCtx.globalAlpha = noiseLevel * 0.7;
+            targetCtx.globalCompositeOperation = isInvert ? 'difference' : 'screen';
+            const noiseCanvas = getSyncNoiseCanvas();
+            const offX = Math.floor((tick * 83) % 256);
+            const offY = Math.floor((tick * 97) % 256);
+            for (let ny = 0; ny < HEIGHT; ny += 256) {
+              for (let nx = xPos; nx < xPos + bandW; nx += 256) {
+                targetCtx.drawImage(noiseCanvas, offX, offY, 128, 128, nx, ny, 256, 256);
+              }
+            }
+            targetCtx.restore();
+          }
+        };
+
+        drawVerticalBarAt(bandX);
+        if (bandX < 0) drawVerticalBarAt(bandX + WIDTH);
+        if (bandX + bandW > WIDTH) drawVerticalBarAt(bandX - WIDTH);
+
+      } else if (direction === 'diagonal') {
+        // Diagonal 45 degree loss-of-sync bar
+        const diagLen = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
+        const bandH = Math.round(diagLen * widthPct);
+        const diagY = Math.round(sync.pos * diagLen) - Math.round(bandH / 2);
+
+        targetCtx.save();
+        targetCtx.translate(WIDTH / 2, HEIGHT / 2);
+        targetCtx.rotate(Math.PI / 4);
+        targetCtx.translate(-diagLen / 2, -diagLen / 2);
+
+        const drawDiagBarAt = (yPos) => {
+          if (isInvert) {
+            targetCtx.save();
+            targetCtx.globalCompositeOperation = 'difference';
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.fillRect(0, yPos, diagLen, bandH);
+            targetCtx.restore();
+          } else {
+            targetCtx.save();
+            targetCtx.fillStyle = color;
+            targetCtx.fillRect(0, yPos, diagLen, bandH);
+            targetCtx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+            targetCtx.fillRect(0, yPos + Math.round(bandH * 0.42), diagLen, Math.max(2, Math.round(bandH * 0.16)));
+            targetCtx.restore();
+          }
+
+          if (noiseLevel > 0) {
+            targetCtx.save();
+            targetCtx.globalAlpha = noiseLevel * 0.7;
+            targetCtx.globalCompositeOperation = isInvert ? 'difference' : 'screen';
+            const noiseCanvas = getSyncNoiseCanvas();
+            const offX = Math.floor((tick * 83) % 256);
+            const offY = Math.floor((tick * 97) % 256);
+            for (let ny = yPos; ny < yPos + bandH; ny += 256) {
+              for (let nx = 0; nx < diagLen; nx += 256) {
+                targetCtx.drawImage(noiseCanvas, offX, offY, 128, 128, nx, ny, 256, 256);
+              }
+            }
+            targetCtx.restore();
+          }
+        };
+
+        drawDiagBarAt(diagY);
+        if (diagY < 0) drawDiagBarAt(diagY + diagLen);
+        if (diagY + bandH > diagLen) drawDiagBarAt(diagY - diagLen);
+
+        targetCtx.restore();
+      }
+
+      targetCtx.restore();
+    }
   </script>
 
   <script>
@@ -3571,9 +4327,10 @@ RAW SIGNAL</textarea>
       // Step kinetic motion
       state.mosh.tick += (state.mosh.speed * 0.05);
 
-      // 1. Render clean layers
+      // 1. PIPELINE STEP 1 & 2: Text + Media Clean Base Composite
       renderBackdropLayer(bgCtx, state.fx.bgMode, state.mosh.tick);
       renderTypographyLayer(textCtx, state.type, state.mosh.tick);
+
       // Check video loop boundaries within chosen [startTime, endTime] segment (max 9s)
       if (state.photo.isVideo && state.photo.video && !state.photo.isLive && state.photo.loaded) {
         const vid = state.photo.video;
@@ -3588,7 +4345,6 @@ RAW SIGNAL</textarea>
         renderAsciiPhoto(photoCanvas, state.photo, state.mosh.tick);
       }
 
-      // 2. Build clean composite (used if holding clean button)
       cleanCompositeCtx.clearRect(0, 0, WIDTH, HEIGHT);
       cleanCompositeCtx.drawImage(bgCanvas, 0, 0);
 
@@ -3603,45 +4359,31 @@ RAW SIGNAL</textarea>
         const blend = state.photo.blend || 'behind';
 
         if (blend === 'behind') {
-          // 1. Photo under typography (basic)
           cleanCompositeCtx.save();
           cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
           cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
           cleanCompositeCtx.restore();
-
-          // 2. Typography on top, fully visible & crisp
           cleanCompositeCtx.drawImage(textCanvas, 0, 0);
-
         } else if (blend === 'inFront') {
-          // Photo in front: text cuts through as an invert / luminance difference pass
           cleanCompositeCtx.save();
           cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
           cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
           cleanCompositeCtx.restore();
-
-          // Invert / Difference pass of text over the photo
           cleanCompositeCtx.save();
           cleanCompositeCtx.globalCompositeOperation = 'difference';
           cleanCompositeCtx.drawImage(textCanvas, 0, 0);
           cleanCompositeCtx.restore();
-
         } else if (blend === 'photoOnly') {
-          // Photo Only: hide text completely
           cleanCompositeCtx.save();
           cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
           cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
           cleanCompositeCtx.restore();
         }
       } else {
-        // No photo: standard typography
         cleanCompositeCtx.drawImage(textCanvas, 0, 0);
       }
 
-      // If Cyber/Oriental graphic is set to 'frame' layer, draw as framing overlay
-      if (state.vibe && state.vibe.graphic !== 'none' && state.vibe.graphicLayer === 'frame') {
-        renderVibeGraphic(cleanCompositeCtx, state.vibe, state.mosh.tick);
-      }
-
+      // If holding clean button, bypass all downstream DSP filters
       if (state.interaction.holdClean) {
         ctx.clearRect(0, 0, WIDTH, HEIGHT);
         ctx.drawImage(cleanCompositeCanvas, 0, 0);
@@ -3650,12 +4392,24 @@ RAW SIGNAL</textarea>
         return;
       }
 
-      // 3. Datamosh smear feedback
+      // 2. PIPELINE STEP 3: Pixel Sorting (Text + Media -> Pixel Sort)
+      if (state.sort.active && !state.isTyping) {
+        pixelSortPass(cleanCompositeCtx, state.sort);
+      }
+
+      // 3. PIPELINE STEP 4: CRT & Analog FX + Sync Suppression (Pixel Sort -> CRT)
+      if (state.fx.active && !state.isTyping) {
+        applyAnalogAndCrt(cleanCompositeCtx, state.fx);
+      }
+      if (state.fx.sync && state.fx.sync.active && !state.isTyping) {
+        applySyncSuppression(cleanCompositeCtx, state.fx.sync, state.mosh.tick);
+      }
+
+      // 4. PIPELINE STEP 5: Datamosh Engine (CRT -> Mosh)
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
       if (state.mosh.freezeIFrame) {
-        // Drop I-Frames: Do not redraw incoming clean composite!
-        // The feedback canvas frame is frozen and continuously displaced by P-frame vectors
+        // Drop I-Frames: keep feedback frame intact and continuous
         ctx.drawImage(feedbackCanvas, 0, 0);
       } else if (state.mosh.active) {
         const persistence = (state.mosh.vectorMoshActive ? (state.mosh.persistence || 95) : state.mosh.smear) || 48;
@@ -3672,17 +4426,7 @@ RAW SIGNAL</textarea>
         ctx.drawImage(cleanCompositeCanvas, 0, 0);
       }
 
-      // 4. Pixel Sort Pass (paused during active typing bursts for instant mobile typing)
-      if (state.sort.active && !state.isTyping) {
-        pixelSortPass(ctx, state.sort);
-      }
-
-      // 4b. Heatmap & Wireframe Pass
-      if (state.heatWire && state.heatWire.active && !state.isTyping) {
-        applyHeatmapWireframePass(ctx, state.heatWire);
-      }
-
-      // 5. Datamosh Slice & Codec macroblocks
+      // Slice Shearing, Macroblocks and P-Frame Motion Vector displacement
       if (state.mosh.active) {
         applyDatamoshBlocks(ctx, state.mosh, state.mosh.tick);
         if (state.mosh.vectorMoshActive) {
@@ -3690,12 +4434,17 @@ RAW SIGNAL</textarea>
         }
       }
 
-      // 6. Analog CRT & Chromatic pass (paused during active typing bursts for 0ms latency)
-      if (state.fx.active && !state.isTyping) {
-        applyAnalogAndCrt(ctx, state.fx);
+      // 5. PIPELINE STEP 6: Heatmap & Wireframe Pass (Mosh -> Heatmap/Wireframe)
+      if (state.heatWire && state.heatWire.active && !state.isTyping) {
+        applyHeatmapWireframePass(ctx, state.heatWire);
       }
 
-      // Save into feedback canvas for consecutive P-frame smear
+      // 6. PIPELINE STEP 7: Vibes Graphic Overlay Frame (Heatmap/Wireframe -> Vibe)
+      if (state.vibe && state.vibe.graphic !== 'none' && state.vibe.graphicLayer === 'frame') {
+        renderVibeGraphic(ctx, state.vibe, state.mosh.tick);
+      }
+
+      // Save final composite into feedback canvas for consecutive P-frame smear
       feedbackCtx.drawImage(moshCanvas, 0, 0);
 
       // WebCodecs 30fps frame capture
@@ -4215,9 +4964,27 @@ RAW SIGNAL</textarea>
       let pinchStartPanY = 0;
       let isPinching = false;
 
+      // Screen gesture state for canvas interaction
+      let touchStartTime = 0;
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchCountAtStart = 0;
+      let touchMovedDist = 0;
+
       // Touch Events -- ignore touches that start on knobs/controls living on the canvas
       box.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.synth-knob')) return;
+        if (e.target.closest('.synth-knob') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
+        touchStartTime = Date.now();
+        touchCountAtStart = e.touches.length;
+        touchMovedDist = 0;
+        if (e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+          touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        }
+
         if (e.touches.length === 2 && state.photo.active && state.photo.loaded) {
           e.preventDefault();
           const t1 = e.touches[0];
@@ -4267,11 +5034,38 @@ RAW SIGNAL</textarea>
         }
         if (e.touches.length > 0) {
           e.preventDefault();
+          if (e.touches.length === 1) {
+            touchMovedDist += Math.hypot(e.touches[0].clientX - touchStartX, e.touches[0].clientY - touchStartY);
+          } else if (e.touches.length === 2) {
+            const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+            const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+            touchMovedDist += Math.hypot(mx - touchStartX, my - touchStartY);
+          }
           onMove(e.touches[0].clientX, e.touches[0].clientY);
         }
       }, { passive: false });
 
       box.addEventListener('touchend', (e) => {
+        const touchDuration = Date.now() - touchStartTime;
+        if (touchDuration < 320 && touchMovedDist < 25) {
+          if (touchCountAtStart === 2) {
+            // 2-Finger Screen Tap: Toggle Random Letter Sizes (Zine / Ransom Chaos)
+            state.type.randomSize = !state.type.randomSize;
+            const rCheck = document.getElementById('randomLetterSizeCheck');
+            if (rCheck) rCheck.checked = state.type.randomSize;
+            showGestureToast(state.type.randomSize ? '🎲 ZINE CHAOS: ON' : '🎲 ZINE CHAOS: OFF');
+          } else if (touchCountAtStart === 1) {
+            // 1-Finger Screen Tap: Cycle Text Alignment (Left -> Center -> Right)
+            const aligns = ['left', 'center', 'right'];
+            const curIdx = aligns.indexOf(state.type.align);
+            state.type.align = aligns[(curIdx + 1) % aligns.length];
+            const alignLabel = document.getElementById('sideAlignLabel');
+            if (alignLabel) alignLabel.textContent = state.type.align === 'center' ? 'MID' : state.type.align.toUpperCase();
+            const alignIcon = document.getElementById('sideAlignIcon');
+            if (alignIcon) alignIcon.textContent = state.type.align === 'left' ? '◀️' : (state.type.align === 'center' ? '⏸️' : '▶️');
+            showGestureToast('ALIGN: ' + state.type.align.toUpperCase());
+          }
+        }
         if (e.touches.length < 2) isPinching = false;
         if (e.touches.length === 0) onEnd();
       });
@@ -4280,13 +5074,40 @@ RAW SIGNAL</textarea>
         onEnd();
       });
 
-      // Mouse fallback for desktop simulation
+      // Mouse fallback for desktop simulation & gestures
+      let mouseStartTime = 0;
+      let mouseStartX = 0;
+      let mouseStartY = 0;
       box.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.synth-knob')) return;
+        if (e.target.closest('.synth-knob') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
+        mouseStartTime = Date.now();
+        mouseStartX = e.clientX;
+        mouseStartY = e.clientY;
         onStart(e.clientX, e.clientY);
       });
       window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
-      window.addEventListener('mouseup', onEnd);
+      window.addEventListener('mouseup', (e) => {
+        const mouseDuration = Date.now() - mouseStartTime;
+        const mouseDist = Math.hypot(e.clientX - mouseStartX, e.clientY - mouseStartY);
+        if (mouseDuration < 280 && mouseDist < 10 && e.target.closest('#canvasBox')) {
+          if (e.shiftKey) {
+            state.type.randomSize = !state.type.randomSize;
+            const rCheck = document.getElementById('randomLetterSizeCheck');
+            if (rCheck) rCheck.checked = state.type.randomSize;
+            showGestureToast(state.type.randomSize ? '🎲 ZINE CHAOS: ON' : '🎲 ZINE CHAOS: OFF');
+          } else {
+            const aligns = ['left', 'center', 'right'];
+            const curIdx = aligns.indexOf(state.type.align);
+            state.type.align = aligns[(curIdx + 1) % aligns.length];
+            const alignLabel = document.getElementById('sideAlignLabel');
+            if (alignLabel) alignLabel.textContent = state.type.align === 'center' ? 'MID' : state.type.align.toUpperCase();
+            const alignIcon = document.getElementById('sideAlignIcon');
+            if (alignIcon) alignIcon.textContent = state.type.align === 'left' ? '◀️' : (state.type.align === 'center' ? '⏸️' : '▶️');
+            showGestureToast('ALIGN: ' + state.type.align.toUpperCase());
+          }
+        }
+        onEnd();
+      });
 
       // Photo drag & drop onto canvas box
       box.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
@@ -4298,36 +5119,42 @@ RAW SIGNAL</textarea>
       });
 
       // Cycle touch interaction: Drag <-> Jam Pad <-> Vector Mosh
-      const modeToggle = document.getElementById('touchModeToggle');
-      const modeIcon = document.getElementById('brushIcon');
-      const modeText = document.getElementById('brushBtnText');
       const touchModeLabel = document.getElementById('touchModeLabel');
+      const diamondToggleBtn = document.getElementById('dragJamToggleBtn');
+      const diamondIcon = document.getElementById('dragJamIcon');
+      const diamondText = document.getElementById('dragJamText');
 
       const MODES = {
         drag: {
-          icon: '👆', text: 'Mode: Drag', label: '👆 Touch: Drag Text',
-          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-slate-300 flex items-center space-x-1 active:scale-95 transition'
+          icon: '👆', text: 'DRAG', label: '👆 Touch: Drag Text',
+          cls: 'mode-drag'
         },
         jam: {
-          icon: '🎛️', text: 'Mode: Jam', label: '🎛️ Touch: Jam XY (Vector × Persistence + Push)',
-          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-pink/20 border border-cyber-pink text-xs text-cyber-pink flex items-center space-x-1 active:scale-95 transition'
+          icon: '🎛️', text: 'JAM', label: '🎛️ Touch: Jam XY (Vector × Persistence)',
+          cls: 'mode-jam'
         },
         vectorMosh: {
-          icon: '🌊', text: 'Mode: Vector Mosh', label: '🌊 Touch: Codec Macroblock Rip & Melt',
-          btnClass: 'tap-btn px-2.5 py-1.5 rounded bg-cyber-cyan/20 border border-cyber-cyan text-xs text-cyber-cyan font-bold flex items-center space-x-1 active:scale-95 transition shadow-[0_0_10px_rgba(0,255,204,0.2)]'
+          icon: '🌊', text: 'MOSH', label: '🌊 Touch: Codec Macroblock Rip & Melt',
+          cls: 'mode-mosh'
         }
       };
       const ORDER = ['drag', 'jam', 'vectorMosh'];
 
       function applyMode() {
         const m = MODES[state.interaction.mode] || MODES.drag;
-        modeIcon.textContent = m.icon;
-        modeText.textContent = m.text;
-        modeToggle.className = m.btnClass;
+        if (diamondToggleBtn) {
+          diamondToggleBtn.classList.remove('mode-drag', 'mode-jam', 'mode-mosh');
+          diamondToggleBtn.classList.add(m.cls);
+        }
+        if (diamondIcon) diamondIcon.textContent = m.icon;
+        if (diamondText) diamondText.textContent = m.text;
+
         const is3D = ['spiral', 'cube', 'sphere'].includes(state.type.layout);
-        touchModeLabel.textContent = (state.interaction.mode === 'drag' && is3D)
-          ? '👆 Touch: Rotate 3D Model'
-          : m.label;
+        if (touchModeLabel) {
+          touchModeLabel.textContent = (state.interaction.mode === 'drag' && is3D)
+            ? '👆 Touch: Rotate 3D Model'
+            : m.label;
+        }
         crosshair.classList.remove('mode-jam', 'mode-brush', 'mode-vector-mosh');
         if (state.interaction.mode === 'jam') crosshair.classList.add('mode-jam');
         if (state.interaction.mode === 'vectorMosh') crosshair.classList.add('mode-vector-mosh');
@@ -4335,88 +5162,1954 @@ RAW SIGNAL</textarea>
       window.applyTouchMode = applyMode;
       applyMode();
 
-      modeToggle.addEventListener('click', () => {
-        const idx = ORDER.indexOf(state.interaction.mode);
-        state.interaction.mode = ORDER[(idx + 1) % ORDER.length];
-        applyMode();
-      });
-
-      // The Mosh tab shortcut jumps straight into Jam mode and collapses the sheet
-      const jamShortcut = document.getElementById('jamModeShortcut');
-      if (jamShortcut) {
-        jamShortcut.addEventListener('click', () => {
-          state.interaction.mode = 'jam';
+      if (diamondToggleBtn) {
+        diamondToggleBtn.addEventListener('click', () => {
+          const idx = ORDER.indexOf(state.interaction.mode);
+          state.interaction.mode = ORDER[(idx + 1) % ORDER.length];
           applyMode();
-          if (window.collapseControlSheet) window.collapseControlSheet();
+          showGestureToast(`MODE: ${MODES[state.interaction.mode].text}`);
         });
       }
 
       // Hold Clean
       const holdBtn = document.getElementById('holdCleanBtn');
-      const startHold = () => state.interaction.holdClean = true;
-      const stopHold = () => state.interaction.holdClean = false;
-      holdBtn.addEventListener('mousedown', startHold);
-      holdBtn.addEventListener('mouseup', stopHold);
-      holdBtn.addEventListener('mouseleave', stopHold);
-      holdBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
-      holdBtn.addEventListener('touchend', stopHold);
+      if (holdBtn) {
+        const startHold = () => state.interaction.holdClean = true;
+        const stopHold = () => state.interaction.holdClean = false;
+        holdBtn.addEventListener('mousedown', startHold);
+        holdBtn.addEventListener('mouseup', stopHold);
+        holdBtn.addEventListener('mouseleave', stopHold);
+        holdBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+        holdBtn.addEventListener('touchend', stopHold);
+      }
     }
 
-    function initUI() {
-      // Bottom Sheet: collapsible control drawer so the text screen stays dominant
-      const controlSheet = document.getElementById('controlSheet');
-      const sheetHandle = document.getElementById('sheetHandle');
-      let activeTab = 'text';
-
-      function expandSheet() { controlSheet.classList.remove('sheet-collapsed'); }
-      function collapseSheet() { controlSheet.classList.add('sheet-collapsed'); }
-      function toggleSheet() { controlSheet.classList.toggle('sheet-collapsed'); }
-      window.collapseControlSheet = collapseSheet;
-      window.expandControlSheet = expandSheet;
-
-      sheetHandle.addEventListener('click', toggleSheet);
-
-      // Bottom Tabs Switching
-      const tabBtns = document.querySelectorAll('.tab-btn');
-      const tabContents = document.querySelectorAll('.tab-content');
-      const INACTIVE_TAB_CLASS = 'tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-slate-400 border-b-2 border-transparent transition active:scale-95';
-      const ACTIVE_TAB_CLASS = 'tab-btn flex flex-col items-center justify-center gap-0.5 min-h-[44px] py-1 text-cyber-cyan border-b-2 border-cyber-cyan transition active:scale-95';
-
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const target = btn.dataset.tab;
-          const sheetOpen = !controlSheet.classList.contains('sheet-collapsed');
-
-          if (target === activeTab && sheetOpen) {
-            // Tapping the already-open tab again tucks the sheet away
-            collapseSheet();
-            return;
+    // ===== MODULAR ARCHITECTURE (TOP MODULE RIBBON + LOWER THIRD SUB-ENGINE SELECTOR + 3 BASE KNOBS) =====
+    const MODULE_CONFIG = {
+      photo: {
+        name: 'MEDIA',
+        icon: '🎬',
+        color: '#ffe600',
+        tabId: 'tabPhoto',
+        wingLeft: 'wingGroupPhotoLeft',
+        wingRight: 'wingGroupPhotoRight',
+        defaultSubEngine: 'transform',
+        subEngines: {
+          transform: {
+            name: 'TRANSFORM & PAN',
+            icon: '🔍',
+            knobs: [
+              { id: 'photoScaleRange', label: 'ZOOM SCALE', unit: 'x', format: (v) => (v / 100).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'photoPanXRange', label: 'PAN X', unit: 'px', format: (v) => v + 'px', color: '#ffe600' },
+              { id: 'photoPanYRange', label: 'PAN Y', unit: 'px', format: (v) => v + 'px', color: '#ffe600' }
+            ]
+          },
+          color: {
+            name: 'COLOR & GAMMA',
+            icon: '☀️',
+            knobs: [
+              { id: 'photoGammaRange', label: 'GAMMA LIFT', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'photoBrightnessRange', label: 'BRIGHTNESS', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'photoOpacityRange', label: 'OPACITY', unit: '%', format: (v) => v + '%', color: '#ffe600' }
+            ]
+          },
+          ascii: {
+            name: 'ASCII & CONTRAST',
+            icon: '🔠',
+            knobs: [
+              { id: 'asciiCellSizeRange', label: 'CELL SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'photoContrastRange', label: 'CONTRAST', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'photoOpacityRange', label: 'OPACITY', unit: '%', format: (v) => v + '%', color: '#ffe600' }
+            ]
           }
+        }
+      },
+      text: {
+        name: 'TEXT',
+        icon: '🔤',
+        color: '#00ffcc',
+        tabId: 'tabText',
+        wingLeft: 'wingGroupTextLeft',
+        wingRight: 'wingGroupTextRight',
+        defaultSubEngine: 'stack',
+        subEngines: {
+          stack: {
+            name: '2D: STACK',
+            icon: '📐',
+            layout: 'stack',
+            knobs: [
+              { id: 'fontSizeRange', label: 'FONT SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'letterSpacingRange', label: 'TRACKING', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'speed3DRange', label: 'SPEED', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' }
+            ]
+          },
+          marquee: {
+            name: '2D: ROLL',
+            icon: '🎞️',
+            layout: 'marquee',
+            knobs: [
+              { id: 'fontSizeRange', label: 'FONT SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'letterSpacingRange', label: 'TRACKING', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'speed3DRange', label: 'SPEED', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' }
+            ]
+          },
+          vertical: {
+            name: '2D: TALL',
+            icon: '↕️',
+            layout: 'vertical',
+            knobs: [
+              { id: 'fontSizeRange', label: 'FONT SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'letterSpacingRange', label: 'TRACKING', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'speed3DRange', label: 'SPEED', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' }
+            ]
+          },
+          spiral: {
+            name: '3D: ESPIRAL',
+            icon: '🌀',
+            layout: 'spiral',
+            knobs: [
+              { id: 'radius3DRange', label: '3D RADIUS', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'speed3DRange', label: 'ROT SPEED', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'fontSizeRange', label: 'FONT SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' }
+            ]
+          },
+          cube: {
+            name: '3D: CUBE',
+            icon: '🎲',
+            layout: 'cube',
+            knobs: [
+              { id: 'radius3DRange', label: '3D RADIUS', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'speed3DRange', label: 'ROT SPEED', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'fontSizeRange', label: 'FONT SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' }
+            ]
+          },
+          sphere: {
+            name: '3D: SPHERE',
+            icon: '🌐',
+            layout: 'sphere',
+            knobs: [
+              { id: 'radius3DRange', label: '3D RADIUS', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'speed3DRange', label: 'ROT SPEED', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'fontSizeRange', label: 'FONT SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' }
+            ]
+          }
+        }
+      },
+      mosh: {
+        name: 'MOSH',
+        icon: '📼',
+        color: '#ff0055',
+        tabId: 'tabMosh',
+        wingLeft: 'wingGroupMoshLeft',
+        wingRight: 'wingGroupMoshRight',
+        defaultSubEngine: 'pframe',
+        subEngines: {
+          pframe: {
+            name: 'P-FRAME VECTOR',
+            icon: '🌊',
+            knobs: [
+              { id: 'pframePersistenceRange', label: 'PERSISTENCE', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'vectorForceRange', label: 'VECTOR FORCE', unit: '', format: (v) => v, color: '#ff0055' },
+              { id: 'chromaBleedRange', label: 'CHROMA BLEED', unit: 'px', format: (v) => v + 'px', color: '#ff0055' }
+            ]
+          },
+          classic: {
+            name: 'CLASSIC & SMEAR',
+            icon: '⚡',
+            knobs: [
+              { id: 'moshSmearRange', label: 'SMEAR', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'moshSliceRange', label: 'SLICE SHEAR', unit: 'px', format: (v) => v + 'px', color: '#ff0055' },
+              { id: 'moshBlockRange', label: 'BLOCKS', unit: '', format: (v) => v, color: '#ff0055' }
+            ]
+          },
+          grid: {
+            name: 'GRID & VIDEO LINK',
+            icon: '🧊',
+            knobs: [
+              { id: 'pframeBlockRange', label: 'BLOCK GRID', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'videoCouplingRange', label: 'VIDEO LINK', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'motionSpeedRange', label: 'KINETIC SPD', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ff0055' }
+            ]
+          }
+        }
+      },
+      glitch: {
+        name: 'HEAT/WIRE',
+        icon: '🌀',
+        color: '#ff0055',
+        tabId: 'tabGlitch',
+        wingLeft: 'wingGroupGlitchLeft',
+        wingRight: 'wingGroupGlitchRight',
+        defaultSubEngine: 'heatmap',
+        subEngines: {
+          heatmap: {
+            name: 'HEATMAP ENGINE',
+            icon: '🔥',
+            knobs: [
+              { id: 'hwThresholdRange', label: 'THRESHOLD', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'hwFeatherRange', label: 'FEATHER', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'hwOpacityRange', label: 'OPACITY', unit: '%', format: (v) => v + '%', color: '#ff0055' }
+            ]
+          },
+          wireframe: {
+            name: 'WIREFRAME MESH',
+            icon: '📐',
+            knobs: [
+              { id: 'hwWireStepRange', label: 'GRID STEP', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'hwWireThickRange', label: 'THICKNESS', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'hwOpacityRange', label: 'OPACITY', unit: '%', format: (v) => v + '%', color: '#ff0055' }
+            ]
+          }
+        }
+      },
+      sort: {
+        name: 'PIXEL SORT',
+        icon: '🌊',
+        color: '#00ffcc',
+        tabId: 'tabSort',
+        wingLeft: 'wingGroupSortLeft',
+        wingRight: 'wingGroupSortRight',
+        defaultSubEngine: 'streak',
+        subEngines: {
+          streak: {
+            name: 'STREAK SORTER',
+            icon: '🌊',
+            knobs: [
+              { id: 'sortLengthRange', label: 'STREAK LEN', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'sortLowRange', label: 'MIN THRESH', unit: '%', format: (v) => v + '%', color: '#00ffcc' },
+              { id: 'sortHighRange', label: 'MAX THRESH', unit: '%', format: (v) => v + '%', color: '#00ffcc' }
+            ]
+          }
+        }
+      },
+      fx: {
+        name: 'CRT/FX',
+        icon: '📡',
+        color: '#39ff14',
+        tabId: 'tabFx',
+        wingLeft: 'wingGroupFxLeft',
+        wingRight: 'wingGroupFxRight',
+        defaultSubEngine: 'crt',
+        subEngines: {
+          crt: {
+            name: 'CRT & NOISE',
+            icon: '📺',
+            knobs: [
+              { id: 'rgbSplitRange', label: 'RGB SPLIT', unit: 'px', format: (v) => v + 'px', color: '#39ff14' },
+              { id: 'scanlinesRange', label: 'SCANLINES', unit: '%', format: (v) => v + '%', color: '#39ff14' },
+              { id: 'noiseRange', label: 'TAPE NOISE', unit: '%', format: (v) => v + '%', color: '#39ff14' }
+            ]
+          },
+          split: {
+            name: 'SPLIT ANGLE',
+            icon: '🌈',
+            knobs: [
+              { id: 'rgbAngleRange', label: 'RGB ANGLE', unit: '°', format: (v) => v + '°', color: '#39ff14' },
+              { id: 'scanlinesRange', label: 'SCANLINES', unit: '%', format: (v) => v + '%', color: '#39ff14' },
+              { id: 'noiseRange', label: 'TAPE NOISE', unit: '%', format: (v) => v + '%', color: '#39ff14' }
+            ]
+          },
+          sync: {
+            name: 'SYNC SUPPRESSION',
+            icon: '⚡',
+            knobs: [
+              { id: 'syncWidthRange', label: 'SYNC BAND', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'syncSpeedRange', label: 'ROLL SPD', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'syncNoiseRange', label: 'NOISE HASH', unit: '%', format: (v) => v + '%', color: '#ff0055' }
+            ]
+          },
+          syncTear: {
+            name: 'SYNC TEAR & HASH',
+            icon: '📻',
+            knobs: [
+              { id: 'syncTearRange', label: 'EDGE TEAR', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'syncNoiseRange', label: 'NOISE HASH', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'syncWidthRange', label: 'SYNC BAND', unit: '%', format: (v) => v + '%', color: '#ffe600' }
+            ]
+          }
+        }
+      },
+      vibe: {
+        name: 'VIBES',
+        icon: '⛩️',
+        color: '#00ffcc',
+        tabId: 'tabVibes',
+        wingLeft: 'wingGroupVibeLeft',
+        wingRight: 'wingGroupVibeRight',
+        defaultSubEngine: 'graphics',
+        subEngines: {
+          graphics: {
+            name: 'GRAPHIC FRAME',
+            icon: '⛩️',
+            knobs: [
+              { id: 'vibeGraphicOpacityRange', label: 'FRAME OPA', unit: '%', format: (v) => v + '%', color: '#00ffcc' },
+              { id: 'moshSliceRange', label: 'SLICE SHEAR', unit: 'px', format: (v) => v + 'px', color: '#ff0055' },
+              { id: 'rgbAngleRange', label: 'RGB ANGLE', unit: '°', format: (v) => v + '°', color: '#39ff14' }
+            ]
+          },
+          sync: {
+            name: 'SYNC SUPPRESSION',
+            icon: '⚡',
+            knobs: [
+              { id: 'syncWidthRange', label: 'SYNC BAND', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'syncSpeedRange', label: 'ROLL SPD', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'syncNoiseRange', label: 'NOISE HASH', unit: '%', format: (v) => v + '%', color: '#ff0055' }
+            ]
+          },
+          presets: {
+            name: 'PRESET COMBOS',
+            icon: '🎚️',
+            knobs: [
+              { id: 'pframePersistenceRange', label: 'PERSISTENCE', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'sortLengthRange', label: 'SORT LEN', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'rgbSplitRange', label: 'RGB SPLIT', unit: 'px', format: (v) => v + 'px', color: '#39ff14' }
+            ]
+          }
+        }
+      }
+    };
 
-          activeTab = target;
-          expandSheet();
-          tabBtns.forEach(b => { b.className = INACTIVE_TAB_CLASS; });
-          btn.className = ACTIVE_TAB_CLASS;
+    const MODULE_ORDER = ['text', 'photo', 'sort', 'fx', 'mosh', 'glitch', 'vibe'];
+    let currentModuleKey = 'text';
+    let currentSubEngineKey = 'stack';
 
-          tabContents.forEach(c => c.classList.add('hidden'));
-          document.getElementById(`tab${target.charAt(0).toUpperCase() + target.slice(1)}`).classList.remove('hidden');
+    function getActiveKnobDef(index) {
+      const mod = MODULE_CONFIG[currentModuleKey];
+      if (!mod) return null;
+      const sub = mod.subEngines[currentSubEngineKey];
+      if (!sub || !sub.knobs[index]) return null;
+      return sub.knobs[index];
+    }
+
+    function getActiveKnobInput(index) {
+      const kd = getActiveKnobDef(index);
+      return kd ? document.getElementById(kd.id) : null;
+    }
+
+    function updateBaseKnob(index) {
+      const knobDef = getActiveKnobDef(index);
+      if (!knobDef) return;
+      const num = index + 1;
+      const input = document.getElementById(knobDef.id);
+      if (!input) return;
+
+      const min = parseFloat(input.min) || 0;
+      const max = parseFloat(input.max) || 100;
+      const span = max - min || 1;
+      const v = parseFloat(input.value) || 0;
+      const pct = Math.min(1, Math.max(0, (v - min) / span));
+      const minDeg = -135, maxDeg = 135;
+      const deg = minDeg + pct * (maxDeg - minDeg);
+
+      const indEl = document.getElementById(`vmKnob${num}Indicator`);
+      const bodyEl = document.getElementById(`vmKnob${num}Body`);
+      const valEl = document.getElementById(`vmKnob${num}Value`);
+
+      if (indEl) {
+        indEl.style.transform = `rotate(${deg}deg)`;
+        indEl.style.background = knobDef.color || '#00ffcc';
+        indEl.style.boxShadow = `0 0 6px ${knobDef.color || '#00ffcc'}`;
+      }
+      if (bodyEl) {
+        bodyEl.style.setProperty('--knob-arc', `${pct * 270}deg`);
+        bodyEl.style.setProperty('--knob-color', knobDef.color || '#00ffcc');
+      }
+      if (valEl) {
+        valEl.textContent = knobDef.format ? knobDef.format(v) : (v + (knobDef.unit || ''));
+        valEl.style.color = knobDef.color || '#00ffcc';
+      }
+    }
+
+    function bindBaseDeckKnobs() {
+      const mod = MODULE_CONFIG[currentModuleKey];
+      if (!mod) return;
+      const sub = mod.subEngines[currentSubEngineKey];
+      if (!sub) return;
+
+      sub.knobs.forEach((knobDef, index) => {
+        const num = index + 1;
+        const labelEl = document.getElementById(`vmKnob${num}Label`);
+        if (labelEl) {
+          labelEl.textContent = knobDef.label;
+          labelEl.style.color = knobDef.color || '#94a3b8';
+        }
+
+        const input = document.getElementById(knobDef.id);
+        if (input && !input._baseDeckAttached) {
+          input._baseDeckAttached = true;
+          input.addEventListener('input', () => {
+            const activeSub = MODULE_CONFIG[currentModuleKey]?.subEngines[currentSubEngineKey];
+            if (!activeSub) return;
+            activeSub.knobs.forEach((kd, idx) => {
+              if (kd.id === input.id) updateBaseKnob(idx);
+            });
+          });
+        }
+
+        updateBaseKnob(index);
+      });
+    }
+
+    function toggleModuleFlowModal() {
+      const modal = document.getElementById('moduleFlowModal');
+      if (!modal) return;
+      if (modal.classList.contains('hidden')) {
+        closeSubEngineMenu();
+        closeSidePopovers();
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function closeModuleFlowModal() {
+      const modal = document.getElementById('moduleFlowModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function stepModule(direction) {
+      const curIdx = MODULE_ORDER.indexOf(currentModuleKey);
+      const nextIdx = (curIdx + direction + MODULE_ORDER.length) % MODULE_ORDER.length;
+      selectModule(MODULE_ORDER[nextIdx]);
+    }
+
+    function selectModule(modKey) {
+      if (!MODULE_CONFIG[modKey]) return;
+      currentModuleKey = modKey;
+      const mod = MODULE_CONFIG[modKey];
+      if (modKey === 'text' && mod.subEngines[state.type.layout]) {
+        currentSubEngineKey = state.type.layout;
+      } else {
+        currentSubEngineKey = mod.defaultSubEngine;
+      }
+
+      // Update Top Bar Module Selector Button ("much like the control below it")
+      const selIcon = document.getElementById('activeModuleIcon');
+      const selLabel = document.getElementById('activeModuleLabel');
+      const selBtn = document.getElementById('moduleSelectorBtn');
+      if (selIcon) selIcon.textContent = mod.icon;
+      if (selLabel) selLabel.textContent = mod.name;
+      if (selBtn) {
+        selBtn.style.borderColor = mod.color || '#00ffcc';
+        selBtn.style.color = mod.color || '#00ffcc';
+        selBtn.style.boxShadow = `0 0 14px ${mod.color || '#00ffcc'}55`;
+      }
+
+      // Update Pipeline Flow Modal Chamfer Buttons
+      document.querySelectorAll('.pipeline-node-btn').forEach(btn => {
+        if (btn.dataset.module === modKey) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Update module ribbon buttons
+      document.querySelectorAll('.mod-ribbon-btn').forEach(btn => {
+        if (btn.dataset.module === modKey) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Show/hide top text quick input capsule
+      const textCapsule = document.getElementById('textQuickInputBox');
+      if (textCapsule) {
+        if (modKey === 'text') textCapsule.classList.remove('hidden');
+        else textCapsule.classList.add('hidden');
+      }
+
+      // Update side wings button groups
+      const allWings = [
+        'wingGroupPhotoLeft', 'wingGroupTextLeft', 'wingGroupMoshLeft', 'wingGroupGlitchLeft', 'wingGroupSortLeft', 'wingGroupFxLeft', 'wingGroupVibeLeft',
+        'wingGroupPhotoRight', 'wingGroupTextRight', 'wingGroupMoshRight', 'wingGroupGlitchRight', 'wingGroupSortRight', 'wingGroupFxRight', 'wingGroupVibeRight'
+      ];
+      allWings.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      const activeLeft = document.getElementById(mod.wingLeft);
+      if (activeLeft) activeLeft.classList.remove('hidden');
+      const activeRight = document.getElementById(mod.wingRight);
+      if (activeRight) activeRight.classList.remove('hidden');
+
+      closeSidePopovers();
+      closeSubEngineMenu();
+      closeModuleFlowModal();
+      updateSubEngineUI();
+      bindBaseDeckKnobs();
+    }
+
+    function selectSubEngine(subKey) {
+      const mod = MODULE_CONFIG[currentModuleKey];
+      if (!mod) return;
+      if (currentModuleKey === 'text') {
+        if (subKey === 'layout2d') subKey = 'stack';
+        if (subKey === 'layout3d') subKey = 'spiral';
+      }
+      if (!mod.subEngines[subKey]) return;
+      currentSubEngineKey = subKey;
+
+      if (currentModuleKey === 'text') {
+        const targetLayout = mod.subEngines[subKey].layout || subKey;
+        state.type.layout = targetLayout;
+        document.querySelectorAll('.layout-btn').forEach(b => {
+          b.className = (b.dataset.layout === targetLayout)
+            ? 'layout-btn py-2 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold'
+            : 'layout-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+        });
+        if (window.applyTouchMode) window.applyTouchMode();
+        if (typeof showGestureToast === 'function') showGestureToast(`LAYOUT: ${mod.subEngines[subKey].name}`);
+      } else if (currentModuleKey === 'glitch') {
+        if (subKey === 'heatmap') {
+          state.heatWire.mode = 'heatmap';
+          state.heatWire.active = true;
+        } else if (subKey === 'wireframe') {
+          state.heatWire.mode = 'wireframe';
+          state.heatWire.active = true;
+        }
+        const hwActive = document.getElementById('heatWireActiveCheck');
+        if (hwActive) hwActive.checked = true;
+      } else if (currentModuleKey === 'fx' || currentModuleKey === 'vibe') {
+        if (subKey === 'sync' || subKey === 'syncTear') {
+          state.fx.sync.active = true;
+          const syncChk = document.getElementById('syncActiveCheck');
+          if (syncChk) syncChk.checked = true;
+          const sideSyncBtn = document.getElementById('sideSyncToggleBtn');
+          if (sideSyncBtn) sideSyncBtn.classList.add('active');
+        }
+      }
+
+      closeSubEngineMenu();
+      updateSubEngineUI();
+      bindBaseDeckKnobs();
+    }
+
+    function updateSubEngineUI() {
+      const mod = MODULE_CONFIG[currentModuleKey];
+      if (!mod) return;
+      const sub = mod.subEngines[currentSubEngineKey];
+      if (!sub) return;
+
+      const btn = document.getElementById('subEngineBtn');
+      const iconEl = document.getElementById('subEngineIcon');
+      const labelEl = document.getElementById('subEngineLabel');
+      if (iconEl) iconEl.textContent = sub.icon;
+      if (labelEl) labelEl.textContent = sub.name;
+      if (btn) {
+        btn.style.borderColor = mod.color;
+        btn.style.color = mod.color;
+        btn.style.boxShadow = `0 0 14px ${mod.color}44`;
+      }
+    }
+
+    function toggleSubEngineMenu() {
+      const menu = document.getElementById('subEngineMenu');
+      if (!menu) return;
+      if (!menu.classList.contains('hidden')) {
+        closeSubEngineMenu();
+      } else {
+        openSubEngineMenu();
+      }
+    }
+
+    function closeSubEngineMenu() {
+      const menu = document.getElementById('subEngineMenu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    function openSubEngineMenu() {
+      closeSidePopovers();
+      const menu = document.getElementById('subEngineMenu');
+      const list = document.getElementById('subEngineMenuList');
+      if (!menu || !list) return;
+
+      const mod = MODULE_CONFIG[currentModuleKey];
+      if (!mod) return;
+
+      const keys = Object.keys(mod.subEngines);
+      list.className = (keys.length >= 6) ? 'grid grid-cols-3 gap-1.5 text-xs' : 'grid grid-cols-2 gap-1.5 text-xs';
+      list.innerHTML = '';
+      keys.forEach(key => {
+        const sub = mod.subEngines[key];
+        const isCurrent = (key === currentSubEngineKey);
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = isCurrent
+          ? 'py-2 px-2 rounded-xl border border-cyber-cyan bg-cyber-cyan/20 text-cyber-cyan font-bold flex items-center justify-center gap-1 active:scale-95 transition text-[10px]'
+          : 'py-2 px-2 rounded-xl border border-cyber-border bg-cyber-card text-slate-300 font-bold flex items-center justify-center gap-1 active:scale-95 transition hover:border-cyber-cyan/50 text-[10px]';
+        itemBtn.innerHTML = `<span>${sub.icon}</span><span class="truncate">${sub.name}</span>`;
+        itemBtn.addEventListener('click', () => {
+          selectSubEngine(key);
+        });
+        list.appendChild(itemBtn);
+      });
+
+      menu.classList.remove('hidden');
+    }
+
+    function closeSidePopovers() {
+      const leftPop = document.getElementById('leftPopoverCard');
+      const rightPop = document.getElementById('rightPopoverCard');
+      if (leftPop) leftPop.classList.add('hidden');
+      if (rightPop) rightPop.classList.add('hidden');
+    }
+
+    function openLeftPopover(title, renderFn) {
+      closeSubEngineMenu();
+      const leftPop = document.getElementById('leftPopoverCard');
+      const rightPop = document.getElementById('rightPopoverCard');
+      if (rightPop) rightPop.classList.add('hidden');
+      const titleEl = document.getElementById('leftPopoverTitle');
+      const contentEl = document.getElementById('leftPopoverContent');
+      if (!leftPop || !titleEl || !contentEl) return;
+      titleEl.textContent = title;
+      contentEl.innerHTML = '';
+      renderFn(contentEl);
+      leftPop.classList.remove('hidden');
+    }
+
+    function openRightPopover(title, renderFn) {
+      closeSubEngineMenu();
+      const leftPop = document.getElementById('leftPopoverCard');
+      const rightPop = document.getElementById('rightPopoverCard');
+      if (leftPop) leftPop.classList.add('hidden');
+      const titleEl = document.getElementById('rightPopoverTitle');
+      const contentEl = document.getElementById('rightPopoverContent');
+      if (!rightPop || !titleEl || !contentEl) return;
+      titleEl.textContent = title;
+      contentEl.innerHTML = '';
+      renderFn(contentEl);
+      rightPop.classList.remove('hidden');
+    }
+
+    // Backward compatibility hooks
+    window.collapseControlSheet = () => {
+      closeSidePopovers();
+      closeSubEngineMenu();
+      closeModuleFlowModal();
+    };
+    window.expandControlSheet = () => {};
+
+    function initUI() {
+      // ===== TOP MODULE SELECTOR & S-CURVE FLOW MODAL =====
+      const moduleSelectorBtn = document.getElementById('moduleSelectorBtn');
+      if (moduleSelectorBtn) moduleSelectorBtn.addEventListener('click', toggleModuleFlowModal);
+      const closeModuleFlowBtn = document.getElementById('closeModuleFlowBtn');
+      if (closeModuleFlowBtn) closeModuleFlowBtn.addEventListener('click', closeModuleFlowModal);
+      const prevModuleBtn = document.getElementById('prevModuleBtn');
+      if (prevModuleBtn) prevModuleBtn.addEventListener('click', () => stepModule(-1));
+      const nextModuleBtn = document.getElementById('nextModuleBtn');
+      if (nextModuleBtn) nextModuleBtn.addEventListener('click', () => stepModule(1));
+
+      // 2-Column S-Curve Pipeline Node Buttons
+      document.querySelectorAll('.pipeline-node-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const modKey = btn.dataset.module;
+          if (modKey) selectModule(modKey);
         });
       });
 
-      // Text Input
+      // Legacy Module Ribbon Buttons (backward compatibility)
+      document.querySelectorAll('.mod-ribbon-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const modKey = btn.dataset.module;
+          if (modKey) selectModule(modKey);
+        });
+      });
+
+      // ===== SUB-ENGINE SELECTOR IN LOWER THIRD =====
+      const subEngineBtn = document.getElementById('subEngineBtn');
+      if (subEngineBtn) subEngineBtn.addEventListener('click', toggleSubEngineMenu);
+      const closeSubEngineMenuBtn = document.getElementById('closeSubEngineMenuBtn');
+      if (closeSubEngineMenuBtn) closeSubEngineMenuBtn.addEventListener('click', closeSubEngineMenu);
+
+      // ===== POPOVER CLOSE BUTTONS =====
+      document.querySelectorAll('.close-popover-btn').forEach(btn => {
+        btn.addEventListener('click', closeSidePopovers);
+      });
+
+      // Canvas click dismisses popovers and modals for pure unobstructed view
+      moshCanvas.addEventListener('pointerdown', () => {
+        closeSidePopovers();
+        closeSubEngineMenu();
+        closeModuleFlowModal();
+      });
+
+      // ===== DECK REC BUTTON =====
+      const deckRecBtn = document.getElementById('deckRecBtn');
+      const recVideoBtn = document.getElementById('recVideoBtn');
+      if (deckRecBtn && recVideoBtn) {
+        deckRecBtn.addEventListener('click', () => {
+          recVideoBtn.click();
+        });
+        setInterval(() => {
+          const isRec = !recVideoBtn.classList.contains('bg-cyber-pink/20');
+          const dot = document.getElementById('deckRecDot');
+          if (dot) {
+            if (isRec) {
+              dot.className = 'w-3.5 h-3.5 rounded bg-white animate-pulse';
+              deckRecBtn.classList.add('bg-cyber-pink', 'border-white');
+            } else {
+              dot.className = 'w-3.5 h-3.5 rounded-full bg-cyber-pink';
+              deckRecBtn.classList.remove('bg-cyber-pink', 'border-white');
+            }
+          }
+        }, 200);
+      }
+
+      // ===== SIDE WING ACTIONS =====
+      // 1. TEXT MODULE WINGS
+      const sideFontBtn = document.getElementById('sideFontBtn');
+      if (sideFontBtn) {
+        sideFontBtn.addEventListener('click', () => {
+          openLeftPopover('SELECT FONT', (container) => {
+            const fonts = [
+              { val: 'Syne, sans-serif', name: 'Syne Heavy', label: 'Brutal Sans' },
+              { val: 'Rubik Glitch, cursive', name: 'Rubik Glitch', label: 'Glitch Cyber' },
+              { val: 'Orbitron, sans-serif', name: 'Orbitron', label: 'Sci-Fi Future' },
+              { val: 'Bebas Neue, sans-serif', name: 'Bebas Neue', label: 'Tall Poster' },
+              { val: 'Anton, sans-serif', name: 'Anton Impact', label: 'Heavy Display' },
+              { val: 'UnifrakturCook, cursive', name: 'UnifrakturCook', label: 'Gothic Black' },
+              { val: 'Cinzel, serif', name: 'Cinzel', label: 'Brutal Serif' },
+              { val: 'Space Mono, monospace', name: 'Space Mono', label: 'Terminal Mono' }
+            ];
+            fonts.forEach(f => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isCur = state.type.fontFamily === f.val || state.type.fontFamily.includes(f.name.split(' ')[0]);
+              btn.className = `w-full py-1.5 px-2 text-left rounded-lg text-xs font-bold transition active:scale-95 flex items-center justify-between ${isCur ? 'bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan' : 'bg-white/5 border border-white/10 text-slate-300 hover:border-cyber-cyan/40'}`;
+              btn.innerHTML = `<span style="font-family:${f.val}">${f.name}</span><span class="text-[9px] text-slate-400 font-normal">${f.label}</span>`;
+              btn.addEventListener('click', () => {
+                state.type.fontFamily = f.val;
+                const fontSelect = document.getElementById('fontSelect');
+                if (fontSelect) fontSelect.value = f.val;
+                closeSidePopovers();
+                showGestureToast(`FONT: ${f.name}`);
+              });
+              container.appendChild(btn);
+            });
+          });
+        });
+      }
+
+      const sideAnimBtn = document.getElementById('sideAnimBtn');
+      if (sideAnimBtn) {
+        sideAnimBtn.addEventListener('click', () => {
+          openLeftPopover('MOTION & LAYOUT', (container) => {
+            const anims = [
+              { key: 'float', name: '🌊 Float Wobble (Harmonic)' },
+              { key: 'pulse', name: '💓 Kinetic Bass Pulse' },
+              { key: 'jitter', name: '⚡ Glitch Jitter (Stutter)' },
+              { key: 'wave', name: '〰️ Sinusoidal Liquid Wave' },
+              { key: 'cascade', name: '☄️ Diagonal Cascade Drift' },
+              { key: 'bounce', name: '🏀 Kinetic Rebound Bounce' }
+            ];
+            const secTitle = document.createElement('div');
+            secTitle.className = 'text-[9px] text-slate-400 font-bold mb-1';
+            secTitle.textContent = 'MOTION COMPOSITION';
+            container.appendChild(secTitle);
+
+            anims.forEach(a => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isCur = (state.type.motion === a.key);
+              btn.className = `w-full py-1.5 px-2 mb-1 text-left rounded-lg text-[11px] font-bold transition active:scale-95 flex items-center justify-between ${isCur ? 'bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan' : 'bg-white/5 border border-white/10 text-slate-300 hover:border-cyber-cyan/40'}`;
+              btn.innerHTML = `<span>${a.name}</span>`;
+              btn.addEventListener('click', () => {
+                state.type.motion = a.key;
+                const motionSelect = document.getElementById('textMotionSelect');
+                if (motionSelect) motionSelect.value = a.key;
+                closeSidePopovers();
+                showGestureToast(`ANIM: ${a.key.toUpperCase()}`);
+              });
+              container.appendChild(btn);
+            });
+          });
+        });
+      }
+
+      const sideColorBtn = document.getElementById('sideColorBtn');
+      if (sideColorBtn) {
+        sideColorBtn.addEventListener('click', () => {
+          openRightPopover('COLOR, STROKE & GLOW', (container) => {
+            container.innerHTML = `
+              <div class="space-y-2">
+                <div>
+                  <div class="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                    <span>COLOR 1 (FILL)</span>
+                    <span id="popCol1Hex" class="font-mono text-cyber-cyan">${state.type.fillColor}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <input type="color" id="popCol1Input" value="${state.type.fillColor}" class="w-8 h-7 rounded bg-transparent cursor-pointer border border-cyber-border">
+                    <div class="flex-1 grid grid-cols-5 gap-1">
+                      ${['#ffffff', '#00ffcc', '#ff0055', '#ffe600', '#39ff14'].map(c => `
+                        <button type="button" class="h-6 rounded border border-white/20 active:scale-90 transition" style="background:${c}" data-col1="${c}"></button>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                    <span>COLOR 2 (GRADIENT)</span>
+                    <span id="popCol2Hex" class="font-mono text-cyber-pink">${state.type.fillColor2}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <input type="color" id="popCol2Input" value="${state.type.fillColor2}" class="w-8 h-7 rounded bg-transparent cursor-pointer border border-cyber-border">
+                    <div class="flex-1 grid grid-cols-5 gap-1">
+                      ${['#ffe600', '#ff0055', '#00ffcc', '#7b2cbf', '#ff9e00'].map(c => `
+                        <button type="button" class="h-6 rounded border border-white/20 active:scale-90 transition" style="background:${c}" data-col2="${c}"></button>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <div class="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                      <span>NEON GLOW</span>
+                      <span id="popGlowHex" class="font-mono text-cyber-cyan">${state.type.glowColor}</span>
+                    </div>
+                    <input type="color" id="popGlowInput" value="${state.type.glowColor}" class="w-full h-7 rounded bg-transparent cursor-pointer border border-cyber-border">
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                      <span>STROKE</span>
+                      <span id="popStrokeHex" class="font-mono text-cyber-pink">${state.type.strokeColor}</span>
+                    </div>
+                    <input type="color" id="popStrokeInput" value="${state.type.strokeColor}" class="w-full h-7 rounded bg-transparent cursor-pointer border border-cyber-border">
+                  </div>
+                </div>
+                <div class="pt-1 border-t border-white/10">
+                  <span class="block text-[9px] text-slate-400 mb-1">FILL STYLE MODE</span>
+                  <div class="grid grid-cols-3 gap-1 text-[9px]">
+                    <button type="button" data-fillmode="solid" class="pop-fmode-btn py-1.5 px-1 rounded ${state.type.fillMode === 'solid' ? 'bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold' : 'bg-white/5 border border-white/10 text-slate-300'}">SOLID</button>
+                    <button type="button" data-fillmode="gradient" class="pop-fmode-btn py-1.5 px-1 rounded ${state.type.fillMode === 'gradient' ? 'bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold' : 'bg-white/5 border border-white/10 text-slate-300'}">GRADIENT</button>
+                    <button type="button" data-fillmode="rainbow" class="pop-fmode-btn py-1.5 px-1 rounded ${state.type.fillMode === 'rainbow' ? 'bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold' : 'bg-white/5 border border-white/10 text-slate-300'}">RAINBOW</button>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            const popCol1Input = container.querySelector('#popCol1Input');
+            const popCol1Hex = container.querySelector('#popCol1Hex');
+            const fcInput = document.getElementById('fillColorInput');
+            popCol1Input.addEventListener('input', (e) => {
+              state.type.fillColor = e.target.value;
+              popCol1Hex.textContent = e.target.value;
+              if (fcInput) fcInput.value = e.target.value;
+            });
+            container.querySelectorAll('[data-col1]').forEach(b => {
+              b.addEventListener('click', () => {
+                state.type.fillColor = b.dataset.col1;
+                popCol1Input.value = b.dataset.col1;
+                popCol1Hex.textContent = b.dataset.col1;
+                if (fcInput) fcInput.value = b.dataset.col1;
+              });
+            });
+
+            const popCol2Input = container.querySelector('#popCol2Input');
+            const popCol2Hex = container.querySelector('#popCol2Hex');
+            const fc2Input = document.getElementById('fillColor2Input');
+            popCol2Input.addEventListener('input', (e) => {
+              state.type.fillColor2 = e.target.value;
+              popCol2Hex.textContent = e.target.value;
+              if (fc2Input) fc2Input.value = e.target.value;
+            });
+            container.querySelectorAll('[data-col2]').forEach(b => {
+              b.addEventListener('click', () => {
+                state.type.fillColor2 = b.dataset.col2;
+                popCol2Input.value = b.dataset.col2;
+                popCol2Hex.textContent = b.dataset.col2;
+                if (fc2Input) fc2Input.value = b.dataset.col2;
+              });
+            });
+
+            const popGlowInput = container.querySelector('#popGlowInput');
+            const popGlowHex = container.querySelector('#popGlowHex');
+            const gcInput = document.getElementById('glowColorInput');
+            popGlowInput.addEventListener('input', (e) => {
+              state.type.glowColor = e.target.value;
+              popGlowHex.textContent = e.target.value;
+              if (gcInput) gcInput.value = e.target.value;
+            });
+
+            const popStrokeInput = container.querySelector('#popStrokeInput');
+            const popStrokeHex = container.querySelector('#popStrokeHex');
+            const scInput = document.getElementById('strokeColorInput');
+            popStrokeInput.addEventListener('input', (e) => {
+              state.type.strokeColor = e.target.value;
+              popStrokeHex.textContent = e.target.value;
+              if (scInput) scInput.value = e.target.value;
+            });
+
+            const fmSelect = document.getElementById('fillModeSelect');
+            container.querySelectorAll('.pop-fmode-btn').forEach(b => {
+              b.addEventListener('click', () => {
+                state.type.fillMode = b.dataset.fillmode;
+                if (fmSelect) fmSelect.value = b.dataset.fillmode;
+                container.querySelectorAll('.pop-fmode-btn').forEach(btn => {
+                  btn.className = (btn.dataset.fillmode === state.type.fillMode)
+                    ? 'pop-fmode-btn py-1.5 px-1 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold'
+                    : 'pop-fmode-btn py-1.5 px-1 rounded bg-white/5 border border-white/10 text-slate-300';
+                });
+              });
+            });
+          });
+        });
+      }
+
+      const sideAlignBtn = document.getElementById('sideAlignBtn');
+      if (sideAlignBtn) {
+        sideAlignBtn.addEventListener('click', () => {
+          const aligns = ['left', 'center', 'right'];
+          const curIdx = aligns.indexOf(state.type.align);
+          state.type.align = aligns[(curIdx + 1) % aligns.length];
+          const alignLabel = document.getElementById('sideAlignLabel');
+          if (alignLabel) alignLabel.textContent = state.type.align === 'center' ? 'MID' : state.type.align.toUpperCase();
+          const alignIcon = document.getElementById('sideAlignIcon');
+          if (alignIcon) alignIcon.textContent = state.type.align === 'left' ? '◀️' : (state.type.align === 'center' ? '⏸️' : '▶️');
+          document.querySelectorAll('.align-btn').forEach(b => {
+            b.className = b.dataset.align === state.type.align
+              ? 'align-btn py-1 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold'
+              : 'align-btn py-1 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+          });
+          showGestureToast(`ALIGN: ${state.type.align.toUpperCase()}`);
+        });
+      }
+
+      const sideChaosBtn = document.getElementById('sideChaosBtn');
+      if (sideChaosBtn) {
+        sideChaosBtn.addEventListener('click', () => {
+          state.type.randomSize = !state.type.randomSize;
+          sideChaosBtn.classList.toggle('active', state.type.randomSize);
+          const rCheck = document.getElementById('randomLetterSizeCheck');
+          if (rCheck) rCheck.checked = state.type.randomSize;
+          showGestureToast(state.type.randomSize ? '🎲 ZINE CHAOS: ON' : '🎲 ZINE CHAOS: OFF');
+        });
+      }
+
+      // 2. MOSH MODULE WINGS
+      const sideMoshModeBtn = document.getElementById('sideMoshModeBtn');
+      if (sideMoshModeBtn) {
+        sideMoshModeBtn.addEventListener('click', () => {
+          openLeftPopover('MOSH PRESETS & ENGINES', (container) => {
+            container.innerHTML = `
+              <div class="space-y-2">
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">P-FRAME STYLE PRESETS</span>
+                  <div class="grid grid-cols-3 gap-1">
+                    ${[
+                      { key: 'melt', icon: '🌊', name: 'MELT' },
+                      { key: 'shear', icon: '⚡', name: 'SHEAR' },
+                      { key: 'decay', icon: '🧊', name: 'DECAY' }
+                    ].map(m => `
+                      <button type="button" data-pframemode="${m.key}" class="pop-pfmode-btn py-1.5 px-1 rounded text-[10px] font-bold border transition active:scale-95 ${state.mosh.pframeMode === m.key ? 'bg-cyber-pink/20 border-cyber-pink text-cyber-pink' : 'bg-white/5 border-white/10 text-slate-300'}">${m.icon} ${m.name}</button>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="pt-1 border-t border-white/10 space-y-1.5">
+                  <span class="block text-[9px] text-slate-400 font-bold">ACTIVE ENGINES</span>
+                  <label class="flex items-center justify-between text-[10px] text-slate-200 bg-white/5 px-2 py-1.5 rounded border border-white/10 cursor-pointer">
+                    <span>🌊 P-Frame Vector Codec</span>
+                    <input type="checkbox" id="popVecMoshChk" ${state.mosh.vectorMoshActive ? 'checked' : ''} class="accent-cyber-cyan">
+                  </label>
+                  <label class="flex items-center justify-between text-[10px] text-slate-200 bg-white/5 px-2 py-1.5 rounded border border-white/10 cursor-pointer">
+                    <span>⚡ Classic Slice & Smear</span>
+                    <input type="checkbox" id="popClassicMoshChk" ${state.mosh.active ? 'checked' : ''} class="accent-cyber-pink">
+                  </label>
+                </div>
+              </div>
+            `;
+            container.querySelectorAll('.pop-pfmode-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const nextMode = btn.dataset.pframemode;
+                state.mosh.pframeMode = nextMode;
+                const lbl = document.getElementById('sideMoshModeLabel');
+                if (lbl) lbl.textContent = nextMode.toUpperCase();
+                const origBtn = document.querySelector(`.pframe-mode-btn[data-mode="${nextMode}"]`);
+                if (origBtn) origBtn.click();
+                closeSidePopovers();
+                showGestureToast(`MOSH: ${nextMode.toUpperCase()}`);
+              });
+            });
+            const vChk = container.querySelector('#popVecMoshChk');
+            if (vChk) {
+              vChk.addEventListener('change', (e) => {
+                state.mosh.vectorMoshActive = e.target.checked;
+                const domChk = document.getElementById('vectorMoshActiveCheck');
+                if (domChk) domChk.checked = e.target.checked;
+              });
+            }
+            const cChk = container.querySelector('#popClassicMoshChk');
+            if (cChk) {
+              cChk.addEventListener('change', (e) => {
+                state.mosh.active = e.target.checked;
+                const domChk = document.getElementById('moshActiveCheck');
+                if (domChk) domChk.checked = e.target.checked;
+              });
+            }
+          });
+        });
+      }
+
+      const sideFreezeBtn = document.getElementById('sideFreezeBtn');
+      if (sideFreezeBtn) {
+        sideFreezeBtn.addEventListener('click', () => {
+          const domFreezeBtn = document.getElementById('freezeIFrameBtn');
+          if (domFreezeBtn) domFreezeBtn.click();
+          else state.mosh.freezeIFrame = !state.mosh.freezeIFrame;
+          sideFreezeBtn.classList.toggle('active', state.mosh.freezeIFrame);
+          showGestureToast(state.mosh.freezeIFrame ? '❄️ KEYFRAME FROZEN' : '🧊 KEYFRAME LIVE');
+        });
+      }
+
+      const sideVideoCouplingBtn = document.getElementById('sideVideoCouplingBtn');
+      if (sideVideoCouplingBtn) {
+        sideVideoCouplingBtn.addEventListener('click', () => {
+          const cur = state.mosh.videoCoupling || 0;
+          const next = cur > 20 ? 0 : 80;
+          setSliderValue('videoCouplingRange', next);
+          showGestureToast(`VIDEO LINK: ${next}%`);
+        });
+      }
+
+      const sideClearMoshBtn = document.getElementById('sideClearMoshBtn');
+      if (sideClearMoshBtn) {
+        sideClearMoshBtn.addEventListener('click', () => {
+          const freshBtn = document.getElementById('freshKeyframeBtn');
+          if (freshBtn) freshBtn.click();
+          else {
+            feedbackCtx.clearRect(0, 0, WIDTH, HEIGHT);
+            feedbackCtx.drawImage(cleanCompositeCanvas, 0, 0);
+            state.mosh.freezeIFrame = false;
+          }
+          if (sideFreezeBtn) sideFreezeBtn.classList.remove('active');
+          showGestureToast('🧹 FRESH KEYFRAME');
+        });
+      }
+
+      // 3. HEAT / WIRE MODULE WINGS
+      const sideHwModeBtn = document.getElementById('sideHwModeBtn');
+      if (sideHwModeBtn) {
+        sideHwModeBtn.addEventListener('click', () => {
+          const modes = ['heatmap', 'wireframe', 'both'];
+          const curIdx = modes.indexOf(state.heatWire.mode);
+          const next = modes[(curIdx + 1) % modes.length];
+          state.heatWire.mode = next;
+          state.heatWire.active = true;
+          const chk = document.getElementById('heatWireActiveCheck');
+          if (chk) chk.checked = true;
+          document.querySelectorAll('.hw-mode-btn').forEach(b => {
+            b.className = b.dataset.hwmode === state.heatWire.mode
+              ? 'hw-mode-btn py-2 rounded bg-cyber-card border border-cyber-pink text-cyber-pink font-bold text-[10px] active:scale-95 transition'
+              : 'hw-mode-btn py-2 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] active:scale-95 transition';
+          });
+          showGestureToast(`MODE: ${next.toUpperCase()}`);
+        });
+      }
+
+      const sideHwTriggerBtn = document.getElementById('sideHwTriggerBtn');
+      if (sideHwTriggerBtn) {
+        sideHwTriggerBtn.addEventListener('click', () => {
+          openLeftPopover('TRIGGER MASK & POWER', (container) => {
+            const triggers = [
+              { key: 'bright', name: '☀️ Bright Highlights (Highs)' },
+              { key: 'contrast', name: '⚡ High Contrast / Edges' },
+              { key: 'dark', name: '🌑 Dark Shadows (Lows)' },
+              { key: 'global', name: '🌐 Global (Full Canvas)' }
+            ];
+            container.innerHTML = `
+              <div class="space-y-1.5">
+                <label class="flex items-center justify-between text-[10px] text-cyber-pink font-bold bg-cyber-pink/10 px-2 py-1.5 rounded border border-cyber-pink/40 cursor-pointer">
+                  <span>🌡️ Heat/Wire Engine Active</span>
+                  <input type="checkbox" id="popHwActiveChk" ${state.heatWire.active ? 'checked' : ''} class="accent-cyber-pink">
+                </label>
+                <div class="text-[9px] text-slate-400 font-bold pt-1">MASK CONDITION</div>
+                <div id="popHwTrigList" class="space-y-1"></div>
+                <label class="flex items-center justify-between text-[10px] text-slate-300 bg-white/5 px-2 py-1.5 rounded border border-white/10 cursor-pointer mt-1">
+                  <span>🔄 Invert Mask Range</span>
+                  <input type="checkbox" id="popHwInvertChk" ${state.heatWire.invert ? 'checked' : ''} class="accent-cyber-pink">
+                </label>
+              </div>
+            `;
+            const list = container.querySelector('#popHwTrigList');
+            triggers.forEach(t => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isCur = (state.heatWire.trigger === t.key);
+              btn.className = `w-full py-1.5 px-2 text-left rounded-lg text-[11px] font-bold transition active:scale-95 ${isCur ? 'bg-cyber-pink/20 border border-cyber-pink text-cyber-pink' : 'bg-white/5 border border-white/10 text-slate-300'}`;
+              btn.textContent = t.name;
+              btn.addEventListener('click', () => {
+                state.heatWire.trigger = t.key;
+                state.heatWire.active = true;
+                const sel = document.getElementById('hwTriggerSelect');
+                if (sel) sel.value = t.key;
+                const chk = document.getElementById('heatWireActiveCheck');
+                if (chk) chk.checked = true;
+                closeSidePopovers();
+                showGestureToast(`MASK: ${t.key.toUpperCase()}`);
+              });
+              list.appendChild(btn);
+            });
+            const actChk = container.querySelector('#popHwActiveChk');
+            if (actChk) {
+              actChk.addEventListener('change', (e) => {
+                state.heatWire.active = e.target.checked;
+                const chk = document.getElementById('heatWireActiveCheck');
+                if (chk) chk.checked = e.target.checked;
+              });
+            }
+            const invChk = container.querySelector('#popHwInvertChk');
+            if (invChk) {
+              invChk.addEventListener('change', (e) => {
+                state.heatWire.invert = e.target.checked;
+                const chk = document.getElementById('hwInvertCheck');
+                if (chk) chk.checked = e.target.checked;
+              });
+            }
+          });
+        });
+      }
+
+      const sideHwPaletteBtn = document.getElementById('sideHwPaletteBtn');
+      if (sideHwPaletteBtn) {
+        sideHwPaletteBtn.addEventListener('click', () => {
+          openRightPopover('HEATMAP PALETTE', (container) => {
+            const pals = [
+              { key: 'thermal', name: '🔥 Thermal FLIR' },
+              { key: 'cyber', name: '💜 Cyber Neon' },
+              { key: 'acid', name: '🧪 Acid Lime' },
+              { key: 'magma', name: '🌋 Magma Lava' },
+              { key: 'rainbow', name: '🌈 Spectral IR' },
+              { key: 'custom', name: '🎨 Custom 2-Tone' }
+            ];
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 gap-1 mb-2';
+            pals.forEach(p => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isCur = (state.heatWire.palette === p.key);
+              btn.className = `py-1.5 px-2 text-left rounded-lg text-[10px] font-bold transition active:scale-95 ${isCur ? 'bg-cyber-pink/20 border border-cyber-pink text-cyber-pink' : 'bg-white/5 border border-white/10 text-slate-300 hover:border-cyber-pink/40'}`;
+              btn.innerHTML = `<span>${p.name}</span>`;
+              btn.addEventListener('click', () => {
+                const origBtn = document.querySelector(`.hw-pal-btn[data-hwpal="${p.key}"]`);
+                if (origBtn) origBtn.click();
+                else {
+                  state.heatWire.palette = p.key;
+                  state.heatWire.active = true;
+                  updateHeatmapLUT(state.heatWire.palette, state.heatWire.customColorA, state.heatWire.customColorB);
+                }
+                closeSidePopovers();
+                showGestureToast(`PALETTE: ${p.name}`);
+              });
+              grid.appendChild(btn);
+            });
+            container.appendChild(grid);
+
+            const customBox = document.createElement('div');
+            customBox.className = 'pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-300';
+            customBox.innerHTML = `
+              <span>Custom 2-Tone Gradient:</span>
+              <div class="flex items-center gap-1.5">
+                <input type="color" id="popHwColA" value="${state.heatWire.customColorA}" class="w-6 h-6 rounded bg-transparent border border-cyber-border cursor-pointer">
+                <input type="color" id="popHwColB" value="${state.heatWire.customColorB}" class="w-6 h-6 rounded bg-transparent border border-cyber-border cursor-pointer">
+              </div>
+            `;
+            container.appendChild(customBox);
+
+            const colA = customBox.querySelector('#popHwColA');
+            const colB = customBox.querySelector('#popHwColB');
+            const syncCustomGrad = () => {
+              state.heatWire.customColorA = colA.value;
+              state.heatWire.customColorB = colB.value;
+              state.heatWire.palette = 'custom';
+              state.heatWire.active = true;
+              const domA = document.getElementById('hwCustomColorA');
+              const domB = document.getElementById('hwCustomColorB');
+              if (domA) domA.value = colA.value;
+              if (domB) domB.value = colB.value;
+              updateHeatmapLUT('custom', colA.value, colB.value);
+            };
+            colA.addEventListener('input', syncCustomGrad);
+            colB.addEventListener('input', syncCustomGrad);
+          });
+        });
+      }
+
+      const sideHwWireStyleBtn = document.getElementById('sideHwWireStyleBtn');
+      if (sideHwWireStyleBtn) {
+        sideHwWireStyleBtn.addEventListener('click', () => {
+          openRightPopover('WIREFRAME MESH & STROKE', (container) => {
+            const styles = [
+              { key: 'grid', name: '📐 Orthogonal Grid' },
+              { key: 'iso', name: '⤡ Isometric Tri-Mesh' },
+              { key: 'contour', name: '〰️ Topo Contour Lines' },
+              { key: 'scanlines', name: '═ Data Scanlines' }
+            ];
+            styles.forEach(s => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isCur = (state.heatWire.wireStyle === s.key);
+              btn.className = `w-full py-1.5 px-2 mb-1 text-left rounded-lg text-xs font-bold transition active:scale-95 flex items-center justify-between ${isCur ? 'bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan' : 'bg-white/5 border border-white/10 text-slate-300 hover:border-cyber-cyan/40'}`;
+              btn.innerHTML = `<span>${s.name}</span>`;
+              btn.addEventListener('click', () => {
+                const origBtn = document.querySelector(`.hw-wire-style-btn[data-wirestyle="${s.key}"]`);
+                if (origBtn) origBtn.click();
+                else state.heatWire.wireStyle = s.key;
+                state.heatWire.active = true;
+                closeSidePopovers();
+                showGestureToast(`MESH: ${s.name}`);
+              });
+              container.appendChild(btn);
+            });
+
+            const strokeBox = document.createElement('div');
+            strokeBox.className = 'pt-2 mt-1 border-t border-white/10';
+            strokeBox.innerHTML = `
+              <div class="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                <span>WIRE STROKE COLOR</span>
+                <span id="popWireHex" class="font-mono text-cyber-cyan">${state.heatWire.wireColor}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <input type="color" id="popWireColorInput" value="${state.heatWire.wireColor}" class="w-8 h-7 rounded bg-transparent border border-cyber-border cursor-pointer">
+                <div class="flex-1 grid grid-cols-5 gap-1">
+                  ${['#00ffcc', '#ff0055', '#39ff14', '#ffe600', '#ffffff'].map(c => `
+                    <button type="button" data-wcol="${c}" class="h-6 rounded border border-white/20 active:scale-90 transition" style="background:${c}"></button>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+            container.appendChild(strokeBox);
+
+            const wcInput = strokeBox.querySelector('#popWireColorInput');
+            const wcHex = strokeBox.querySelector('#popWireHex');
+            const domWc = document.getElementById('hwWireColor');
+            wcInput.addEventListener('input', (e) => {
+              state.heatWire.wireColor = e.target.value;
+              wcHex.textContent = e.target.value;
+              if (domWc) domWc.value = e.target.value;
+            });
+            strokeBox.querySelectorAll('[data-wcol]').forEach(b => {
+              b.addEventListener('click', () => {
+                state.heatWire.wireColor = b.dataset.wcol;
+                wcInput.value = b.dataset.wcol;
+                wcHex.textContent = b.dataset.wcol;
+                if (domWc) domWc.value = b.dataset.wcol;
+              });
+            });
+          });
+        });
+      }
+
+      // 4. PIXEL SORT WINGS
+      const sideSortDirBtn = document.getElementById('sideSortDirBtn');
+      if (sideSortDirBtn) {
+        sideSortDirBtn.addEventListener('click', () => {
+          const dirs = [
+            { key: 'vertical', label: 'DOWN', icon: '💧' },
+            { key: 'horizontal', label: 'TEAR', icon: '↔️' },
+            { key: 'diagonal', label: 'SLANT', icon: '⤡' }
+          ];
+          const curIdx = dirs.findIndex(d => d.key === state.sort.direction);
+          const next = dirs[(curIdx + 1) % dirs.length];
+          state.sort.direction = next.key;
+          const origBtn = document.querySelector(`.sort-dir-btn[data-sortdir="${next.key}"]`);
+          if (origBtn) origBtn.click();
+          const lbl = document.getElementById('sideSortDirLabel');
+          if (lbl) lbl.textContent = next.label;
+          const icn = document.getElementById('sideSortDirIcon');
+          if (icn) icn.textContent = next.icon;
+          showGestureToast(`SORT: ${next.label}`);
+        });
+      }
+
+      const sideSortCritBtn = document.getElementById('sideSortCritBtn');
+      if (sideSortCritBtn) {
+        sideSortCritBtn.addEventListener('click', () => {
+          const crits = [
+            { key: 'brightness', label: 'LUMA' },
+            { key: 'red', label: 'RED' },
+            { key: 'blue', label: 'BLUE' },
+            { key: 'saturation', label: 'SAT' }
+          ];
+          const curIdx = crits.findIndex(c => c.key === state.sort.criterion);
+          const next = crits[(curIdx + 1) % crits.length];
+          state.sort.criterion = next.key;
+          const sel = document.getElementById('sortCriterionSelect');
+          if (sel) sel.value = next.key;
+          const lbl = document.getElementById('sideSortCritLabel');
+          if (lbl) lbl.textContent = next.label;
+          showGestureToast(`CRIT: ${next.label}`);
+        });
+      }
+
+      const sideSortPowerBtn = document.getElementById('sideSortPowerBtn');
+      if (sideSortPowerBtn) {
+        sideSortPowerBtn.addEventListener('click', () => {
+          state.sort.active = !state.sort.active;
+          sideSortPowerBtn.classList.toggle('active', state.sort.active);
+          const chk = document.getElementById('sortActiveCheck');
+          if (chk) chk.checked = state.sort.active;
+          showGestureToast(state.sort.active ? '🌊 SORT ON' : 'SORT OFF');
+        });
+      }
+
+      // 5. CRT / FX WINGS
+      const sideFxToggleBtn = document.getElementById('sideFxToggleBtn');
+      if (sideFxToggleBtn) {
+        sideFxToggleBtn.addEventListener('click', () => {
+          state.fx.active = !state.fx.active;
+          const chk = document.getElementById('fxActiveCheck');
+          if (chk) chk.checked = state.fx.active;
+          sideFxToggleBtn.classList.toggle('active', state.fx.active);
+          showGestureToast(state.fx.active ? '📺 CRT ON' : '📺 CRT OFF');
+        });
+      }
+
+      const sideSyncToggleBtn = document.getElementById('sideSyncToggleBtn');
+      if (sideSyncToggleBtn) {
+        sideSyncToggleBtn.addEventListener('click', () => {
+          state.fx.sync.active = !state.fx.sync.active;
+          const chk = document.getElementById('syncActiveCheck');
+          if (chk) chk.checked = state.fx.sync.active;
+          sideSyncToggleBtn.classList.toggle('active', state.fx.sync.active);
+          showGestureToast(state.fx.sync.active ? '⚡ SYNC ON' : '⚡ SYNC OFF');
+        });
+      }
+
+      const sideSyncDirBtn = document.getElementById('sideSyncDirBtn');
+      if (sideSyncDirBtn) {
+        sideSyncDirBtn.addEventListener('click', () => {
+          const dirs = ['horizontal', 'vertical', 'diagonal'];
+          const curIdx = dirs.indexOf(state.fx.sync.direction);
+          const next = dirs[(curIdx + 1) % dirs.length];
+          state.fx.sync.direction = next;
+          const sel = document.getElementById('syncDirectionSelect');
+          if (sel) sel.value = next;
+          const lbl = document.getElementById('sideSyncDirLabel');
+          if (lbl) lbl.textContent = next === 'horizontal' ? 'HORIZ' : (next === 'vertical' ? 'VERT' : 'DIAG');
+          showGestureToast(`🧭 SYNC DIR: ${next.toUpperCase()}`);
+        });
+      }
+
+      const sideSyncColorBtn = document.getElementById('sideSyncColorBtn');
+      if (sideSyncColorBtn) {
+        sideSyncColorBtn.addEventListener('click', () => {
+          openRightPopover('SYNC BAR COLOR', (container) => {
+            const barColors = [
+              { color: '#000000', label: 'Void Black (CRT Blanking)' },
+              { color: 'invert', label: 'Invert / Negative (Diff)' },
+              { color: '#ff0055', label: 'Cyber Pink' },
+              { color: '#00ffcc', label: 'Neon Cyan' },
+              { color: '#39ff14', label: 'Toxic Acid Lime' },
+              { color: '#ffffff', label: 'Pure White (Flash)' }
+            ];
+            barColors.forEach(c => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isCur = (state.fx.sync.color === c.color);
+              btn.className = `w-full py-1.5 px-2 text-left rounded-lg text-xs font-bold transition active:scale-95 flex items-center justify-between ${isCur ? 'bg-cyber-yellow/20 border border-cyber-yellow text-cyber-yellow' : 'bg-white/5 border border-white/10 text-slate-300 hover:border-cyber-yellow/40'}`;
+              btn.innerHTML = `<span class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded border border-white/30 inline-block" style="background:${c.color === 'invert' ? 'linear-gradient(135deg, #000 50%, #fff 50%)' : c.color}"></span><span>${c.label}</span></span>`;
+              btn.addEventListener('click', () => {
+                state.fx.sync.color = c.color;
+                state.fx.sync.active = true;
+                const chk = document.getElementById('syncActiveCheck');
+                if (chk) chk.checked = true;
+                const colInput = document.getElementById('syncColorInput');
+                if (colInput && c.color.startsWith('#')) colInput.value = c.color;
+                if (sideSyncToggleBtn) sideSyncToggleBtn.classList.add('active');
+                closeSidePopovers();
+                showGestureToast(`BAR: ${c.label}`);
+              });
+              container.appendChild(btn);
+            });
+          });
+        });
+      }
+
+      const sideSyncNoiseBtn = document.getElementById('sideSyncNoiseBtn');
+      if (sideSyncNoiseBtn) {
+        sideSyncNoiseBtn.addEventListener('click', () => {
+          const levels = [
+            { noise: 25, tear: 20, name: 'SUBTLE DRIFT' },
+            { noise: 65, tear: 45, name: 'STANDARD CRT' },
+            { noise: 90, tear: 80, name: 'HEAVY CORRUPT' },
+            { noise: 0, tear: 0, name: 'CLEAN BLANK' }
+          ];
+          const curNoise = state.fx.sync.noise;
+          let next = levels[1];
+          if (curNoise <= 0) next = levels[0];
+          else if (curNoise <= 35) next = levels[1];
+          else if (curNoise <= 75) next = levels[2];
+          else next = levels[3];
+
+          setSliderValue('syncNoiseRange', next.noise);
+          setSliderValue('syncTearRange', next.tear);
+          state.fx.sync.active = true;
+          const chk = document.getElementById('syncActiveCheck');
+          if (chk) chk.checked = true;
+          if (sideSyncToggleBtn) sideSyncToggleBtn.classList.add('active');
+          showGestureToast(`TEAR: ${next.name}`);
+        });
+      }
+
+      const sideBgModeBtn = document.getElementById('sideBgModeBtn');
+      if (sideBgModeBtn) {
+        sideBgModeBtn.addEventListener('click', () => {
+          const bgs = ['cyberGradient', 'acidLime', 'deepVoid', 'monochrome'];
+          const curIdx = bgs.indexOf(state.fx.bgMode);
+          const next = bgs[(curIdx + 1) % bgs.length];
+          state.fx.bgMode = next;
+          state.fx.customBg = false;
+          const sel = document.getElementById('bgModeSelect');
+          if (sel) sel.value = next;
+          showGestureToast(`BG: ${next.toUpperCase()}`);
+        });
+      }
+
+      const sideCustomBgBtn = document.getElementById('sideCustomBgBtn');
+      if (sideCustomBgBtn) {
+        sideCustomBgBtn.addEventListener('click', () => {
+          openRightPopover('BACKDROP & CUSTOM TINT', (container) => {
+            container.innerHTML = `
+              <div class="space-y-2">
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">PRESET BACKDROP</span>
+                  <div class="grid grid-cols-2 gap-1">
+                    ${[
+                      { key: 'cyberGradient', name: 'Cyber Neon' },
+                      { key: 'acidLime', name: 'Acid Vapor' },
+                      { key: 'deepVoid', name: 'OLED Void' },
+                      { key: 'monochrome', name: 'Concrete Mono' }
+                    ].map(b => `
+                      <button type="button" data-bgpreset="${b.key}" class="pop-bg-btn py-1 px-1.5 rounded text-[10px] font-bold border ${!state.fx.customBg && state.fx.bgMode === b.key ? 'bg-cyber-lime/20 border-cyber-lime text-cyber-lime' : 'bg-white/5 border-white/10 text-slate-300'}">${b.name}</button>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="pt-1.5 border-t border-white/10">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-[9px] text-slate-400 font-bold">CUSTOM GRADIENT TINT</span>
+                    <button type="button" id="popResetBgBtn" class="text-[9px] text-cyber-lime hover:underline">↺ Reset</button>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2">
+                    <div>
+                      <span class="block text-[8px] text-slate-400 mb-0.5">Top / Void</span>
+                      <input type="color" id="popBgCol1" value="${state.fx.bgColor1}" class="w-full h-7 rounded bg-transparent border border-cyber-border cursor-pointer">
+                    </div>
+                    <div>
+                      <span class="block text-[8px] text-slate-400 mb-0.5">Bottom / Glow</span>
+                      <input type="color" id="popBgCol2" value="${state.fx.bgColor2}" class="w-full h-7 rounded bg-transparent border border-cyber-border cursor-pointer">
+                    </div>
+                    <div>
+                      <span class="block text-[8px] text-slate-400 mb-0.5">Grid Line</span>
+                      <input type="color" id="popBgAccent" value="${state.fx.bgAccent}" class="w-full h-7 rounded bg-transparent border border-cyber-border cursor-pointer">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+            container.querySelectorAll('.pop-bg-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                state.fx.bgMode = btn.dataset.bgpreset;
+                state.fx.customBg = false;
+                const sel = document.getElementById('bgModeSelect');
+                if (sel) sel.value = btn.dataset.bgpreset;
+                closeSidePopovers();
+                showGestureToast(`BG: ${btn.textContent}`);
+              });
+            });
+            const c1 = container.querySelector('#popBgCol1');
+            const c2 = container.querySelector('#popBgCol2');
+            const ca = container.querySelector('#popBgAccent');
+            c1.addEventListener('input', (e) => {
+              state.fx.bgColor1 = e.target.value;
+              state.fx.customBg = true;
+              const d = document.getElementById('bgColor1Input');
+              if (d) d.value = e.target.value;
+            });
+            c2.addEventListener('input', (e) => {
+              state.fx.bgColor2 = e.target.value;
+              state.fx.customBg = true;
+              const d = document.getElementById('bgColor2Input');
+              if (d) d.value = e.target.value;
+            });
+            ca.addEventListener('input', (e) => {
+              state.fx.bgAccent = e.target.value;
+              state.fx.customBg = true;
+              const d = document.getElementById('bgAccentInput');
+              if (d) d.value = e.target.value;
+            });
+            const rst = container.querySelector('#popResetBgBtn');
+            if (rst) {
+              rst.addEventListener('click', () => {
+                state.fx.customBg = false;
+                closeSidePopovers();
+                showGestureToast('↺ BG PRESET RESTORED');
+              });
+            }
+          });
+        });
+      }
+
+      // 6. MEDIA WINGS (GALLERY, CAMERA, LIVE/PLAYBACK CONTROLS & FULL ASCII MENU)
+      const sideGalleryInput = document.getElementById('sideGalleryInput');
+      if (sideGalleryInput) {
+        sideGalleryInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            loadMediaFile(e.target.files[0]);
+            e.target.value = '';
+          }
+        });
+      }
+      const sideCamInput = document.getElementById('sideCamInput');
+      if (sideCamInput) {
+        sideCamInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            loadMediaFile(e.target.files[0]);
+            e.target.value = '';
+          }
+        });
+      }
+
+      const sideMediaCtrlBtn = document.getElementById('sideMediaCtrlBtn');
+      if (sideMediaCtrlBtn) {
+        sideMediaCtrlBtn.addEventListener('click', () => {
+          openLeftPopover('MEDIA & LIVE CAMERA', (container) => {
+            const isVid = state.photo.loaded && state.photo.isVideo && !state.photo.isLive;
+            const isLive = state.photo.loaded && state.photo.isLive;
+            const isPaused = isVid && state.photo.video && state.photo.video.paused;
+            const isMuted = isVid && state.photo.video && state.photo.video.muted;
+
+            container.innerHTML = `
+              <div class="space-y-2">
+                <label class="flex items-center justify-between text-[10px] text-cyber-yellow font-bold bg-cyber-yellow/10 px-2 py-1.5 rounded border border-cyber-yellow/40 cursor-pointer">
+                  <span>🎬 Media Layer Active</span>
+                  <input type="checkbox" id="popPhotoActiveChk" ${state.photo.active ? 'checked' : ''} class="accent-cyber-yellow">
+                </label>
+
+                <div class="grid grid-cols-2 gap-1.5">
+                  <button type="button" id="popLiveCamBtn" class="py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 active:scale-95 transition ${isLive ? 'bg-red-500/20 border-red-500 text-red-400' : 'bg-cyber-card border-cyber-cyan/50 text-cyber-cyan'}">
+                    <span>${isLive ? '⏹️' : '🔴'}</span>
+                    <span>${isLive ? 'Stop Live' : 'Live Cam'}</span>
+                  </button>
+                  <button type="button" id="popPhotoSnapBtn" class="py-1.5 px-2 rounded-lg bg-cyber-card border border-cyber-border text-slate-200 text-[10px] font-bold flex items-center justify-center gap-1 active:scale-95 transition">
+                    <span>📸</span>
+                    <span>Photo Cam</span>
+                  </button>
+                </div>
+
+                ${isLive ? `
+                  <button type="button" id="popFlipCamBtn" class="w-full py-1.5 px-2 rounded-lg bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold flex items-center justify-center gap-1 active:scale-95 transition">
+                    <span>🔄 Flip Front / Rear Camera</span>
+                  </button>
+                ` : ''}
+
+                ${isVid ? `
+                  <div class="pt-1 border-t border-white/10 space-y-1.5">
+                    <span class="block text-[9px] text-slate-400 font-bold">VIDEO CLIP CONTROLS</span>
+                    <div class="grid grid-cols-3 gap-1">
+                      <button type="button" id="popVidPlayBtn" class="py-1.5 px-1 rounded bg-cyber-card border border-cyber-border text-slate-200 text-[10px] font-bold active:scale-95">${isPaused ? '▶️ Play' : '⏸️ Pause'}</button>
+                      <button type="button" id="popVidMuteBtn" class="py-1.5 px-1 rounded bg-cyber-card border border-cyber-border text-slate-200 text-[10px] font-bold active:scale-95">${isMuted ? '🔇 Muted' : '🔊 Audio'}</button>
+                      <button type="button" id="popVidTrimBtn" class="py-1.5 px-1 rounded bg-cyber-yellow/20 border border-cyber-yellow text-cyber-yellow text-[10px] font-bold active:scale-95">✂️ Trim 9s</button>
+                    </div>
+                  </div>
+                ` : ''}
+
+                <div class="pt-1 border-t border-white/10">
+                  <button type="button" id="popClearMediaBtn" class="w-full py-1.5 px-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-[10px] font-bold active:scale-95 transition">
+                    ✕ Clear / Unload Media
+                  </button>
+                </div>
+              </div>
+            `;
+
+            const actChk = container.querySelector('#popPhotoActiveChk');
+            if (actChk) {
+              actChk.addEventListener('change', (e) => {
+                state.photo.active = e.target.checked;
+                const domChk = document.getElementById('photoActiveCheck');
+                if (domChk) domChk.checked = e.target.checked;
+              });
+            }
+
+            const liveBtn = container.querySelector('#popLiveCamBtn');
+            if (liveBtn) {
+              liveBtn.addEventListener('click', () => {
+                closeSidePopovers();
+                const domLive = document.getElementById('liveCameraBtn');
+                if (domLive) domLive.click();
+              });
+            }
+
+            const snapBtn = container.querySelector('#popPhotoSnapBtn');
+            if (snapBtn) {
+              snapBtn.addEventListener('click', () => {
+                closeSidePopovers();
+                const pCam = document.getElementById('photoCameraInput');
+                if (pCam) pCam.click();
+              });
+            }
+
+            const flipBtn = container.querySelector('#popFlipCamBtn');
+            if (flipBtn) {
+              flipBtn.addEventListener('click', () => {
+                closeSidePopovers();
+                const domFlip = document.getElementById('mediaFlipCamBtn');
+                if (domFlip) domFlip.click();
+              });
+            }
+
+            const playBtn = container.querySelector('#popVidPlayBtn');
+            if (playBtn) {
+              playBtn.addEventListener('click', () => {
+                const domPlay = document.getElementById('mediaPlayPauseBtn');
+                if (domPlay) domPlay.click();
+                closeSidePopovers();
+              });
+            }
+
+            const muteBtn = container.querySelector('#popVidMuteBtn');
+            if (muteBtn) {
+              muteBtn.addEventListener('click', () => {
+                const domMute = document.getElementById('mediaMuteBtn');
+                if (domMute) domMute.click();
+                closeSidePopovers();
+              });
+            }
+
+            const trimBtn = container.querySelector('#popVidTrimBtn');
+            if (trimBtn) {
+              trimBtn.addEventListener('click', () => {
+                closeSidePopovers();
+                const domTrim = document.getElementById('mediaTrimBtn');
+                if (domTrim) domTrim.click();
+              });
+            }
+
+            const clrBtn = container.querySelector('#popClearMediaBtn');
+            if (clrBtn) {
+              clrBtn.addEventListener('click', () => {
+                stopCurrentMedia();
+                closeSidePopovers();
+                showGestureToast('🗑️ MEDIA CLEARED');
+              });
+            }
+          });
+        });
+      }
+
+      const sideAsciiModeBtn = document.getElementById('sideAsciiModeBtn');
+      if (sideAsciiModeBtn) {
+        sideAsciiModeBtn.addEventListener('click', () => {
+          openRightPopover('ASCII & RENDER MENU', (container) => {
+            container.innerHTML = `
+              <div class="space-y-2">
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">RENDER MODE</span>
+                  <div class="grid grid-cols-3 gap-1">
+                    ${[
+                      { key: 'ascii', label: '🔠 Pure ASCII' },
+                      { key: 'asciiOverlay', label: '🎛️ ASCII+Media' },
+                      { key: 'direct', label: '🎬 Raw Media' }
+                    ].map(m => `
+                      <button type="button" data-rmode="${m.key}" class="pop-rmode-btn py-1.5 px-1 rounded text-[9.5px] font-bold border transition active:scale-95 ${state.photo.mode === m.key ? 'bg-cyber-yellow/20 border-cyber-yellow text-cyber-yellow' : 'bg-white/5 border-white/10 text-slate-300'}">${m.label}</button>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">ASCII COLOR MODE</span>
+                  <div class="grid grid-cols-3 gap-1">
+                    ${[
+                      { key: 'photo', label: '🌈 Media Color' },
+                      { key: 'matrix', label: '🟢 Matrix' },
+                      { key: 'neon', label: '💖 Cyber Duo' },
+                      { key: 'mono', label: '⚪ Mono' },
+                      { key: 'amber', label: '🟠 CRT Amber' }
+                    ].map(c => `
+                      <button type="button" data-acmode="${c.key}" class="pop-acmode-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 ${state.photo.colorMode === c.key ? 'bg-cyber-cyan/20 border-cyber-cyan text-cyber-cyan' : 'bg-white/5 border-white/10 text-slate-300'}">${c.label}</button>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">CHARACTER SET</span>
+                  <div class="grid grid-cols-3 gap-1">
+                    ${[
+                      { key: 'blocks', label: '█▓▒░ Blocks' },
+                      { key: 'standard', label: '@%#* Standard' },
+                      { key: 'matrix', label: '$#&* Glitch' },
+                      { key: 'binary', label: '0101 Binary' },
+                      { key: 'katakana', label: 'ｱｲｳｴ Katakana' }
+                    ].map(ch => `
+                      <button type="button" data-achar="${ch.key}" class="pop-achar-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 ${state.photo.charSet === ch.key ? 'bg-cyber-pink/20 border-cyber-pink text-cyber-pink' : 'bg-white/5 border-white/10 text-slate-300'}">${ch.label}</button>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">LAYER BLEND</span>
+                  <div class="grid grid-cols-3 gap-1">
+                    ${[
+                      { key: 'behind', label: 'Behind Text' },
+                      { key: 'inFront', label: 'In Front' },
+                      { key: 'photoOnly', label: 'Media Only' }
+                    ].map(b => `
+                      <button type="button" data-ablend="${b.key}" class="pop-ablend-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 ${state.photo.blend === b.key ? 'bg-cyber-yellow/20 border-cyber-yellow text-cyber-yellow' : 'bg-white/5 border-white/10 text-slate-300'}">${b.label}</button>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <div class="pt-1 border-t border-white/10 flex items-center justify-between gap-2">
+                  <label class="flex items-center space-x-1.5 text-[10px] text-slate-200 cursor-pointer">
+                    <input type="checkbox" id="popAsciiInvertChk" ${state.photo.invert ? 'checked' : ''} class="accent-cyber-yellow">
+                    <span>Invert Inks</span>
+                  </label>
+                  <button type="button" id="popOpenAsciiKnobsBtn" class="py-1 px-2 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan text-[9.5px] font-bold active:scale-95">
+                    🎛️ Cell Size & Contrast Knobs
+                  </button>
+                </div>
+              </div>
+            `;
+
+            container.querySelectorAll('.pop-rmode-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                state.photo.mode = btn.dataset.rmode;
+                const sel = document.getElementById('photoRenderModeSelect');
+                if (sel) sel.value = btn.dataset.rmode;
+                container.querySelectorAll('.pop-rmode-btn').forEach(b => {
+                  b.className = b.dataset.rmode === state.photo.mode
+                    ? 'pop-rmode-btn py-1.5 px-1 rounded text-[9.5px] font-bold border transition active:scale-95 bg-cyber-yellow/20 border-cyber-yellow text-cyber-yellow'
+                    : 'pop-rmode-btn py-1.5 px-1 rounded text-[9.5px] font-bold border transition active:scale-95 bg-white/5 border-white/10 text-slate-300';
+                });
+                showGestureToast(`RENDER: ${btn.dataset.rmode.toUpperCase()}`);
+              });
+            });
+
+            container.querySelectorAll('.pop-acmode-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                state.photo.colorMode = btn.dataset.acmode;
+                const sel = document.getElementById('asciiColorModeSelect');
+                if (sel) sel.value = btn.dataset.acmode;
+                container.querySelectorAll('.pop-acmode-btn').forEach(b => {
+                  b.className = b.dataset.acmode === state.photo.colorMode
+                    ? 'pop-acmode-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-cyan/20 border-cyber-cyan text-cyber-cyan'
+                    : 'pop-acmode-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 bg-white/5 border-white/10 text-slate-300';
+                });
+                showGestureToast(`ASCII COLOR: ${btn.dataset.acmode.toUpperCase()}`);
+              });
+            });
+
+            container.querySelectorAll('.pop-achar-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                state.photo.charSet = btn.dataset.achar;
+                const sel = document.getElementById('asciiCharSetSelect');
+                if (sel) sel.value = btn.dataset.achar;
+                container.querySelectorAll('.pop-achar-btn').forEach(b => {
+                  b.className = b.dataset.achar === state.photo.charSet
+                    ? 'pop-achar-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-pink/20 border-cyber-pink text-cyber-pink'
+                    : 'pop-achar-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 bg-white/5 border-white/10 text-slate-300';
+                });
+                showGestureToast(`CHARS: ${btn.dataset.achar.toUpperCase()}`);
+              });
+            });
+
+            container.querySelectorAll('.pop-ablend-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                state.photo.blend = btn.dataset.ablend;
+                const sel = document.getElementById('photoBlendSelect');
+                if (sel) sel.value = btn.dataset.ablend;
+                container.querySelectorAll('.pop-ablend-btn').forEach(b => {
+                  b.className = b.dataset.ablend === state.photo.blend
+                    ? 'pop-ablend-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 bg-cyber-yellow/20 border-cyber-yellow text-cyber-yellow'
+                    : 'pop-ablend-btn py-1 px-1 rounded text-[9px] font-bold border transition active:scale-95 bg-white/5 border-white/10 text-slate-300';
+                });
+                showGestureToast(`BLEND: ${btn.dataset.ablend.toUpperCase()}`);
+              });
+            });
+
+            const invChk = container.querySelector('#popAsciiInvertChk');
+            if (invChk) {
+              invChk.addEventListener('change', (e) => {
+                state.photo.invert = e.target.checked;
+                const domInv = document.getElementById('photoInvertCheck');
+                if (domInv) domInv.checked = e.target.checked;
+              });
+            }
+
+            const knobsBtn = container.querySelector('#popOpenAsciiKnobsBtn');
+            if (knobsBtn) {
+              knobsBtn.addEventListener('click', () => {
+                selectSubEngine('ascii');
+                closeSidePopovers();
+                showGestureToast('🔠 ASCII KNOBS ACTIVE');
+              });
+            }
+          });
+        });
+      }
+
+      const sideResetTransformBtn = document.getElementById('sideResetTransformBtn');
+      if (sideResetTransformBtn) {
+        sideResetTransformBtn.addEventListener('click', () => {
+          setSliderValue('photoScaleRange', 100);
+          setSliderValue('photoPanXRange', 0);
+          setSliderValue('photoPanYRange', 0);
+          showGestureToast('↺ TRANSFORM RESET');
+        });
+      }
+
+      // 7. VIBES WINGS
+      const sideVibeGraphicBtn = document.getElementById('sideVibeGraphicBtn');
+      if (sideVibeGraphicBtn) {
+        sideVibeGraphicBtn.addEventListener('click', () => {
+          openLeftPopover('CYBER FRAME & COLOR', (container) => {
+            const frames = [
+              { key: 'none', name: '🚫 None (Clean)' },
+              { key: 'mechaHudGlyphs', name: '🤖 Mecha HUD Glyphs' },
+              { key: 'cyberHeart', name: '💖 Cyber Heart Vector' },
+              { key: 'circuitTraces', name: '⚡ Circuit Board Traces' },
+              { key: 'sakuraSumiE', name: '🌸 Sakura Sumi-e' },
+              { key: 'neoTokyoPoster', name: '⛩️ Neo-Tokyo Poster' },
+              { key: 'asciiSkull', name: '💀 ASCII Skull Matrix' }
+            ];
+            frames.forEach(f => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              const isCur = (state.vibe.graphic === f.key);
+              btn.className = `w-full py-1.5 px-2 mb-1 text-left rounded-lg text-xs font-bold transition active:scale-95 flex items-center justify-between ${isCur ? 'bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan' : 'bg-white/5 border border-white/10 text-slate-300 hover:border-cyber-cyan/40'}`;
+              btn.innerHTML = `<span>${f.name}</span>`;
+              btn.addEventListener('click', () => {
+                state.vibe.graphic = f.key;
+                document.querySelectorAll('.vibe-graphic-btn').forEach(b => {
+                  b.className = b.dataset.graphic === f.key
+                    ? 'vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold'
+                    : 'vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
+                });
+                closeSidePopovers();
+                showGestureToast(`FRAME: ${f.name}`);
+              });
+              container.appendChild(btn);
+            });
+
+            const colBox = document.createElement('div');
+            colBox.className = 'pt-1.5 mt-1 border-t border-white/10 flex items-center justify-between gap-2';
+            colBox.innerHTML = `
+              <span class="text-[9px] text-slate-400 font-bold">LINE COLOR:</span>
+              <div class="flex items-center gap-1.5">
+                <input type="color" id="popVibeColInput" value="${state.vibe.graphicColor}" class="w-7 h-6 rounded bg-transparent border border-cyber-border cursor-pointer">
+                <button type="button" id="popVibeSyncColBtn" class="px-2 py-1 rounded bg-cyber-card border border-cyber-border text-[9px] text-cyber-cyan font-bold active:scale-95">Sync Glow</button>
+              </div>
+            `;
+            container.appendChild(colBox);
+
+            const vcIn = colBox.querySelector('#popVibeColInput');
+            const domVc = document.getElementById('vibeGraphicColorInput');
+            vcIn.addEventListener('input', (e) => {
+              state.vibe.graphicColor = e.target.value;
+              if (domVc) domVc.value = e.target.value;
+            });
+            const syncBtn = colBox.querySelector('#popVibeSyncColBtn');
+            if (syncBtn) {
+              syncBtn.addEventListener('click', () => {
+                state.vibe.graphicColor = state.type.glowColor;
+                vcIn.value = state.type.glowColor;
+                if (domVc) domVc.value = state.type.glowColor;
+                showGestureToast('🎨 FRAME SYNCED TO GLOW');
+              });
+            }
+          });
+        });
+      }
+
+      const sideVibeLayerBtn = document.getElementById('sideVibeLayerBtn');
+      if (sideVibeLayerBtn) {
+        sideVibeLayerBtn.addEventListener('click', () => {
+          const nextLayer = (state.vibe.graphicLayer === 'frame') ? 'background' : 'frame';
+          state.vibe.graphicLayer = nextLayer;
+          const layerSelect = document.getElementById('vibeGraphicLayerSelect');
+          if (layerSelect) layerSelect.value = nextLayer;
+          const lbl = document.getElementById('sideVibeLayerLabel');
+          if (lbl) lbl.textContent = nextLayer === 'frame' ? 'FRONT' : 'BACK';
+          showGestureToast(`LAYER: ${nextLayer.toUpperCase()}`);
+        });
+      }
+
+      const sideVibePresetBtn = document.getElementById('sideVibePresetBtn');
+      if (sideVibePresetBtn) {
+        sideVibePresetBtn.addEventListener('click', () => {
+          openRightPopover('1-TAP AESTHETIC PRESETS', (container) => {
+            const presets = [
+              { key: 'cyberHyper', name: 'CYBER HYPER', color: '#00ffcc', desc: 'Neon cyan, tear sort & chromatic drift' },
+              { key: 'acidVapor', name: 'ACID VAPOR', color: '#ffe600', desc: 'Toxic lime dripping, high-key saturation' },
+              { key: 'analogVhs', name: 'ANALOG VHS', color: '#b026ff', desc: 'Heavy tape scanlines, P-frame melt' },
+              { key: 'brutalRed', name: 'BRUTAL RED', color: '#ff0055', desc: 'Editorial poster, jagged slice shears' },
+              { key: 'meltVoid', name: 'MELT VOID', color: '#ffffff', desc: 'Transparent pure drift feedback' }
+            ];
+            presets.forEach(p => {
+              const card = document.createElement('button');
+              card.type = 'button';
+              card.className = 'w-full p-2 rounded-xl bg-cyber-card border border-cyber-border text-left active:scale-95 transition hover:border-white/40 mb-1';
+              card.innerHTML = `<div class="text-[11px] font-bold" style="color:${p.color}">${p.name}</div><div class="text-[9px] text-slate-400">${p.desc}</div>`;
+              card.addEventListener('click', () => {
+                applyVibePreset(p.key);
+                closeSidePopovers();
+                showGestureToast(`PRESET: ${p.name}`);
+              });
+              container.appendChild(card);
+            });
+          });
+        });
+      }
+
+      const sidePaletteShuffleBtn = document.getElementById('sidePaletteShuffleBtn');
+      if (sidePaletteShuffleBtn) {
+        sidePaletteShuffleBtn.addEventListener('click', () => {
+          const palBtn = document.getElementById('paletteBtn');
+          if (palBtn) palBtn.click();
+          showGestureToast('🎨 PALETTE SHUFFLED');
+        });
+      }
+
+      // Set initial module state: TEXT
+      selectModule(currentModuleKey);
+
+      // Text Input & Quick Capsule Synchronization
       const textInput = document.getElementById('textInput');
+      const topTextInput = document.getElementById('topTextInput');
+      const clearTopTextBtn = document.getElementById('clearTopTextBtn');
       let typingTimer = null;
-      textInput.addEventListener('input', (e) => {
-        state.type.text = e.target.value;
-        state.isTyping = true;
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(() => {
+
+      if (textInput) {
+        textInput.addEventListener('input', (e) => {
+          state.type.text = e.target.value;
+          if (topTextInput) topTextInput.value = e.target.value;
+          state.isTyping = true;
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(() => { state.isTyping = false; }, 220);
+        });
+        textInput.addEventListener('blur', () => {
           state.isTyping = false;
-        }, 220);
-      });
-      textInput.addEventListener('blur', () => {
-        state.isTyping = false;
-      });
+        });
+      }
+
+      if (topTextInput) {
+        topTextInput.addEventListener('input', (e) => {
+          state.type.text = e.target.value;
+          if (textInput) textInput.value = e.target.value;
+          state.isTyping = true;
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(() => { state.isTyping = false; }, 220);
+        });
+        if (clearTopTextBtn) {
+          clearTopTextBtn.addEventListener('click', () => {
+            topTextInput.value = '';
+            if (textInput) textInput.value = '';
+            state.type.text = '';
+          });
+        }
+      }
 
       document.getElementById('fontSelect').addEventListener('change', (e) => state.type.fontFamily = e.target.value);
       document.getElementById('fillColorInput').addEventListener('input', (e) => state.type.fillColor = e.target.value);
@@ -5301,6 +7994,39 @@ RAW SIGNAL</textarea>
         state.fx.customBg = false;
       });
 
+      // Sync Suppression Controls
+      const syncActiveCheck = document.getElementById('syncActiveCheck');
+      if (syncActiveCheck) {
+        syncActiveCheck.addEventListener('change', (e) => {
+          state.fx.sync.active = e.target.checked;
+          const sideBtn = document.getElementById('sideSyncToggleBtn');
+          if (sideBtn) sideBtn.classList.toggle('active', state.fx.sync.active);
+        });
+      }
+
+      const syncDirectionSelect = document.getElementById('syncDirectionSelect');
+      if (syncDirectionSelect) {
+        syncDirectionSelect.addEventListener('change', (e) => {
+          state.fx.sync.direction = e.target.value;
+          const lbl = document.getElementById('sideSyncDirLabel');
+          if (lbl) {
+            lbl.textContent = state.fx.sync.direction === 'horizontal' ? 'HORIZ' : (state.fx.sync.direction === 'vertical' ? 'VERT' : 'DIAG');
+          }
+        });
+      }
+
+      const syncColorInput = document.getElementById('syncColorInput');
+      if (syncColorInput) {
+        syncColorInput.addEventListener('input', (e) => {
+          state.fx.sync.color = e.target.value;
+        });
+      }
+
+      bind('syncWidthRange', state.fx.sync, 'width', 'syncWidthLabel', '%');
+      bind('syncSpeedRange', state.fx.sync, 'speed', 'syncSpeedLabel', 'x', 0.1);
+      bind('syncNoiseRange', state.fx.sync, 'noise', 'syncNoiseLabel', '%');
+      bind('syncTearRange', state.fx.sync, 'tear', 'syncTearLabel', '%');
+
       // Quick Color Palette Shuffle Button
       const paletteBtn = document.getElementById('paletteBtn');
       if (paletteBtn) {
@@ -5468,6 +8194,7 @@ RAW SIGNAL</textarea>
       if (id.startsWith('sort')) return '#00ffcc';
       if (id.startsWith('mosh') || id.startsWith('motion') || id.startsWith('speed3D') || id.startsWith('vector') || id.startsWith('pframe') || id.startsWith('chroma')) return '#ff0055';
       if (id.startsWith('rgb') || id.startsWith('scanlines') || id.startsWith('noise')) return '#39ff14';
+      if (id.startsWith('sync')) return '#ffe600';
       if (id.startsWith('ascii') || id.startsWith('photo')) return '#ffe600';
       if (id.startsWith('vibe')) return '#00ffcc';
       return '#00ffcc';
@@ -5581,34 +8308,120 @@ RAW SIGNAL</textarea>
       });
     }
 
-    // ===== Integrated Knob Dock: relocate a few key knobs directly onto the text screen =====
-    function buildCanvasDock() {
-      const dock = document.getElementById('canvasKnobDock');
-      if (!dock) return;
-      const items = [
-        { id: 'fontSizeRange', label: 'SIZE' },
-        { id: 'moshSmearRange', label: 'SMEAR' },
-        { id: 'rgbSplitRange', label: 'RGB' }
-      ];
-      items.forEach(({ id, label }) => {
-        const input = document.getElementById(id);
-        if (!input) return;
-        const wrap = input.closest('.synth-knob');
-        if (!wrap) return;
-        wrap.classList.add('dock-knob');
-        const tag = document.createElement('span');
-        tag.className = 'dock-knob-label';
-        tag.textContent = label;
-        wrap.insertBefore(tag, wrap.firstChild);
-        dock.appendChild(wrap);
+    // ===== BASE DECK DYNAMIC 3-KNOB CONTROLLER ENGINE =====
+    function initBaseDeckKnobs() {
+      [1, 2, 3].forEach((num, index) => {
+        const dial = document.getElementById(`vmKnob${num}Dial`);
+        if (!dial) return;
+
+        let dragging = false, startY = 0, startVal = 0;
+
+        function getActiveInput() {
+          return getActiveKnobInput(index);
+        }
+
+        function down(clientY) {
+          const input = getActiveInput();
+          if (!input) return;
+          dragging = true;
+          startY = clientY;
+          startVal = parseFloat(input.value) || 0;
+          dial.classList.add('active');
+        }
+
+        function move(clientY) {
+          if (!dragging) return;
+          const input = getActiveInput();
+          if (!input) return;
+          const min = parseFloat(input.min) || 0;
+          const max = parseFloat(input.max) || 100;
+          const span = max - min || 1;
+          const step = parseFloat(input.step) || 1;
+          const deltaY = startY - clientY;
+          const sensitivity = span / 160;
+          let newVal = startVal + deltaY * sensitivity;
+          newVal = Math.min(max, Math.max(min, newVal));
+          newVal = Math.round(newVal / step) * step;
+          if (newVal !== parseFloat(input.value)) {
+            input.value = newVal;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            updateBaseKnob(index);
+          }
+        }
+
+        function up() {
+          dragging = false;
+          dial.classList.remove('active');
+        }
+
+        dial.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          try { dial.setPointerCapture(e.pointerId); } catch (err) {}
+          down(e.clientY);
+        });
+        dial.addEventListener('pointermove', (e) => {
+          if (dragging) {
+            e.preventDefault();
+            move(e.clientY);
+          }
+        });
+        dial.addEventListener('pointerup', (e) => {
+          try { dial.releasePointerCapture(e.pointerId); } catch (err) {}
+          up();
+        });
+        dial.addEventListener('pointercancel', (e) => {
+          try { dial.releasePointerCapture(e.pointerId); } catch (err) {}
+          up();
+        });
+
+        dial.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          down(e.touches[0].clientY);
+        }, { passive: false });
+        dial.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          move(e.touches[0].clientY);
+        }, { passive: false });
+        dial.addEventListener('touchend', up);
+        dial.addEventListener('touchcancel', up);
+
+        dial.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const input = getActiveInput();
+          if (!input) return;
+          const min = parseFloat(input.min) || 0;
+          const max = parseFloat(input.max) || 100;
+          const span = max - min || 1;
+          const step = parseFloat(input.step) || 1;
+          const stepDelta = (e.deltaY < 0 ? 1 : -1) * (step || 1) * Math.max(1, span / 50);
+          let newVal = (parseFloat(input.value) || 0) + stepDelta;
+          newVal = Math.min(max, Math.max(min, newVal));
+          newVal = Math.round(newVal / step) * step;
+          if (newVal !== parseFloat(input.value)) {
+            input.value = newVal;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            updateBaseKnob(index);
+          }
+        }, { passive: false });
+
+        dial.addEventListener('dblclick', () => {
+          const input = getActiveInput();
+          if (!input) return;
+          const defVal = input.getAttribute('value') || input.min || 0;
+          setSliderValue(input.id, defVal);
+          updateBaseKnob(index);
+        });
       });
+
+      bindBaseDeckKnobs();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       initUI();
       initTouchGestures();
       synthifyKnobs();
-      buildCanvasDock();
+      selectModule('text');
+      initBaseDeckKnobs();
       requestAnimationFrame(render);
     });
   </script>
