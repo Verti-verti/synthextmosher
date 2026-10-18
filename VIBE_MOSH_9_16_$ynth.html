@@ -643,11 +643,15 @@ RAW SIGNAL</textarea>
       </button>
     </div>
 
-    <!-- Pixel Sort Module Tools: Direction -->
+    <!-- Pixel Sort Module Tools: Direction & Line Style/Pattern -->
     <div id="wingGroupSortLeft" class="hidden flex flex-col gap-2">
       <button id="sideSortDirBtn" type="button" class="side-wing-btn" title="Sort Direction">
         <span id="sideSortDirIcon" class="text-sm">💧</span>
         <span id="sideSortDirLabel" class="text-[8px] font-bold text-slate-300">DOWN</span>
+      </button>
+      <button id="sideSortStyleBtn" type="button" class="side-wing-btn" title="Streak Line Thickness, Pattern Wideness & Speed">
+        <span class="text-sm">📏</span>
+        <span id="sideSortStyleLabel" class="text-[8px] font-bold text-slate-300">LINES</span>
       </button>
     </div>
 
@@ -772,8 +776,12 @@ RAW SIGNAL</textarea>
       </button>
     </div>
 
-    <!-- Media Module: ASCII Mode & Reset -->
+    <!-- Media Module: Depth Mask/Edges, ASCII Mode & Reset -->
     <div id="wingGroupPhotoRight" class="hidden flex flex-col gap-2">
+      <button id="sideMediaMaskBtn" type="button" class="side-wing-btn" title="Depth Mask, Edge Detection, Saturation & Lightness">
+        <span class="text-sm">🎭</span>
+        <span class="text-[8px] font-bold text-slate-300">MASK</span>
+      </button>
       <button id="sideAsciiModeBtn" type="button" class="side-wing-btn" title="ASCII & Render Menu">
         <span class="text-sm">🔠</span>
         <span class="text-[8px] font-bold text-slate-300">ASCII</span>
@@ -1267,14 +1275,40 @@ RAW SIGNAL</textarea>
           </div>
         </div>
 
-        <!-- Exposure, Brightness & Gamma -->
-        <div class="grid grid-cols-2 gap-3 pt-1 border-t border-cyber-border/60">
+        <!-- Depth Mask, Edge Detection, Saturation, Lightness & Gamma -->
+        <div class="grid grid-cols-3 gap-2 pt-1 border-t border-cyber-border/60">
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
-              <span>☀️ Media Brightness</span>
+              <span>🎭 Depth Thresh</span>
+              <span id="photoThresholdLabel" class="text-cyber-cyan">0%</span>
+            </div>
+            <input type="range" id="photoThresholdRange" min="0" max="95" value="0">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>⚡ Edge Detect</span>
+              <span id="photoEdgeLabel" class="text-cyber-pink">0%</span>
+            </div>
+            <input type="range" id="photoEdgeRange" min="0" max="100" value="0">
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>🌈 Saturation</span>
+              <span id="photoSaturationLabel" class="text-cyber-pink">100%</span>
+            </div>
+            <input type="range" id="photoSaturationRange" min="0" max="300" value="100">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>☀️ Lightness</span>
               <span id="photoBrightnessLabel" class="text-cyber-yellow">115%</span>
             </div>
-            <input type="range" id="photoBrightnessRange" min="50" max="220" value="115">
+            <input type="range" id="photoBrightnessRange" min="30" max="220" value="115">
           </div>
 
           <div class="space-y-0.5">
@@ -1370,9 +1404,34 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Streak Length</span>
-              <span id="sortLengthLabel" class="text-cyber-cyan">340px</span>
+              <span id="sortLengthLabel" class="text-cyber-cyan">85px</span>
             </div>
-            <input type="range" id="sortLengthRange" min="30" max="800" value="340">
+            <input type="range" id="sortLengthRange" min="15" max="600" value="85">
+          </div>
+        </div>
+
+        <!-- Streak Thickness, Pattern Wideness & Animation Speed -->
+        <div class="grid grid-cols-3 gap-2">
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Line Thick</span>
+              <span id="sortThicknessLabel" class="text-cyber-cyan">2px</span>
+            </div>
+            <input type="range" id="sortThicknessRange" min="1" max="16" value="2">
+          </div>
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Pattern Wide</span>
+              <span id="sortSpreadLabel" class="text-cyber-yellow">32%</span>
+            </div>
+            <input type="range" id="sortSpreadRange" min="5" max="100" value="32">
+          </div>
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Flow Speed</span>
+              <span id="sortSpeedLabel" class="text-cyber-pink">0.8x</span>
+            </div>
+            <input type="range" id="sortSpeedRange" min="0" max="30" value="8">
           </div>
         </div>
 
@@ -1381,9 +1440,9 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Min Threshold</span>
-              <span id="sortLowLabel" class="text-cyber-cyan">18%</span>
+              <span id="sortLowLabel" class="text-cyber-cyan">20%</span>
             </div>
-            <input type="range" id="sortLowRange" min="0" max="100" value="18">
+            <input type="range" id="sortLowRange" min="0" max="100" value="20">
           </div>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
@@ -1858,9 +1917,9 @@ RAW SIGNAL</textarea>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[9px] text-slate-400">
                 <span>Roll Speed</span>
-                <span id="syncSpeedLabel" class="text-cyber-yellow">1.2x</span>
+                <span id="syncSpeedLabel" class="text-cyber-yellow">2.4x</span>
               </div>
-              <input type="range" id="syncSpeedRange" min="-50" max="50" value="12">
+              <input type="range" id="syncSpeedRange" min="-100" max="100" value="24">
             </div>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[9px] text-slate-400">
@@ -2105,25 +2164,32 @@ RAW SIGNAL</textarea>
         charSet: 'blocks', // 'blocks', 'standard', 'matrix', 'binary', 'katakana'
         cellSize: 12,
         contrast: 1.2,
-        brightness: 115, // Brightness boost % (50 to 220, default 115)
-        gamma: 1.0,      // Gamma midtone lift (0.5 to 2.5, default 1.0)
-        scale: 1.0,      // Zoom / scale (0.3 to 3.5, default 1.0)
-        rotation: 0,     // Rotation angle in degrees (-180 to +180, default 0)
-        panX: 0,         // Pan X offset (-400 to +400, default 0)
-        panY: 0,         // Pan Y offset (-600 to +600, default 0)
+        brightness: 115,     // Lightness / Brightness % (30 to 220, default 115)
+        saturation: 100,     // Color Saturation % (0 to 300, default 100)
+        gamma: 1.0,          // Gamma midtone lift (0.5 to 2.5, default 1.0)
+        edgeDetect: 0,       // Sobel / gradient edge detection (0 to 100%)
+        depthThreshold: 0,   // Luma depth mask / threshold cutout (0 to 95%)
+        scale: 1.0,          // Zoom / scale (0.3 to 3.5, default 1.0)
+        rotation: 0,         // Rotation angle in degrees (-180 to +180, default 0)
+        panX: 0,             // Pan X offset (-400 to +400, default 0)
+        panY: 0,             // Pan Y offset (-600 to +600, default 0)
         opacity: 100,
         invert: false,
         blend: 'behind' // 'behind', 'inFront', 'photoOnly'
       },
 
-      // Pixel Sorter
+      // Pixel Sorter (Subtle Linear Streak Defaults — Readable Text + Crisp Lines)
       sort: {
         active: true,
         direction: 'vertical', // 'vertical', 'horizontal', 'diagonal'
         criterion: 'brightness',
-        thresholdLow: 18,
+        thresholdLow: 20,
         thresholdHigh: 100,
-        maxLength: 340
+        maxLength: 85,         // 15 - 600px (Dialed down default so text stays readable)
+        thickness: 2,          // 1 - 16px (Thickness of individual linear streaks)
+        spread: 32,            // 5 - 100% (Wideness/density of streak pattern across glyphs)
+        speed: 0.8,            // 0.0 - 3.0x (Animation speed of streaks)
+        phase: 0
       },
 
       // Heatmap & Wireframe Engine
@@ -2185,7 +2251,7 @@ RAW SIGNAL</textarea>
           active: false,
           direction: 'horizontal', // 'horizontal' | 'vertical' | 'diagonal'
           width: 18,               // 2 - 60%
-          speed: 12,               // -50 to +50
+          speed: 24,               // -100 to +100 (faster roll default)
           pos: 0.35,               // 0.0 - 1.0
           color: '#000000',        // bar color
           noise: 65,               // 0 - 100%
@@ -2302,31 +2368,31 @@ RAW SIGNAL</textarea>
     const PRESETS = {
       cyberHyper: {
         type: { fontFamily: "Syne, sans-serif", layout: 'stack', fontSize: 100, fillColor: '#ffffff', fillColor2: '#ffe600', strokeColor: '#ff0055', glowColor: '#00ffcc', radius3D: 260, speed3D: 1.0 },
-        sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 20, thresholdHigh: 90, maxLength: 300 },
+        sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 20, thresholdHigh: 95, maxLength: 95, thickness: 2, spread: 34, speed: 0.9 },
         mosh: { active: true, smear: 50, macroblocks: 40, sliceShear: 28, vectorMoshActive: true, pframeMode: 'melt', vectorForce: 30, persistence: 65, blockSize: 16, chromaBleed: 14 },
         fx: { active: true, rgbSplit: 18, rgbAngle: 15, scanlines: 45, noise: 25, bgMode: 'cyberGradient', customBg: false }
       },
       acidVapor: {
         type: { fontFamily: "Rubik Glitch, cursive", layout: 'spiral', fontSize: 95, fillColor: '#39ff14', fillColor2: '#ffe600', strokeColor: '#ffe600', glowColor: '#ffe600', radius3D: 280, speed3D: 1.2 },
-        sort: { active: true, direction: 'vertical', criterion: 'saturation', thresholdLow: 15, thresholdHigh: 95, maxLength: 360 },
+        sort: { active: true, direction: 'vertical', criterion: 'saturation', thresholdLow: 15, thresholdHigh: 98, maxLength: 110, thickness: 2, spread: 38, speed: 1.0 },
         mosh: { active: true, smear: 40, macroblocks: 30, sliceShear: 32, vectorMoshActive: true, pframeMode: 'shear', vectorForce: 38, persistence: 70, blockSize: 16, chromaBleed: 18 },
         fx: { active: true, rgbSplit: 22, rgbAngle: 90, scanlines: 35, noise: 35, bgMode: 'acidLime', customBg: false }
       },
       analogVhs: {
         type: { fontFamily: "Bebas Neue, sans-serif", layout: 'cube', fontSize: 130, fillColor: '#e2d5ff', fillColor2: '#ff0055', strokeColor: '#b026ff', glowColor: '#b026ff', radius3D: 240, speed3D: 0.8 },
-        sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 30, thresholdHigh: 80, maxLength: 180 },
+        sort: { active: true, direction: 'horizontal', criterion: 'brightness', thresholdLow: 28, thresholdHigh: 90, maxLength: 75, thickness: 3, spread: 28, speed: 0.6 },
         mosh: { active: true, smear: 75, macroblocks: 20, sliceShear: 20, vectorMoshActive: true, pframeMode: 'melt', vectorForce: 24, persistence: 75, blockSize: 24, chromaBleed: 10 },
         fx: { active: true, rgbSplit: 24, rgbAngle: 0, scanlines: 75, noise: 55, bgMode: 'cyberGradient', customBg: false }
       },
       brutalRed: {
         type: { fontFamily: "Anton, sans-serif", layout: 'sphere', fontSize: 120, fillColor: '#ffffff', fillColor2: '#ff0055', strokeColor: '#ff0055', glowColor: '#ff0055', radius3D: 270, speed3D: 1.1 },
-        sort: { active: true, direction: 'vertical', criterion: 'red', thresholdLow: 10, thresholdHigh: 90, maxLength: 320 },
+        sort: { active: true, direction: 'vertical', criterion: 'red', thresholdLow: 15, thresholdHigh: 95, maxLength: 105, thickness: 3, spread: 35, speed: 1.1 },
         mosh: { active: true, smear: 30, macroblocks: 50, sliceShear: 45, vectorMoshActive: true, pframeMode: 'shear', vectorForce: 45, persistence: 65, blockSize: 8, chromaBleed: 22 },
         fx: { active: true, rgbSplit: 12, rgbAngle: 45, scanlines: 50, noise: 30, bgMode: 'monochrome', customBg: false }
       },
       meltVoid: {
         type: { fontFamily: "Space Mono, monospace", layout: 'marquee', fontSize: 75, fillColor: '#ffffff', fillColor2: '#00ffcc', strokeColor: '#00ffcc', glowColor: '#00ffcc', radius3D: 260, speed3D: 1.0 },
-        sort: { active: true, direction: 'vertical', criterion: 'brightness', thresholdLow: 25, thresholdHigh: 90, maxLength: 400 },
+        sort: { active: true, direction: 'vertical', criterion: 'brightness', thresholdLow: 22, thresholdHigh: 96, maxLength: 120, thickness: 1, spread: 42, speed: 1.2 },
         mosh: { active: true, smear: 80, macroblocks: 25, sliceShear: 15, vectorMoshActive: true, pframeMode: 'melt', vectorForce: 35, persistence: 78, blockSize: 16, chromaBleed: 16 },
         fx: { active: true, rgbSplit: 15, rgbAngle: 120, scanlines: 20, noise: 15, bgMode: 'deepVoid', customBg: false }
       }
@@ -2724,12 +2790,16 @@ RAW SIGNAL</textarea>
       const centerY = HEIGHT / 2 + (pState.panY || 0);
       const rotRad = ((pState.rotation || 0) * Math.PI) / 180;
 
-      const bVal = pState.brightness || 115;
+      const bVal = pState.brightness !== undefined ? pState.brightness : 115;
       const cVal = Math.round((pState.contrast || 1.2) * 100);
+      const satVal = pState.saturation !== undefined ? pState.saturation : 100;
+      const edgeAmt = (pState.edgeDetect || 0) / 100;
+      const depthThresh = (pState.depthThreshold || 0) / 100;
+      const gamma = pState.gamma || 1.0;
 
       photoSourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
       photoSourceCtx.save();
-      photoSourceCtx.filter = `brightness(${bVal}%) contrast(${cVal}%)`;
+      photoSourceCtx.filter = `brightness(${bVal}%) contrast(${cVal}%) saturate(${satVal}%)`;
       photoSourceCtx.translate(centerX, centerY);
       if (rotRad !== 0) {
         photoSourceCtx.rotate(rotRad);
@@ -2738,6 +2808,84 @@ RAW SIGNAL</textarea>
       photoSourceCtx.restore();
       photoSourceCtx.filter = 'none';
 
+      // Real-time Depth Mask Threshold, Sobel Edge Detection, Gamma & Invert Pass
+      const srcImgData = photoSourceCtx.getImageData(0, 0, WIDTH, HEIGHT);
+      const srcData = srcImgData.data;
+
+      if (edgeAmt > 0 || depthThresh > 0 || (pState.mode !== 'ascii' && (pState.invert || gamma !== 1.0))) {
+        const w = WIDTH;
+        const h = HEIGHT;
+        const feather = 0.085;
+        const invGamma = gamma !== 1.0 ? (1.0 / gamma) : 1.0;
+
+        for (let y = 0; y < h; y++) {
+          const rowOff = y * w * 4;
+          const nextRowOff = (y < h - 1 ? (y + 1) : y) * w * 4;
+          for (let x = 0; x < w; x++) {
+            const idx = rowOff + (x << 2);
+            const a = srcData[idx + 3];
+            if (a < 8) continue;
+
+            let r = srcData[idx];
+            let g = srcData[idx + 1];
+            let b = srcData[idx + 2];
+
+            // Compute spatial edge gradient (fast 2D Sobel-like difference) before modifying pixel
+            let edgeNorm = 0;
+            if (edgeAmt > 0) {
+              const rIdx = rowOff + ((x < w - 1 ? x + 1 : x) << 2);
+              const dIdx = nextRowOff + (x << 2);
+              const gx = Math.abs(r - srcData[rIdx]) + Math.abs(g - srcData[rIdx + 1]) + Math.abs(b - srcData[rIdx + 2]);
+              const gy = Math.abs(r - srcData[dIdx]) + Math.abs(g - srcData[dIdx + 1]) + Math.abs(b - srcData[dIdx + 2]);
+              edgeNorm = Math.min(1.0, ((gx + gy) / 380) * (0.65 + edgeAmt * 1.85));
+            }
+
+            if (pState.invert) {
+              r = 255 - r;
+              g = 255 - g;
+              b = 255 - b;
+            }
+
+            if (invGamma !== 1.0) {
+              r = Math.pow(r / 255, invGamma) * 255;
+              g = Math.pow(g / 255, invGamma) * 255;
+              b = Math.pow(b / 255, invGamma) * 255;
+            }
+
+            const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            // Effective depth combines luminance and detected edges so strong edges survive depth masking
+            const depthVal = Math.min(1.0, lum + edgeNorm * 0.55);
+
+            // 1. Apply Luma Depth Mask Threshold (keys out background below threshold)
+            let outAlpha = a;
+            if (depthThresh > 0) {
+              if (depthVal < depthThresh - feather) {
+                srcData[idx + 3] = 0;
+                continue;
+              } else if (depthVal < depthThresh) {
+                outAlpha = Math.round(a * ((depthVal - (depthThresh - feather)) / feather));
+              }
+            }
+
+            // 2. Apply Edge Detection boost (sharpens structural contours for overlays & downstream effects)
+            if (edgeAmt > 0) {
+              // At high edgeAmt, dim flat interiors slightly and ignite high-contrast glowing edges
+              const bodyKeep = 1.0 - edgeAmt * 0.62;
+              const edgeBoost = edgeNorm * edgeAmt * 255;
+              r = Math.min(255, r * bodyKeep + edgeBoost * 1.05);
+              g = Math.min(255, g * bodyKeep + edgeBoost * 1.15);
+              b = Math.min(255, b * bodyKeep + edgeBoost * 1.10);
+            }
+
+            srcData[idx] = r | 0;
+            srcData[idx + 1] = g | 0;
+            srcData[idx + 2] = b | 0;
+            srcData[idx + 3] = outAlpha;
+          }
+        }
+        photoSourceCtx.putImageData(srcImgData, 0, 0);
+      }
+
       if (pState.mode === 'direct') {
         pCtx.drawImage(photoSourceCanvas, 0, 0);
         return;
@@ -2745,8 +2893,10 @@ RAW SIGNAL</textarea>
 
       if (pState.mode === 'asciiOverlay') {
         pCtx.drawImage(photoSourceCanvas, 0, 0);
-        pCtx.fillStyle = 'rgba(0,0,0,0.35)';
-        pCtx.fillRect(0, 0, WIDTH, HEIGHT);
+        if (depthThresh <= 0) {
+          pCtx.fillStyle = 'rgba(0,0,0,0.35)';
+          pCtx.fillRect(0, 0, WIDTH, HEIGHT);
+        }
       }
 
       // ASCII generation
@@ -2754,7 +2904,6 @@ RAW SIGNAL</textarea>
       const cols = Math.floor(WIDTH / cSize);
       const rows = Math.floor(HEIGHT / cSize);
 
-      const srcData = photoSourceCtx.getImageData(0, 0, WIDTH, HEIGHT).data;
       const ramp = CHAR_RAMPS[pState.charSet] || CHAR_RAMPS.blocks;
       const rampLen = ramp.length;
       const contrast = pState.contrast || 1.2;
@@ -3696,12 +3845,18 @@ RAW SIGNAL</textarea>
       const data32 = new Uint32Array(img.data.buffer);
 
       const low = Math.max(0.02, (opt.thresholdLow || 0) / 100);
-      // Treat >= 88% high threshold as inclusive of pure white (1.0) so white/neon text always drips
       const rawHigh = (opt.thresholdHigh !== undefined ? opt.thresholdHigh : 100) / 100;
       const high = rawHigh >= 0.88 ? 1.01 : Math.max(low + 0.05, rawHigh);
-      const maxSpan = Math.min(Math.max(24, opt.maxLength || 340), sortMaxLen);
-      const tick = (state.mosh && state.mosh.tick) ? state.mosh.tick : 0;
-      const drift = tick * 0.28;
+
+      // Dialed-down default maxLength (85px) so text stays crisp & readable while streaks are subtly noticeable
+      const maxSpan = Math.min(Math.max(15, opt.maxLength !== undefined ? opt.maxLength : 85), sortMaxLen);
+      const lineThick = Math.max(1, Math.min(16, Math.round(opt.thickness !== undefined ? opt.thickness : 2)));
+      const spreadPct = Math.max(0.05, Math.min(1.0, (opt.spread !== undefined ? opt.spread : 32) / 100));
+      const flowSpeed = opt.speed !== undefined ? opt.speed : 0.8;
+
+      // Advance streak animation phase according to Flow Speed
+      opt.phase = (opt.phase || 0) + flowSpeed * 0.045;
+      const phase = opt.phase;
 
       const getMetric = (pixel) => {
         const r = pixel & 0xff;
@@ -3721,38 +3876,36 @@ RAW SIGNAL</textarea>
       const isVertical = opt.direction === 'vertical';
 
       if (isVertical) {
-        // Precompute coherent multi-width drip shafts & stepped border tear notches across X (Ref: big curtain drips + stepped notches)
+        // Precompute discrete, flat-edged LINE bands of width `lineThick` (NO smooth triangular fangs!)
         for (let x = 0; x < WIDTH; x++) {
-          const wideBand = (x / 26) | 0;       // 26px wide curtain shafts
-          const medBand = ((x + 9) / 8) | 0;   // 8px stepped rectangular notches
-          const fineBand = (x >> 1);           // 2px sharp icicle spikes
+          const bandIdx = (x / lineThick) | 0;
+          // Independent deterministic hash per line band so adjacent lines have discrete lengths, never triangular cones
+          const rawH1 = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
+          const hash1 = rawH1 - Math.floor(rawH1);
+          const rawH2 = Math.sin(bandIdx * 269.5 + 183.3) * 28461.7123;
+          const hash2 = rawH2 - Math.floor(rawH2);
 
-          const wWave = Math.sin(wideBand * 2.31 + drift * 0.35) * 0.5 + 0.5;
-          const mWave = Math.cos(medBand * 3.83 - drift * 0.52) * 0.5 + 0.5;
-          const fWave = Math.sin(fineBand * 7.19 + drift * 0.85) * 0.5 + 0.5;
+          // Pattern wideness / density gate with gentle kinetic breathing
+          const patMod = Math.sin(bandIdx * 0.55 - phase * 0.45) * 0.5 + 0.5;
+          const gateVal = hash1 * 0.78 + patMod * 0.22;
 
-          let dFactor;
-          if (wWave < 0.15 && mWave < 0.42) {
-            // Crisp reference island so intact letter edges contrast against huge vertical drips
-            dFactor = 0.05 + fWave * 0.08;
-          } else if (wWave > 0.58) {
-            // Massive curtain waterfall drip (up to 1.45x maxSpan)
-            dFactor = 0.78 + mWave * 0.48 + (fWave > 0.82 ? 0.22 : 0);
+          if (gateVal <= spreadPct) {
+            // Active straight line streak: uniform across all `lineThick` pixels of this line band
+            const animPulse = 0.68 + 0.32 * Math.sin(bandIdx * 3.71 + phase * 1.4);
+            sortDripFactors[x] = (0.25 + 0.75 * hash2) * animPulse;
           } else {
-            // Medium stepped glyph drip
-            dFactor = 0.28 + mWave * 0.54 + (fWave > 0.78 ? 0.26 : 0);
+            // Untouched column so the letters remain super crisp and readable
+            sortDripFactors[x] = 0;
           }
-          sortDripFactors[x] = dFactor;
-          // Stepped rectangular top-border teardown (bites into the top border of letters like the ref image)
-          sortTearSteps[x] = Math.min(38, ((dFactor * Math.min(34, maxSpan * 0.13) * (0.45 + mWave * 0.75)) | 0));
         }
 
-        // Process EVERY column (x++) so drips are solid and tear glyph borders completely
         for (let x = 0; x < WIDTH; x++) {
           const colDripFactor = sortDripFactors[x];
-          const tearStep = sortTearSteps[x];
-          const dripTailLimit = (maxSpan * colDripFactor) | 0;
-          const colPhase = Math.sin(x * 0.13 + drift * 1.4) * 3.8 + Math.cos(x * 0.045 - drift * 0.7) * 2.4;
+          if (colDripFactor <= 0.01) continue; // Keep non-streak columns 100% pristine!
+
+          const dripTailLimit = Math.max(4, (maxSpan * colDripFactor) | 0);
+          const bandIdx = (x / lineThick) | 0;
+          const lineFlowOffset = Math.sin(bandIdx * 2.13 - phase * 1.8) * 0.14;
 
           let y = 0;
           while (y < HEIGHT) {
@@ -3762,25 +3915,12 @@ RAW SIGNAL</textarea>
 
             if (val >= low && val <= high) {
               const startY = y;
-              // Anchor dark/background pixel just above the glyph for top-border step teardown & wood-grain contrast
-              const upperBgY = startY > 2 ? startY - 2 : 0;
-              const upperBgPixel = data32[upperBgY * WIDTH + x];
-              const upperBgVal = getMetric(upperBgPixel);
-
               let gLen = 0;
-              // Seed palette with dark/edge transition pixels so sorted drips have deep wood-grain ribs
-              for (let s = 0; s < 4; s++) {
-                sortVals[gLen] = upperBgVal + s * 0.01;
-                sortPixels[gLen] = upperBgPixel;
-                sortIndices[gLen] = gLen;
-                gLen++;
-              }
-
-              // Scan through the glyph (bridging small internal counter gaps up to 18px inside hollow letters like O, B, A, R)
               let gapCount = 0;
               let glyphEndY = startY;
-              const maxGlyphScan = Math.min(HEIGHT, startY + maxSpan);
+              const maxGlyphScan = Math.min(HEIGHT, startY + 220);
 
+              // Scan contiguous glyph stroke/fill without bridging across separate text lines
               while (y < maxGlyphScan) {
                 const curP = data32[y * WIDTH + x];
                 const curVal = getMetric(curP);
@@ -3795,95 +3935,78 @@ RAW SIGNAL</textarea>
                   }
                 } else {
                   gapCount++;
-                  // Capture anti-aliased border / glow fringe pixels just outside the glyph edge
-                  if (gapCount <= 3 && gLen < 124) {
+                  // Capture 2px of border/glow fringe at the trailing edge of the letter
+                  if (gapCount <= 2 && gLen < 124) {
                     sortVals[gLen] = curVal;
                     sortPixels[gLen] = curP;
                     sortIndices[gLen] = gLen;
                     gLen++;
                   }
-                  if (gapCount > 16) break;
+                  if (gapCount > 4) break;
                 }
                 y++;
               }
 
-              // Sort collected glyph + border + edge palette by metric
-              const sub = sortIndices.subarray(0, gLen);
-              sub.sort((a, b) => sortVals[a] - sortVals[b]);
+              if (gLen > 2) {
+                const sub = sortIndices.subarray(0, gLen);
+                sub.sort((a, b) => sortVals[a] - sortVals[b]);
 
-              // Extend the drip shaft far BELOW the bottom border of the glyph!
-              const shaftEndY = Math.min(HEIGHT - 1, glyphEndY + dripTailLimit);
-              const tearEndY = Math.min(glyphEndY, startY + tearStep);
+                const glyphH = Math.max(1, glyphEndY - startY);
+                // Keep the upper ~75% of the letter untouched so text is always easy to read;
+                // start the linear streak from the lower border zone of the glyph!
+                const borderAnchor = Math.min(8, (glyphH * 0.25) | 0);
+                const streakStartY = Math.max(startY, glyphEndY - borderAnchor);
+                const shaftEndY = Math.min(HEIGHT - 1, glyphEndY + dripTailLimit);
+                const shaftSpan = Math.max(1, shaftEndY - streakStartY);
+                const lastIdx = gLen - 1;
 
-              // 1. Top-border stepped teardown: push upper background/edge down into the top border of the letter
-              for (let ty = startY; ty < tearEndY; ty++) {
-                const origP = data32[ty * WIDTH + x];
-                data32[ty * WIDTH + x] = blendPixel32(upperBgPixel, origP, 220);
-              }
+                for (let dy = streakStartY; dy <= shaftEndY; dy++) {
+                  const destIdx = dy * WIDTH + x;
+                  const destP = data32[destIdx];
 
-              // 2. Extrude & sort-stretch the glyph and its border down the entire vertical drip shaft
-              const bodyStartY = tearEndY;
-              const shaftSpan = Math.max(1, shaftEndY - bodyStartY);
-              const lastIdx = gLen - 1;
+                  const prog = (dy - streakStartY) / shaftSpan; // 0.0 at glyph border -> 1.0 at line tip
+                  // Pure 1D linear gradient along the straight line (brightest glyph core -> border glow at tip)
+                  let sampleT = (1.0 - prog * 0.88) + lineFlowOffset * prog;
+                  if (sampleT > 0.999) sampleT = 0.999;
+                  else if (sampleT < 0.0) sampleT = 0.0;
 
-              for (let dy = bodyStartY; dy <= shaftEndY; dy++) {
-                const destIdx = dy * WIDTH + x;
-                const destP = data32[destIdx];
-                const destVal = getMetric(destP);
+                  const palIdx = sub[(sampleT * lastIdx) | 0];
+                  const sortedPixel = sortPixels[palIdx];
 
-                // If the drip passes through another bright letter below, absorb its pixels into the sorted palette
-                if (dy > glyphEndY && destVal >= low && destVal <= high && gLen < 126) {
-                  sortPixels[sub[(lastIdx * 0.85) | 0]] = destP;
+                  // Crisp linear streak with clean tip fade in the last 15%
+                  if (prog > 0.85) {
+                    const fadeAlpha = ((1.0 - prog) / 0.15 * 255) | 0;
+                    data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
+                  } else {
+                    data32[destIdx] = sortedPixel;
+                  }
                 }
 
-                const prog = (dy - bodyStartY) / shaftSpan; // 0.0 at glyph -> 1.0 at drip tip
-                // 2D liquid wood-grain interference wave (matches reference image's internal drip texture)
-                const grain = Math.sin(dy * 0.09 + colPhase + Math.cos(dy * 0.027 - x * 0.08) * 2.6) * 0.24;
-                let sampleT = (1.0 - prog * 0.78) + grain;
-                if (sampleT > 0.999) sampleT = 0.999;
-                else if (sampleT < 0.0) sampleT = 0.0;
-
-                const palIdx = sub[(sampleT * lastIdx) | 0];
-                const sortedPixel = sortPixels[palIdx];
-
-                // Smooth taper at the bottom 18% of the drip tail
-                if (prog > 0.82) {
-                  const fadeAlpha = ((1.0 - prog) / 0.18 * 255) | 0;
-                  data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
-                } else {
-                  data32[destIdx] = sortedPixel;
-                }
+                y = Math.max(y, shaftEndY + 1);
               }
-
-              y = shaftEndY + 1;
             } else {
               y++;
             }
           }
         }
       } else {
-        // Horizontal Tear / Diagonal Slant with coherent band teardown & long sorted streaks
+        // Horizontal Tear / Diagonal Slant with discrete straight LINE streaks
         const isDiag = opt.direction === 'diagonal';
         for (let y = 0; y < HEIGHT; y++) {
-          const wideBand = (y / 24) | 0;
-          const medBand = ((y + 7) / 7) | 0;
-          const fineBand = (y >> 1);
+          const bandIdx = (y / lineThick) | 0;
+          const rawH1 = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
+          const hash1 = rawH1 - Math.floor(rawH1);
+          const rawH2 = Math.sin(bandIdx * 269.5 + 183.3) * 28461.7123;
+          const hash2 = rawH2 - Math.floor(rawH2);
 
-          const wWave = Math.sin(wideBand * 2.41 + drift * 0.38) * 0.5 + 0.5;
-          const mWave = Math.cos(medBand * 3.67 - drift * 0.55) * 0.5 + 0.5;
-          const fWave = Math.sin(fineBand * 6.91 + drift * 0.82) * 0.5 + 0.5;
+          const patMod = Math.sin(bandIdx * 0.55 - phase * 0.45) * 0.5 + 0.5;
+          const gateVal = hash1 * 0.78 + patMod * 0.22;
+          if (gateVal > spreadPct) continue; // Keep non-streak rows 100% pristine!
 
-          let rowDripFactor;
-          if (wWave < 0.15 && mWave < 0.42) {
-            rowDripFactor = 0.05 + fWave * 0.08;
-          } else if (wWave > 0.58) {
-            rowDripFactor = 0.78 + mWave * 0.48 + (fWave > 0.82 ? 0.22 : 0);
-          } else {
-            rowDripFactor = 0.28 + mWave * 0.54 + (fWave > 0.78 ? 0.26 : 0);
-          }
-          const tearStep = Math.min(34, ((rowDripFactor * Math.min(30, maxSpan * 0.12) * (0.45 + mWave * 0.75)) | 0));
-          const dripTailLimit = (maxSpan * rowDripFactor) | 0;
-          const rowPhase = Math.sin(y * 0.12 + drift * 1.3) * 3.6;
+          const animPulse = 0.68 + 0.32 * Math.sin(bandIdx * 3.71 + phase * 1.4);
+          const rowDripFactor = (0.25 + 0.75 * hash2) * animPulse;
+          const dripTailLimit = Math.max(4, (maxSpan * rowDripFactor) | 0);
+          const lineFlowOffset = Math.sin(bandIdx * 2.13 - phase * 1.8) * 0.14;
 
           let x = 0;
           while (x < WIDTH) {
@@ -3894,22 +4017,10 @@ RAW SIGNAL</textarea>
 
             if (val >= low && val <= high) {
               const startX = x;
-              const leadBgX = startX > 2 ? startX - 2 : 0;
-              const leadBgPx = isDiag ? (leadBgX + y) % WIDTH : leadBgX;
-              const leadBgPixel = data32[y * WIDTH + leadBgPx];
-              const leadBgVal = getMetric(leadBgPixel);
-
               let gLen = 0;
-              for (let s = 0; s < 4; s++) {
-                sortVals[gLen] = leadBgVal + s * 0.01;
-                sortPixels[gLen] = leadBgPixel;
-                sortIndices[gLen] = gLen;
-                gLen++;
-              }
-
               let gapCount = 0;
               let glyphEndX = startX;
-              const maxGlyphScan = Math.min(WIDTH, startX + maxSpan);
+              const maxGlyphScan = Math.min(WIDTH, startX + 220);
 
               while (x < maxGlyphScan) {
                 const curPx = isDiag ? (x + y) % WIDTH : x;
@@ -3926,56 +4037,51 @@ RAW SIGNAL</textarea>
                   }
                 } else {
                   gapCount++;
-                  if (gapCount <= 3 && gLen < 124) {
+                  if (gapCount <= 2 && gLen < 124) {
                     sortVals[gLen] = curVal;
                     sortPixels[gLen] = curP;
                     sortIndices[gLen] = gLen;
                     gLen++;
                   }
-                  if (gapCount > 16) break;
+                  if (gapCount > 4) break;
                 }
                 x++;
               }
 
-              const sub = sortIndices.subarray(0, gLen);
-              sub.sort((a, b) => sortVals[a] - sortVals[b]);
+              if (gLen > 2) {
+                const sub = sortIndices.subarray(0, gLen);
+                sub.sort((a, b) => sortVals[a] - sortVals[b]);
 
-              const shaftEndX = Math.min(WIDTH - 1, glyphEndX + dripTailLimit);
-              const tearEndX = Math.min(glyphEndX, startX + tearStep);
+                const glyphW = Math.max(1, glyphEndX - startX);
+                const borderAnchor = Math.min(8, (glyphW * 0.25) | 0);
+                const streakStartX = Math.max(startX, glyphEndX - borderAnchor);
+                const shaftEndX = Math.min(WIDTH - 1, glyphEndX + dripTailLimit);
+                const shaftSpan = Math.max(1, shaftEndX - streakStartX);
+                const lastIdx = gLen - 1;
 
-              for (let tx = startX; tx < tearEndX; tx++) {
-                const writeX = isDiag ? (tx + y) % WIDTH : tx;
-                const origP = data32[y * WIDTH + writeX];
-                data32[y * WIDTH + writeX] = blendPixel32(leadBgPixel, origP, 220);
-              }
+                for (let dx = streakStartX; dx <= shaftEndX; dx++) {
+                  const writeX = isDiag ? (dx + y) % WIDTH : dx;
+                  const destIdx = y * WIDTH + writeX;
+                  const destP = data32[destIdx];
 
-              const bodyStartX = tearEndX;
-              const shaftSpan = Math.max(1, shaftEndX - bodyStartX);
-              const lastIdx = gLen - 1;
+                  const prog = (dx - streakStartX) / shaftSpan;
+                  let sampleT = (1.0 - prog * 0.88) + lineFlowOffset * prog;
+                  if (sampleT > 0.999) sampleT = 0.999;
+                  else if (sampleT < 0.0) sampleT = 0.0;
 
-              for (let dx = bodyStartX; dx <= shaftEndX; dx++) {
-                const writeX = isDiag ? (dx + y) % WIDTH : dx;
-                const destIdx = y * WIDTH + writeX;
-                const destP = data32[destIdx];
+                  const palIdx = sub[(sampleT * lastIdx) | 0];
+                  const sortedPixel = sortPixels[palIdx];
 
-                const prog = (dx - bodyStartX) / shaftSpan;
-                const grain = Math.sin(dx * 0.09 + rowPhase + Math.cos(dx * 0.025 - y * 0.08) * 2.5) * 0.24;
-                let sampleT = (1.0 - prog * 0.78) + grain;
-                if (sampleT > 0.999) sampleT = 0.999;
-                else if (sampleT < 0.0) sampleT = 0.0;
-
-                const palIdx = sub[(sampleT * lastIdx) | 0];
-                const sortedPixel = sortPixels[palIdx];
-
-                if (prog > 0.82) {
-                  const fadeAlpha = ((1.0 - prog) / 0.18 * 255) | 0;
-                  data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
-                } else {
-                  data32[destIdx] = sortedPixel;
+                  if (prog > 0.85) {
+                    const fadeAlpha = ((1.0 - prog) / 0.15 * 255) | 0;
+                    data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
+                  } else {
+                    data32[destIdx] = sortedPixel;
+                  }
                 }
-              }
 
-              x = shaftEndX + 1;
+                x = Math.max(x, shaftEndX + 1);
+              }
             } else {
               x++;
             }
@@ -4442,10 +4548,9 @@ RAW SIGNAL</textarea>
     function applySyncSuppression(targetCtx, sync, tick) {
       if (!sync || !sync.active) return;
 
-      // 1. Step rolling phase & vertical blanking position
-      const spd = (sync.speed !== undefined ? sync.speed : 12) * 0.0016;
-      sync.pos = ((sync.pos || 0) + spd);
-      if (sync.pos > 1) sync.pos -= 1;
+      // 1. Step rolling phase & vertical blanking position (Faster 1990s Cable Roll Speed)
+      const spd = (sync.speed !== undefined ? sync.speed : 24) * 0.0055;
+      sync.pos = ((sync.pos || 0) + spd) % 1;
       if (sync.pos < 0) sync.pos += 1;
 
       const direction = sync.direction || 'horizontal';
@@ -4471,7 +4576,7 @@ RAW SIGNAL</textarea>
         srcCanvas = syncScratchCanvas;
       }
 
-      const phase = sync.pos * Math.PI * 2 + (tick || 0) * 0.14;
+      const phase = sync.pos * Math.PI * 2 + (tick || 0) * 0.28;
       const primaryToothColor = hasCustomColor ? color : '#ff1e56';
       const secondaryToothColor = hasCustomColor ? color : '#ff6a00';
       const tertiaryToothColor = '#b829ff';
@@ -4777,14 +4882,23 @@ RAW SIGNAL</textarea>
           cleanCompositeCtx.restore();
           cleanCompositeCtx.drawImage(textCanvas, 0, 0);
         } else if (blend === 'inFront') {
-          cleanCompositeCtx.save();
-          cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
-          cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
-          cleanCompositeCtx.restore();
-          cleanCompositeCtx.save();
-          cleanCompositeCtx.globalCompositeOperation = 'difference';
-          cleanCompositeCtx.drawImage(textCanvas, 0, 0);
-          cleanCompositeCtx.restore();
+          if ((state.photo.depthThreshold || 0) > 0 || (state.photo.edgeDetect || 0) > 0) {
+            // Foreground Depth Mask / Edge Overlay in front of Text
+            cleanCompositeCtx.drawImage(textCanvas, 0, 0);
+            cleanCompositeCtx.save();
+            cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
+            cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
+            cleanCompositeCtx.restore();
+          } else {
+            cleanCompositeCtx.save();
+            cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
+            cleanCompositeCtx.drawImage(photoCanvas, 0, 0);
+            cleanCompositeCtx.restore();
+            cleanCompositeCtx.save();
+            cleanCompositeCtx.globalCompositeOperation = 'difference';
+            cleanCompositeCtx.drawImage(textCanvas, 0, 0);
+            cleanCompositeCtx.restore();
+          }
         } else if (blend === 'photoOnly') {
           cleanCompositeCtx.save();
           cleanCompositeCtx.globalAlpha = (state.photo.opacity || 100) / 100;
@@ -5848,41 +5962,32 @@ RAW SIGNAL</textarea>
         tabId: 'tabPhoto',
         wingLeft: 'wingGroupPhotoLeft',
         wingRight: 'wingGroupPhotoRight',
-        defaultSubEngine: 'transform',
+        defaultSubEngine: 'depthMask',
         subEngines: {
-          transform: {
-            name: 'ZOOM, ROT & PAN',
-            icon: '🔍',
+          depthMask: {
+            name: 'DEPTH MASK & EDGES',
+            icon: '🎭',
             knobs: [
-              { id: 'photoScaleRange', label: 'ZOOM SCALE', unit: 'x', format: (v) => (v / 100).toFixed(1) + 'x', color: '#ffe600' },
-              { id: 'photoRotateRange', label: 'ROTATE', unit: '°', format: (v) => v + '°', color: '#ffe600' },
-              { id: 'photoPanXRange', label: 'PAN X', unit: 'px', format: (v) => v + 'px', color: '#ffe600' }
-            ]
-          },
-          pan: {
-            name: 'PAN X / Y & SCALE',
-            icon: '✥',
-            knobs: [
-              { id: 'photoPanXRange', label: 'PAN X', unit: 'px', format: (v) => v + 'px', color: '#ffe600' },
-              { id: 'photoPanYRange', label: 'PAN Y', unit: 'px', format: (v) => v + 'px', color: '#ffe600' },
-              { id: 'photoScaleRange', label: 'ZOOM SCALE', unit: 'x', format: (v) => (v / 100).toFixed(1) + 'x', color: '#ffe600' }
+              { id: 'photoThresholdRange', label: 'DEPTH THRESH', unit: '%', format: (v) => v + '%', color: '#00ffcc' },
+              { id: 'photoEdgeRange', label: 'EDGE DETECT', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'photoContrastRange', label: 'CONTRAST', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' }
             ]
           },
           color: {
-            name: 'COLOR & GAMMA',
-            icon: '☀️',
+            name: 'SATURATION & LIGHT',
+            icon: '🌈',
             knobs: [
-              { id: 'photoGammaRange', label: 'GAMMA LIFT', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
-              { id: 'photoBrightnessRange', label: 'BRIGHTNESS', unit: '%', format: (v) => v + '%', color: '#ffe600' },
-              { id: 'photoOpacityRange', label: 'OPACITY', unit: '%', format: (v) => v + '%', color: '#ffe600' }
+              { id: 'photoSaturationRange', label: 'SATURATION', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'photoBrightnessRange', label: 'LIGHTNESS', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'photoGammaRange', label: 'GAMMA LIFT', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#00ffcc' }
             ]
           },
           ascii: {
-            name: 'ASCII & CONTRAST',
+            name: 'ASCII & OPACITY',
             icon: '🔠',
             knobs: [
               { id: 'asciiCellSizeRange', label: 'CELL SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
-              { id: 'photoContrastRange', label: 'CONTRAST', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'photoEdgeRange', label: 'EDGE DETECT', unit: '%', format: (v) => v + '%', color: '#ff0055' },
               { id: 'photoOpacityRange', label: 'OPACITY', unit: '%', format: (v) => v + '%', color: '#ffe600' }
             ]
           }
@@ -6036,10 +6141,19 @@ RAW SIGNAL</textarea>
         defaultSubEngine: 'streak',
         subEngines: {
           streak: {
-            name: 'STREAK SORTER',
-            icon: '🌊',
+            name: 'STREAK LINES & PATTERN',
+            icon: '📏',
             knobs: [
               { id: 'sortLengthRange', label: 'STREAK LEN', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'sortThicknessRange', label: 'LINE THICK', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'sortSpreadRange', label: 'PATTERN WIDE', unit: '%', format: (v) => v + '%', color: '#ffe600' }
+            ]
+          },
+          flow: {
+            name: 'SPEED & THRESHOLDS',
+            icon: '⚡',
+            knobs: [
+              { id: 'sortSpeedRange', label: 'FLOW SPEED', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ff0055' },
               { id: 'sortLowRange', label: 'MIN THRESH', unit: '%', format: (v) => v + '%', color: '#00ffcc' },
               { id: 'sortHighRange', label: 'MAX THRESH', unit: '%', format: (v) => v + '%', color: '#00ffcc' }
             ]
@@ -7103,6 +7217,100 @@ RAW SIGNAL</textarea>
         });
       }
 
+      const sideSortStyleBtn = document.getElementById('sideSortStyleBtn');
+      if (sideSortStyleBtn) {
+        sideSortStyleBtn.addEventListener('click', () => {
+          openLeftPopover('STREAK LINES & PATTERN', (container) => {
+            const linePresets = [
+              { name: '✨ Subtle Fine Lines (Default)', len: 85, thick: 2, spread: 32, spd: 8 },
+              { name: '🌧️ 1px Needle Rain', len: 135, thick: 1, spread: 40, spd: 12 },
+              { name: '📊 4px Barcode Lines', len: 110, thick: 4, spread: 38, spd: 8 },
+              { name: '🧱 8px Brutal Tape Bars', len: 155, thick: 8, spread: 48, spd: 9 },
+              { name: '❄️ Static Frozen Lines (0x)', len: 95, thick: 2, spread: 35, spd: 0 }
+            ];
+            container.innerHTML = `
+              <div class="space-y-2">
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">1-TAP LINE PRESETS</span>
+                  <div class="space-y-1">
+                    ${linePresets.map((p, idx) => `
+                      <button type="button" data-lpreset="${idx}" class="pop-sort-preset-btn w-full py-1 px-2 rounded text-left text-[10px] font-bold border bg-white/5 border-white/10 text-slate-200 hover:border-cyber-cyan/60 transition active:scale-95">${p.name}</button>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="pt-1.5 border-t border-white/10 space-y-1.5">
+                  <div>
+                    <div class="flex justify-between text-[9px] text-slate-300 font-bold">
+                      <span>Line Thickness</span>
+                      <span id="popSortThickVal" class="text-cyber-cyan">${state.sort.thickness || 2}px</span>
+                    </div>
+                    <input type="range" id="popSortThickRange" min="1" max="16" value="${state.sort.thickness || 2}" class="w-full accent-cyber-cyan">
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-[9px] text-slate-300 font-bold">
+                      <span>Pattern Wideness</span>
+                      <span id="popSortSpreadVal" class="text-cyber-yellow">${state.sort.spread || 32}%</span>
+                    </div>
+                    <input type="range" id="popSortSpreadRange" min="5" max="100" value="${state.sort.spread || 32}" class="w-full accent-cyber-yellow">
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-[9px] text-slate-300 font-bold">
+                      <span>Flow Speed</span>
+                      <span id="popSortSpdVal" class="text-cyber-pink">${(state.sort.speed !== undefined ? state.sort.speed : 0.8).toFixed(1)}x</span>
+                    </div>
+                    <input type="range" id="popSortSpdRange" min="0" max="30" value="${Math.round((state.sort.speed !== undefined ? state.sort.speed : 0.8) * 10)}" class="w-full accent-cyber-pink">
+                  </div>
+                </div>
+              </div>
+            `;
+
+            container.querySelectorAll('.pop-sort-preset-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const p = linePresets[Number(btn.dataset.lpreset)];
+                if (!p) return;
+                setSliderValue('sortLengthRange', p.len);
+                setSliderValue('sortThicknessRange', p.thick);
+                setSliderValue('sortSpreadRange', p.spread);
+                setSliderValue('sortSpeedRange', p.spd);
+                state.sort.active = true;
+                const chk = document.getElementById('sortActiveCheck');
+                if (chk) chk.checked = true;
+                if (sideSortPowerBtn) sideSortPowerBtn.classList.add('active');
+                closeSidePopovers();
+                showGestureToast(p.name);
+              });
+            });
+
+            const tRange = container.querySelector('#popSortThickRange');
+            const tVal = container.querySelector('#popSortThickVal');
+            if (tRange) {
+              tRange.addEventListener('input', (e) => {
+                setSliderValue('sortThicknessRange', Number(e.target.value));
+                if (tVal) tVal.textContent = e.target.value + 'px';
+              });
+            }
+
+            const sRange = container.querySelector('#popSortSpreadRange');
+            const sVal = container.querySelector('#popSortSpreadVal');
+            if (sRange) {
+              sRange.addEventListener('input', (e) => {
+                setSliderValue('sortSpreadRange', Number(e.target.value));
+                if (sVal) sVal.textContent = e.target.value + '%';
+              });
+            }
+
+            const spdRange = container.querySelector('#popSortSpdRange');
+            const spdVal = container.querySelector('#popSortSpdVal');
+            if (spdRange) {
+              spdRange.addEventListener('input', (e) => {
+                setSliderValue('sortSpeedRange', Number(e.target.value));
+                if (spdVal) spdVal.textContent = (Number(e.target.value) / 10).toFixed(1) + 'x';
+              });
+            }
+          });
+        });
+      }
+
       const sideSortCritBtn = document.getElementById('sideSortCritBtn');
       if (sideSortCritBtn) {
         sideSortCritBtn.addEventListener('click', () => {
@@ -7474,6 +7682,123 @@ RAW SIGNAL</textarea>
                 showGestureToast('🗑️ MEDIA CLEARED');
               });
             }
+          });
+        });
+      }
+
+      const sideMediaMaskBtn = document.getElementById('sideMediaMaskBtn');
+      if (sideMediaMaskBtn) {
+        sideMediaMaskBtn.addEventListener('click', () => {
+          openRightPopover('DEPTH MASK, EDGES & COLOR', (container) => {
+            container.innerHTML = `
+              <div class="space-y-2.5">
+                <div>
+                  <span class="block text-[9px] text-slate-400 font-bold mb-1">1-TAP DEPTH & EDGE PRESETS</span>
+                  <div class="grid grid-cols-2 gap-1.5">
+                    <button type="button" data-mpreset="clean" class="pop-mpreset-btn py-1.5 px-2 rounded text-[9.5px] font-bold border bg-white/5 border-white/15 text-slate-200 hover:border-cyber-cyan transition">✨ Clean Original</button>
+                    <button type="button" data-mpreset="cutout" class="pop-mpreset-btn py-1.5 px-2 rounded text-[9.5px] font-bold border bg-cyber-cyan/15 border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan/25 transition">🎭 Depth Cutout</button>
+                    <button type="button" data-mpreset="neonEdge" class="pop-mpreset-btn py-1.5 px-2 rounded text-[9.5px] font-bold border bg-cyber-pink/15 border-cyber-pink/40 text-cyber-pink hover:bg-cyber-pink/25 transition">⚡ Neon Edge Mask</button>
+                    <button type="button" data-mpreset="stencil" class="pop-mpreset-btn py-1.5 px-2 rounded text-[9.5px] font-bold border bg-cyber-yellow/15 border-cyber-yellow/40 text-cyber-yellow hover:bg-cyber-yellow/25 transition">🖤 High-Contrast Stencil</button>
+                  </div>
+                </div>
+                <div class="pt-1 border-t border-white/10 space-y-2">
+                  <div>
+                    <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
+                      <span class="text-slate-300 font-bold">DEPTH MASK THRESHOLD</span>
+                      <span id="popMediaThreshVal" class="text-cyber-cyan font-bold">${state.photo.depthThreshold || 0}%</span>
+                    </div>
+                    <input id="popMediaThreshRange" type="range" min="0" max="95" value="${state.photo.depthThreshold || 0}" class="w-full" />
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
+                      <span class="text-slate-300 font-bold">EDGE DETECTION</span>
+                      <span id="popMediaEdgeVal" class="text-cyber-pink font-bold">${state.photo.edgeDetect || 0}%</span>
+                    </div>
+                    <input id="popMediaEdgeRange" type="range" min="0" max="100" value="${state.photo.edgeDetect || 0}" class="w-full" />
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
+                      <span class="text-slate-300 font-bold">SATURATION</span>
+                      <span id="popMediaSatVal" class="text-cyber-yellow font-bold">${state.photo.saturation !== undefined ? state.photo.saturation : 100}%</span>
+                    </div>
+                    <input id="popMediaSatRange" type="range" min="0" max="300" value="${state.photo.saturation !== undefined ? state.photo.saturation : 100}" class="w-full" />
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
+                      <span class="text-slate-300 font-bold">LIGHTNESS / LIFT</span>
+                      <span id="popMediaLightVal" class="text-cyber-purple font-bold">${state.photo.brightness || 115}%</span>
+                    </div>
+                    <input id="popMediaLightRange" type="range" min="40" max="250" value="${state.photo.brightness || 115}" class="w-full" />
+                  </div>
+                </div>
+              </div>
+            `;
+
+            const syncMediaPopUI = () => {
+              const tr = container.querySelector('#popMediaThreshRange');
+              const tv = container.querySelector('#popMediaThreshVal');
+              const er = container.querySelector('#popMediaEdgeRange');
+              const ev = container.querySelector('#popMediaEdgeVal');
+              const sr = container.querySelector('#popMediaSatRange');
+              const sv = container.querySelector('#popMediaSatVal');
+              const lr = container.querySelector('#popMediaLightRange');
+              const lv = container.querySelector('#popMediaLightVal');
+              if (tr) tr.value = state.photo.depthThreshold || 0;
+              if (tv) tv.textContent = (state.photo.depthThreshold || 0) + '%';
+              if (er) er.value = state.photo.edgeDetect || 0;
+              if (ev) ev.textContent = (state.photo.edgeDetect || 0) + '%';
+              if (sr) sr.value = state.photo.saturation !== undefined ? state.photo.saturation : 100;
+              if (sv) sv.textContent = (state.photo.saturation !== undefined ? state.photo.saturation : 100) + '%';
+              if (lr) lr.value = state.photo.brightness || 115;
+              if (lv) lv.textContent = (state.photo.brightness || 115) + '%';
+              syncDockedKnobs();
+            };
+
+            container.querySelectorAll('.pop-mpreset-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const p = btn.dataset.mpreset;
+                if (p === 'clean') {
+                  setSliderValue('photoThresholdRange', 0);
+                  setSliderValue('photoEdgeRange', 0);
+                  setSliderValue('photoSaturationRange', 100);
+                  setSliderValue('photoBrightnessRange', 115);
+                  setSliderValue('photoContrastRange', 14);
+                } else if (p === 'cutout') {
+                  setSliderValue('photoThresholdRange', 38);
+                  setSliderValue('photoEdgeRange', 18);
+                  setSliderValue('photoSaturationRange', 135);
+                  setSliderValue('photoBrightnessRange', 120);
+                  state.photo.blend = 'inFront';
+                  const bs = document.getElementById('photoBlendSelect');
+                  if (bs) bs.value = 'inFront';
+                } else if (p === 'neonEdge') {
+                  setSliderValue('photoThresholdRange', 52);
+                  setSliderValue('photoEdgeRange', 85);
+                  setSliderValue('photoSaturationRange', 220);
+                  setSliderValue('photoBrightnessRange', 130);
+                } else if (p === 'stencil') {
+                  setSliderValue('photoThresholdRange', 48);
+                  setSliderValue('photoEdgeRange', 60);
+                  setSliderValue('photoSaturationRange', 0);
+                  setSliderValue('photoContrastRange', 26);
+                }
+                syncMediaPopUI();
+              });
+            });
+
+            const bindPopSlider = (sel, targetId) => {
+              const el = container.querySelector(sel);
+              if (el) {
+                el.addEventListener('input', (e) => {
+                  setSliderValue(targetId, parseFloat(e.target.value));
+                  syncMediaPopUI();
+                });
+              }
+            };
+            bindPopSlider('#popMediaThreshRange', 'photoThresholdRange');
+            bindPopSlider('#popMediaEdgeRange', 'photoEdgeRange');
+            bindPopSlider('#popMediaSatRange', 'photoSaturationRange');
+            bindPopSlider('#popMediaLightRange', 'photoBrightnessRange');
           });
         });
       }
@@ -7937,6 +8262,9 @@ RAW SIGNAL</textarea>
       document.getElementById('sortActiveCheck').addEventListener('change', (e) => state.sort.active = e.target.checked);
       document.getElementById('sortCriterionSelect').addEventListener('change', (e) => state.sort.criterion = e.target.value);
       bind('sortLengthRange', state.sort, 'maxLength', 'sortLengthLabel', 'px');
+      bind('sortThicknessRange', state.sort, 'thickness', 'sortThicknessLabel', 'px');
+      bind('sortSpreadRange', state.sort, 'spread', 'sortSpreadLabel', '%');
+      bind('sortSpeedRange', state.sort, 'speed', 'sortSpeedLabel', 'x', 0.1);
       bind('sortLowRange', state.sort, 'thresholdLow', 'sortLowLabel', '%');
       bind('sortHighRange', state.sort, 'thresholdHigh', 'sortHighLabel', '%');
 
@@ -8711,6 +9039,9 @@ RAW SIGNAL</textarea>
       bind('photoOpacityRange', state.photo, 'opacity', 'photoOpacityLabel', '%');
       bind('photoBrightnessRange', state.photo, 'brightness', 'photoBrightnessLabel', '%');
       bind('photoGammaRange', state.photo, 'gamma', 'photoGammaLabel', 'x', 0.1);
+      bind('photoThresholdRange', state.photo, 'depthThreshold', 'photoThresholdLabel', '%');
+      bind('photoEdgeRange', state.photo, 'edgeDetect', 'photoEdgeLabel', '%');
+      bind('photoSaturationRange', state.photo, 'saturation', 'photoSaturationLabel', '%');
       bind('photoScaleRange', state.photo, 'scale', 'photoScaleLabel', 'x', 0.01);
       bind('photoRotateRange', state.photo, 'rotation', 'photoRotateLabel', '°');
       bind('photoPanXRange', state.photo, 'panX', 'photoPanXLabel', 'px');
@@ -8727,6 +9058,9 @@ RAW SIGNAL</textarea>
           setSliderValue('photoRotateRange', 0);
           setSliderValue('photoPanXRange', 0);
           setSliderValue('photoPanYRange', 0);
+          setSliderValue('photoThresholdRange', 0);
+          setSliderValue('photoEdgeRange', 0);
+          setSliderValue('photoSaturationRange', 100);
         });
       }
 
@@ -8831,6 +9165,9 @@ RAW SIGNAL</textarea>
 
           // Update inputs (and re-paint knobs / XY pad to match)
           setSliderValue('sortLengthRange', state.sort.maxLength);
+          if (state.sort.thickness !== undefined) setSliderValue('sortThicknessRange', state.sort.thickness);
+          if (state.sort.spread !== undefined) setSliderValue('sortSpreadRange', state.sort.spread);
+          if (state.sort.speed !== undefined) setSliderValue('sortSpeedRange', Math.round(state.sort.speed * 10));
           setSliderValue('moshSmearRange', state.mosh.smear);
           setSliderValue('moshSliceRange', state.mosh.sliceShear);
           setSliderValue('moshBlockRange', state.mosh.macroblocks);
