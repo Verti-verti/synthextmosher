@@ -96,12 +96,48 @@
       border: 1px solid #ffffff;
     }
 
-    /* Safe-area aware header/footer */
+    /* Safe-area aware header/footer & lifted base deck above bottom badges/bars */
     #topBar {
-      padding-top: max(0.4rem, env(safe-area-inset-top, 0px));
+      padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
     }
     #baseDeck {
-      padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+      /* Lifted higher so knobs clear 'Powered by Netlify' badge & OS gesture bars comfortably */
+      padding-bottom: max(3.6rem, calc(env(safe-area-inset-bottom, 0px) + 2.85rem));
+    }
+
+    /* Responsive tuning for compact smartphones (e.g. Motorola / iPhone SE / landscape) */
+    @media (max-height: 740px) {
+      #baseDeck {
+        padding-top: 0.4rem;
+        padding-bottom: max(2.9rem, calc(env(safe-area-inset-bottom, 0px) + 2.2rem));
+        gap: 0.35rem;
+      }
+      .side-wing-btn {
+        width: 38px !important;
+        height: 38px !important;
+      }
+    }
+
+    /* Responsive tuning for iPad Pro & Tablets */
+    @media (min-width: 768px) and (min-height: 820px) {
+      #baseDeck {
+        padding-bottom: max(3.8rem, calc(env(safe-area-inset-bottom, 0px) + 3rem));
+      }
+      .side-wing-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+      }
+    }
+
+    /* Hide bottom deck & wings cleanly while mobile virtual keyboard is open */
+    body.keyboard-open #baseDeck,
+    body.keyboard-open #leftSideWing,
+    body.keyboard-open #rightSideWing {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
     }
 
     /* Module ribbon buttons */
@@ -482,10 +518,9 @@
 
     <!-- Second row: Module Selector (below the logo / REC safe zone) -->
     <div class="w-full max-w-lg pointer-events-auto flex items-center justify-center">
-      <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[200px] py-1.5 px-5 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition" title="Open Module Pipeline Flow">
-        <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Modulos:</span>
+      <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[170px] py-1.5 px-5 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition" title="Open Module Pipeline Flow">
         <span id="activeModuleIcon">🔤</span>
-        <span id="activeModuleLabel" class="truncate font-black">Text</span>
+        <span id="activeModuleLabel" class="truncate font-black">TEXT</span>
         <span class="text-[9px] text-slate-400">▾</span>
       </button>
     </div>
@@ -495,7 +530,7 @@
       <div class="flex items-center justify-between border-b border-white/10 pb-2">
         <div class="flex items-center gap-1.5">
           <span class="text-xs">⚡</span>
-          <span class="font-black text-[11px] text-white tracking-wider">MODULOS PIPELINE ROUTING</span>
+          <span class="font-black text-[11px] text-white tracking-wider">PIPELINE ROUTING</span>
         </div>
         <button id="closeModuleFlowBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
       </div>
@@ -557,9 +592,10 @@
     </div>
 
     <!-- CONTEXTUAL TOP TEXT INPUT CAPSULE (Shown when Text module is active) -->
-    <div id="textQuickInputBox" class="w-full max-w-sm pointer-events-auto flex items-center gap-1.5 bg-black/90 backdrop-blur-md px-3 py-1 rounded-full border border-cyber-cyan/60 shadow-[0_0_12px_rgba(0,255,204,0.25)] transition-all">
+    <div id="textQuickInputBox" class="w-full max-w-sm pointer-events-auto flex items-center gap-1.5 bg-black/90 backdrop-blur-md px-3 py-1 rounded-2xl border border-cyber-cyan/60 shadow-[0_0_12px_rgba(0,255,204,0.25)] transition-all">
       <span class="text-xs">✏️</span>
-      <input type="text" id="topTextInput" class="bg-transparent border-0 text-white font-mono text-xs w-full outline-none placeholder-slate-500" value="VIBE//MOSH&#10;RAW SIGNAL" placeholder="Edit text on screen...">
+      <textarea id="topTextInput" rows="2" class="bg-transparent border-0 text-white font-mono text-[11px] leading-tight w-full outline-none placeholder-slate-500 resize-none py-0.5" placeholder="Edit text on screen...">VIBE//MOSH
+RAW SIGNAL</textarea>
       <button id="clearTopTextBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
     </div>
   </header>
@@ -800,12 +836,33 @@
   </div>
 
   <!-- ==================== BASE DECK (3 KNOBS + SUB-ENGINE SELECTOR) ==================== -->
-  <footer id="baseDeck" class="absolute bottom-0 inset-x-0 z-30 pointer-events-auto bg-gradient-to-t from-black via-black/90 to-transparent pt-3 pb-3 px-3 sm:px-6 flex flex-col items-center gap-2.5 backdrop-blur-md border-t border-white/10">
-    
-    <!-- Top row: Diamond Drag/Jam + Sub-Engine Selector + Circular REC Button -->
-    <div class="w-full max-w-md flex items-center justify-between gap-3 px-1">
+  <footer id="baseDeck" class="absolute bottom-0 inset-x-0 z-30 pointer-events-auto bg-gradient-to-t from-black via-black/95 to-transparent pt-2.5 px-3 sm:px-6 flex flex-col items-center gap-2 backdrop-blur-md border-t border-white/10">
+
+    <!-- Individual Drag System Bar (Target: Text vs Media + Move / Scale / Rotate) -->
+    <div id="dragTransformBar" class="w-full max-w-md flex items-center justify-between gap-1.5 bg-black/80 border border-white/15 rounded-full px-2 py-1 text-[9px] font-bold">
+      <!-- Target Selector: Text vs Media -->
+      <div class="flex items-center gap-1 bg-white/5 rounded-full p-0.5 border border-white/10">
+        <button id="dragTargetTextBtn" type="button" class="tap-btn px-2 py-0.5 rounded-full bg-cyber-cyan/25 border border-cyber-cyan text-cyber-cyan font-black transition active:scale-95 flex items-center gap-1" title="Manipulate Text (Move, Scale, Rotate)">
+          <span>🔤</span><span>TEXT</span>
+        </button>
+        <button id="dragTargetMediaBtn" type="button" class="tap-btn px-2 py-0.5 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1" title="Manipulate Media (Pan, Zoom, Rotate)">
+          <span>🎬</span><span>MEDIA</span>
+        </button>
+      </div>
+
+      <!-- 1-Finger Drag Action Selector (2-Finger Pinch+Twist always Scales+Rotates simultaneously) -->
+      <div class="flex items-center gap-1">
+        <button id="dragActMoveBtn" type="button" data-dragact="move" class="drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold transition active:scale-95" title="1-Finger Move / Pan">✥ MOVE</button>
+        <button id="dragActScaleBtn" type="button" data-dragact="scale" class="drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 font-bold transition active:scale-95" title="1-Finger Scale / Zoom (or 2-Finger Pinch)">⤢ SCALE</button>
+        <button id="dragActRotateBtn" type="button" data-dragact="rotate" class="drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 font-bold transition active:scale-95" title="1-Finger Rotate (or 2-Finger Twist)">↻ ROT</button>
+        <button id="dragActResetBtn" type="button" class="tap-btn px-1.5 py-0.5 rounded-full bg-white/5 border border-white/15 text-slate-400 hover:text-white font-bold transition active:scale-90" title="Reset Active Target Transform">↺</button>
+      </div>
+    </div>
+
+    <!-- Top row: Diamond Drag/Jam + Sub-Engine Selector + Quick Target Pill -->
+    <div class="w-full max-w-md flex items-center justify-between gap-2.5 px-1">
       <!-- Diamond Drag or Jam Toggle Button -->
-      <button id="dragJamToggleBtn" type="button" class="diamond-btn mode-drag tap-btn shrink-0" title="Toggle Drag / Jam Mode">
+      <button id="dragJamToggleBtn" type="button" class="diamond-btn mode-drag tap-btn shrink-0" title="Toggle Drag / Jam / Mosh Touch Mode">
         <div class="flex flex-col items-center justify-center pointer-events-none">
           <span id="dragJamIcon" class="text-xs">👆</span>
           <span id="dragJamText" class="text-[7.5px] font-black uppercase tracking-tighter">DRAG</span>
@@ -819,14 +876,20 @@
         <span class="text-[9px] text-slate-400">▾</span>
       </button>
 
-      <!-- Circular REC MP4 Button -->
-      <button id="deckRecBtn" type="button" class="tap-btn w-10 h-10 rounded-full bg-cyber-pink/20 border-2 border-cyber-pink text-cyber-pink font-black text-xs flex items-center justify-center shadow-[0_0_12px_rgba(255,0,85,0.4)] active:scale-90 transition hover:bg-cyber-pink hover:text-black shrink-0" title="Record 9:16 Video">
-        <span id="deckRecDot" class="w-3.5 h-3.5 rounded-full bg-cyber-pink"></span>
+      <!-- Quick Target Toggle Button (replaces duplicate bottom REC button) -->
+      <button id="dragTargetBtn" type="button" class="tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex flex-col items-center justify-center leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0" title="Switch Drag Target: Text vs Media">
+        <span id="dragTargetIcon" class="text-xs">🔤</span>
+        <span id="dragTargetLabel" class="text-[7.5px] tracking-tighter mt-0.5">TEXT</span>
+      </button>
+
+      <!-- Legacy Hidden Deck REC Button (kept hidden in DOM for compatibility; top REC MP4 is primary) -->
+      <button id="deckRecBtn" type="button" class="hidden" aria-hidden="true">
+        <span id="deckRecDot"></span>
       </button>
     </div>
 
     <!-- Floating Sub-Engine Popover Menu (Directly above subEngineBtn) -->
-    <div id="subEngineMenu" class="hidden absolute bottom-28 inset-x-3 max-w-sm mx-auto z-40 bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3 shadow-2xl space-y-2">
+    <div id="subEngineMenu" class="hidden absolute bottom-44 inset-x-3 max-w-sm mx-auto z-40 bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3 shadow-2xl space-y-2">
       <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
         <span class="text-[10px] font-bold text-white tracking-wider flex items-center gap-1">
           <span>⚡</span>
@@ -995,6 +1058,13 @@ RAW SIGNAL</textarea>
               <span id="letterSpacingLabel" class="text-cyber-cyan">4px</span>
             </div>
             <input type="range" id="letterSpacingRange" min="-5" max="30" value="4">
+          </div>
+          <div class="space-y-0.5 col-span-2">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>2D / 3D Roll Angle</span>
+              <span id="textRotateLabel" class="text-cyber-cyan">0°</span>
+            </div>
+            <input type="range" id="textRotateRange" min="-180" max="180" value="0">
           </div>
         </div>
 
@@ -1195,23 +1265,33 @@ RAW SIGNAL</textarea>
           </div>
         </div>
 
-        <!-- Zoom & Re-frame (Scale & Pan) -->
+        <!-- Zoom & Re-frame (Scale, Rotate & Pan) -->
         <div class="p-2 rounded bg-cyber-bg/60 border border-cyber-border space-y-2">
           <div class="flex items-center justify-between text-[10px]">
             <span class="text-cyber-yellow font-bold flex items-center gap-1">
-              <span>🔍</span> RE-FRAME &amp; ZOOM
+              <span>🔍</span> RE-FRAME, ZOOM &amp; ROTATE
             </span>
             <button id="photoResetTransformBtn" type="button" class="px-2 py-0.5 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] hover:text-cyber-yellow active:scale-95 transition">
               ↺ Center &amp; Reset
             </button>
           </div>
 
-          <div class="space-y-0.5">
-            <div class="flex justify-between text-[10px] text-slate-400">
-              <span>Zoom / Scale (or 2-Finger Pinch)</span>
-              <span id="photoScaleLabel" class="text-cyber-yellow">1.0x</span>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Zoom / Scale</span>
+                <span id="photoScaleLabel" class="text-cyber-yellow">1.0x</span>
+              </div>
+              <input type="range" id="photoScaleRange" min="30" max="350" value="100">
             </div>
-            <input type="range" id="photoScaleRange" min="50" max="300" value="100">
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Rotate Angle</span>
+                <span id="photoRotateLabel" class="text-cyber-yellow">0°</span>
+              </div>
+              <input type="range" id="photoRotateRange" min="-180" max="180" value="0">
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -1975,6 +2055,7 @@ RAW SIGNAL</textarea>
         glowRadius: 20,
         x: WIDTH / 2,
         y: HEIGHT / 2,
+        angle: 0, // 2D/3D rotation angle in degrees (-180 to 180)
         // 3D parameters
         radius3D: 260,
         speed3D: 1.0,
@@ -2005,7 +2086,8 @@ RAW SIGNAL</textarea>
         contrast: 1.2,
         brightness: 115, // Brightness boost % (50 to 220, default 115)
         gamma: 1.0,      // Gamma midtone lift (0.5 to 2.5, default 1.0)
-        scale: 1.0,      // Zoom / scale (0.5 to 3.0, default 1.0)
+        scale: 1.0,      // Zoom / scale (0.3 to 3.5, default 1.0)
+        rotation: 0,     // Rotation angle in degrees (-180 to +180, default 0)
         panX: 0,         // Pan X offset (-400 to +400, default 0)
         panY: 0,         // Pan Y offset (-600 to +600, default 0)
         opacity: 100,
@@ -2101,6 +2183,8 @@ RAW SIGNAL</textarea>
       // Mobile Interaction Modes (Drag, Jam XY Pad, or Vector Mosh)
       interaction: {
         mode: 'drag', // 'drag' | 'jam' | 'vectorMosh'
+        target: 'text', // 'text' | 'media'
+        dragAction: 'move', // 'move' | 'scale' | 'rotate'
         isInteracting: false,
         lastX: 0,
         lastY: 0,
@@ -2322,7 +2406,7 @@ RAW SIGNAL</textarea>
       // Auto spin + interactive tilt
       const rotY = t.rotY + tick * 0.35 * t.speed3D;
       const rotX = t.rotX;
-      const rotZ = t.rotZ;
+      const rotZ = (t.rotZ || 0) + ((t.angle || 0) * Math.PI) / 180;
 
       const points = [];
 
@@ -2391,7 +2475,7 @@ RAW SIGNAL</textarea>
 
       const rotX = t.rotX + Math.sin(tick * 0.25) * 0.08;
       const rotY = t.rotY + tick * 0.35 * t.speed3D;
-      const rotZ = t.rotZ + tick * 0.15 * t.speed3D;
+      const rotZ = (t.rotZ || 0) + ((t.angle || 0) * Math.PI) / 180 + tick * 0.15 * t.speed3D;
 
       // 8 vertices of cube
       const rawVerts = [
@@ -2517,7 +2601,7 @@ RAW SIGNAL</textarea>
 
       const rotX = t.rotX;
       const rotY = t.rotY + tick * 0.4 * t.speed3D;
-      const rotZ = t.rotZ;
+      const rotZ = (t.rotZ || 0) + ((t.angle || 0) * Math.PI) / 180;
 
       const points = [];
       const numLines = rawLines.length;
@@ -2615,15 +2699,22 @@ RAW SIGNAL</textarea>
       const scale = pState.scale || 1.0;
       const drawW = baseW * scale;
       const drawH = baseH * scale;
-      const drawX = (WIDTH - drawW) / 2 + (pState.panX || 0);
-      const drawY = (HEIGHT - drawH) / 2 + (pState.panY || 0);
+      const centerX = WIDTH / 2 + (pState.panX || 0);
+      const centerY = HEIGHT / 2 + (pState.panY || 0);
+      const rotRad = ((pState.rotation || 0) * Math.PI) / 180;
 
       const bVal = pState.brightness || 115;
       const cVal = Math.round((pState.contrast || 1.2) * 100);
 
       photoSourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      photoSourceCtx.save();
       photoSourceCtx.filter = `brightness(${bVal}%) contrast(${cVal}%)`;
-      photoSourceCtx.drawImage(img, drawX, drawY, drawW, drawH);
+      photoSourceCtx.translate(centerX, centerY);
+      if (rotRad !== 0) {
+        photoSourceCtx.rotate(rotRad);
+      }
+      photoSourceCtx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+      photoSourceCtx.restore();
       photoSourceCtx.filter = 'none';
 
       if (pState.mode === 'direct') {
@@ -3422,9 +3513,11 @@ RAW SIGNAL</textarea>
         scaleMod = 0.96 + bounceVal * 0.1;
       }
 
-      if (scaleMod !== 1.0) {
+      const textAngleRad = ((t.angle || 0) * Math.PI) / 180;
+      if (scaleMod !== 1.0 || textAngleRad !== 0) {
         tCtx.translate(t.x, t.y);
-        tCtx.scale(scaleMod, scaleMod);
+        if (textAngleRad !== 0) tCtx.rotate(textAngleRad);
+        if (scaleMod !== 1.0) tCtx.scale(scaleMod, scaleMod);
         tCtx.translate(-t.x, -t.y);
       }
 
@@ -4889,6 +4982,12 @@ RAW SIGNAL</textarea>
         }
       }
 
+      function normalizeDeg(d) {
+        let a = ((d + 180) % 360);
+        if (a < 0) a += 360;
+        return Math.round(a - 180);
+      }
+
       function onStart(cx, cy) {
         state.interaction.isInteracting = true;
         const p = getCanvasCoords(cx, cy);
@@ -4908,10 +5007,6 @@ RAW SIGNAL</textarea>
           if (state.interaction.mode === 'jam') {
             jamAt(cx, cy);
           }
-        } else {
-          // Drag typography position
-          state.type.x = p.x;
-          state.type.y = p.y;
         }
       }
 
@@ -4935,16 +5030,58 @@ RAW SIGNAL</textarea>
           if (state.interaction.mode === 'jam') {
             jamAt(cx, cy);
           }
+          return;
+        }
+
+        // DRAG MODE: Manipulate selected target ('text' or 'media') with selected action ('move', 'scale', 'rotate')
+        const target = state.interaction.target || 'text';
+        const action = state.interaction.dragAction || 'move';
+
+        if (target === 'media') {
+          if (action === 'move') {
+            const newPanX = Math.min(400, Math.max(-400, (state.photo.panX || 0) + vx));
+            const newPanY = Math.min(600, Math.max(-600, (state.photo.panY || 0) + vy));
+            state.photo.panX = newPanX;
+            state.photo.panY = newPanY;
+            setSliderValue('photoPanXRange', Math.round(newPanX));
+            setSliderValue('photoPanYRange', Math.round(newPanY));
+          } else if (action === 'scale') {
+            const deltaScale = (vx - vy) * 0.0035;
+            const newScale = Math.min(3.5, Math.max(0.3, (state.photo.scale || 1.0) + deltaScale));
+            state.photo.scale = newScale;
+            setSliderValue('photoScaleRange', Math.round(newScale * 100));
+          } else if (action === 'rotate') {
+            const deltaDeg = (vx - vy) * 0.35;
+            const newRot = normalizeDeg((state.photo.rotation || 0) + deltaDeg);
+            state.photo.rotation = newRot;
+            setSliderValue('photoRotateRange', newRot);
+          }
         } else {
-          // Drag mode: if 3D layout, rotate 3D object on screen!
-          if (['spiral', 'cube', 'sphere'].includes(state.type.layout)) {
-            const dx = vx * 0.012;
-            const dy = vy * 0.012;
-            state.type.rotY += dx;
-            state.type.rotX -= dy;
-          } else {
-            state.type.x = p.x;
-            state.type.y = p.y;
+          // Target === 'text'
+          const is3D = ['spiral', 'cube', 'sphere'].includes(state.type.layout);
+          if (action === 'move') {
+            state.type.x = Math.min(WIDTH - 30, Math.max(30, (state.type.x || WIDTH / 2) + vx));
+            state.type.y = Math.min(HEIGHT - 30, Math.max(30, (state.type.y || HEIGHT / 2) + vy));
+          } else if (action === 'scale') {
+            const delta = (vx - vy) * 0.35;
+            if (is3D) {
+              const newRad = Math.min(420, Math.max(100, Math.round((state.type.radius3D || 260) + delta)));
+              state.type.radius3D = newRad;
+              setSliderValue('radius3DRange', newRad);
+            }
+            const newSize = Math.min(220, Math.max(30, Math.round((state.type.fontSize || 95) + delta * 0.6)));
+            state.type.fontSize = newSize;
+            setSliderValue('fontSizeRange', newSize);
+          } else if (action === 'rotate') {
+            if (is3D) {
+              state.type.rotY += vx * 0.012;
+              state.type.rotX -= vy * 0.012;
+            } else {
+              const deltaDeg = (vx - vy) * 0.35;
+              const newAngle = normalizeDeg((state.type.angle || 0) + deltaDeg);
+              state.type.angle = newAngle;
+              setSliderValue('textRotateRange', newAngle);
+            }
           }
         }
       }
@@ -4956,12 +5093,20 @@ RAW SIGNAL</textarea>
         jamGrid.style.opacity = '0';
       }
 
+      // 2-Finger Multitouch State (Simultaneous Pinch-Scale + Twist-Rotate + Midpoint-Pan for active target)
       let pinchStartDist = 0;
-      let pinchStartScale = 1.0;
+      let pinchStartAngle = 0;
       let pinchStartMidX = 0;
       let pinchStartMidY = 0;
+      let pinchStartPhotoScale = 1.0;
+      let pinchStartPhotoRot = 0;
       let pinchStartPanX = 0;
       let pinchStartPanY = 0;
+      let pinchStartFontSize = 95;
+      let pinchStartRadius3D = 260;
+      let pinchStartTextAngle = 0;
+      let pinchStartTextX = WIDTH / 2;
+      let pinchStartTextY = HEIGHT / 2;
       let isPinching = false;
 
       // Screen gesture state for canvas interaction
@@ -4973,7 +5118,7 @@ RAW SIGNAL</textarea>
 
       // Touch Events -- ignore touches that start on knobs/controls living on the canvas
       box.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.synth-knob') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
+        if (e.target.closest('.synth-knob') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea')) return;
         touchStartTime = Date.now();
         touchCountAtStart = e.touches.length;
         touchMovedDist = 0;
@@ -4985,17 +5130,28 @@ RAW SIGNAL</textarea>
           touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
         }
 
-        if (e.touches.length === 2 && state.photo.active && state.photo.loaded) {
+        if (e.touches.length === 2 && state.interaction.mode === 'drag') {
           e.preventDefault();
           const t1 = e.touches[0];
           const t2 = e.touches[1];
           pinchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-          pinchStartScale = state.photo.scale || 1.0;
+          pinchStartAngle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
           pinchStartMidX = (t1.clientX + t2.clientX) / 2;
           pinchStartMidY = (t1.clientY + t2.clientY) / 2;
+
+          pinchStartPhotoScale = state.photo.scale || 1.0;
+          pinchStartPhotoRot = state.photo.rotation || 0;
           pinchStartPanX = state.photo.panX || 0;
           pinchStartPanY = state.photo.panY || 0;
+
+          pinchStartFontSize = state.type.fontSize || 95;
+          pinchStartRadius3D = state.type.radius3D || 260;
+          pinchStartTextAngle = state.type.angle || 0;
+          pinchStartTextX = state.type.x || WIDTH / 2;
+          pinchStartTextY = state.type.y || HEIGHT / 2;
+
           isPinching = true;
+          state.interaction.isInteracting = false;
           crosshair.classList.add('hidden');
           return;
         }
@@ -5006,30 +5162,60 @@ RAW SIGNAL</textarea>
       }, { passive: false });
 
       box.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2 && isPinching && state.photo.active && state.photo.loaded) {
+        if (e.touches.length === 2 && isPinching && state.interaction.mode === 'drag') {
           e.preventDefault();
           const t1 = e.touches[0];
           const t2 = e.touches[1];
           const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          const curAngle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
           const midX = (t1.clientX + t2.clientX) / 2;
           const midY = (t1.clientY + t2.clientY) / 2;
+          touchMovedDist += Math.hypot(midX - touchStartX, midY - touchStartY) + Math.abs(dist - pinchStartDist);
 
-          const ratio = dist / Math.max(10, pinchStartDist);
-          const newScale = Math.min(3.0, Math.max(0.5, pinchStartScale * ratio));
-          state.photo.scale = newScale;
-          setSliderValue('photoScaleRange', Math.round(newScale * 100));
+          const ratio = dist / Math.max(12, pinchStartDist);
+          const angleDeltaDeg = ((curAngle - pinchStartAngle) * 180) / Math.PI;
 
           const rect = moshCanvas.getBoundingClientRect();
-          const scaleX = WIDTH / rect.width;
-          const scaleY = HEIGHT / rect.height;
+          const scaleX = WIDTH / (rect.width || WIDTH);
+          const scaleY = HEIGHT / (rect.height || HEIGHT);
           const dX = (midX - pinchStartMidX) * scaleX;
           const dY = (midY - pinchStartMidY) * scaleY;
-          const newPanX = Math.min(400, Math.max(-400, pinchStartPanX + dX));
-          const newPanY = Math.min(600, Math.max(-600, pinchStartPanY + dY));
-          state.photo.panX = newPanX;
-          state.photo.panY = newPanY;
-          setSliderValue('photoPanXRange', Math.round(newPanX));
-          setSliderValue('photoPanYRange', Math.round(newPanY));
+
+          const target = state.interaction.target || 'text';
+          if (target === 'media') {
+            const newScale = Math.min(3.5, Math.max(0.3, pinchStartPhotoScale * ratio));
+            state.photo.scale = newScale;
+            setSliderValue('photoScaleRange', Math.round(newScale * 100));
+
+            const newRot = normalizeDeg(pinchStartPhotoRot + angleDeltaDeg);
+            state.photo.rotation = newRot;
+            setSliderValue('photoRotateRange', newRot);
+
+            const newPanX = Math.min(400, Math.max(-400, pinchStartPanX + dX));
+            const newPanY = Math.min(600, Math.max(-600, pinchStartPanY + dY));
+            state.photo.panX = newPanX;
+            state.photo.panY = newPanY;
+            setSliderValue('photoPanXRange', Math.round(newPanX));
+            setSliderValue('photoPanYRange', Math.round(newPanY));
+          } else {
+            // Target === 'text': simultaneous pinch scale + 2-finger rotate + 2-finger move
+            const newFontSize = Math.min(220, Math.max(30, Math.round(pinchStartFontSize * ratio)));
+            state.type.fontSize = newFontSize;
+            setSliderValue('fontSizeRange', newFontSize);
+
+            if (['spiral', 'cube', 'sphere'].includes(state.type.layout)) {
+              const newRad = Math.min(420, Math.max(100, Math.round(pinchStartRadius3D * ratio)));
+              state.type.radius3D = newRad;
+              setSliderValue('radius3DRange', newRad);
+            }
+
+            const newAngle = normalizeDeg(pinchStartTextAngle + angleDeltaDeg);
+            state.type.angle = newAngle;
+            setSliderValue('textRotateRange', newAngle);
+
+            state.type.x = Math.min(WIDTH - 30, Math.max(30, pinchStartTextX + dX));
+            state.type.y = Math.min(HEIGHT - 30, Math.max(30, pinchStartTextY + dY));
+          }
           return;
         }
         if (e.touches.length > 0) {
@@ -5047,7 +5233,7 @@ RAW SIGNAL</textarea>
 
       box.addEventListener('touchend', (e) => {
         const touchDuration = Date.now() - touchStartTime;
-        if (touchDuration < 320 && touchMovedDist < 25) {
+        if (touchDuration < 320 && touchMovedDist < 22) {
           if (touchCountAtStart === 2) {
             // 2-Finger Screen Tap: Toggle Random Letter Sizes (Zine / Ransom Chaos)
             state.type.randomSize = !state.type.randomSize;
@@ -5069,17 +5255,48 @@ RAW SIGNAL</textarea>
         if (e.touches.length < 2) isPinching = false;
         if (e.touches.length === 0) onEnd();
       });
-      box.addEventListener('touchcancel', (e) => {
+      box.addEventListener('touchcancel', () => {
         isPinching = false;
         onEnd();
       });
+
+      // Mouse wheel on canvas: scales active target (or rotates when ShiftKey / Rotate action is active)
+      box.addEventListener('wheel', (e) => {
+        if (state.interaction.mode !== 'drag') return;
+        e.preventDefault();
+        const dir = e.deltaY < 0 ? 1 : -1;
+        const target = state.interaction.target || 'text';
+        const isRot = e.shiftKey || state.interaction.dragAction === 'rotate';
+
+        if (target === 'media') {
+          if (isRot) {
+            const nextRot = normalizeDeg((state.photo.rotation || 0) + dir * 6);
+            state.photo.rotation = nextRot;
+            setSliderValue('photoRotateRange', nextRot);
+          } else {
+            const nextScale = Math.min(3.5, Math.max(0.3, (state.photo.scale || 1.0) + dir * 0.08));
+            state.photo.scale = nextScale;
+            setSliderValue('photoScaleRange', Math.round(nextScale * 100));
+          }
+        } else {
+          if (isRot) {
+            const nextAngle = normalizeDeg((state.type.angle || 0) + dir * 6);
+            state.type.angle = nextAngle;
+            setSliderValue('textRotateRange', nextAngle);
+          } else {
+            const nextSize = Math.min(220, Math.max(30, Math.round((state.type.fontSize || 95) + dir * 5)));
+            state.type.fontSize = nextSize;
+            setSliderValue('fontSizeRange', nextSize);
+          }
+        }
+      }, { passive: false });
 
       // Mouse fallback for desktop simulation & gestures
       let mouseStartTime = 0;
       let mouseStartX = 0;
       let mouseStartY = 0;
       box.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.synth-knob') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
+        if (e.target.closest('.synth-knob') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea')) return;
         mouseStartTime = Date.now();
         mouseStartX = e.clientX;
         mouseStartY = e.clientY;
@@ -5118,15 +5335,22 @@ RAW SIGNAL</textarea>
         }
       });
 
-      // Cycle touch interaction: Drag <-> Jam Pad <-> Vector Mosh
+      // Cycle touch interaction: Drag <-> Jam Pad <-> Vector Mosh + Individual Target (Text vs Media) & Action (Move / Scale / Rotate)
       const touchModeLabel = document.getElementById('touchModeLabel');
       const diamondToggleBtn = document.getElementById('dragJamToggleBtn');
       const diamondIcon = document.getElementById('dragJamIcon');
       const diamondText = document.getElementById('dragJamText');
+      const dragTransformBar = document.getElementById('dragTransformBar');
+      const dragTargetBtn = document.getElementById('dragTargetBtn');
+      const dragTargetIcon = document.getElementById('dragTargetIcon');
+      const dragTargetLabel = document.getElementById('dragTargetLabel');
+      const dragTargetTextBtn = document.getElementById('dragTargetTextBtn');
+      const dragTargetMediaBtn = document.getElementById('dragTargetMediaBtn');
+      const dragActResetBtn = document.getElementById('dragActResetBtn');
 
       const MODES = {
         drag: {
-          icon: '👆', text: 'DRAG', label: '👆 Touch: Drag Text',
+          icon: '👆', text: 'DRAG', label: '👆 Drag',
           cls: 'mode-drag'
         },
         jam: {
@@ -5140,6 +5364,39 @@ RAW SIGNAL</textarea>
       };
       const ORDER = ['drag', 'jam', 'vectorMosh'];
 
+      function updateDragUI() {
+        const isMedia = state.interaction.target === 'media';
+        const act = state.interaction.dragAction || 'move';
+        const actColor = isMedia ? 'cyber-yellow' : 'cyber-cyan';
+
+        if (dragTargetIcon) dragTargetIcon.textContent = isMedia ? '🎬' : '🔤';
+        if (dragTargetLabel) dragTargetLabel.textContent = isMedia ? 'MEDIA' : 'TEXT';
+        if (dragTargetBtn) {
+          dragTargetBtn.className = isMedia
+            ? 'tap-btn h-9 px-2.5 rounded-xl bg-cyber-yellow/15 border border-cyber-yellow text-cyber-yellow font-black text-[9px] flex flex-col items-center justify-center leading-none shadow-[0_0_10px_rgba(255,230,0,0.25)] active:scale-90 transition shrink-0'
+            : 'tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex flex-col items-center justify-center leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0';
+        }
+
+        if (dragTargetTextBtn && dragTargetMediaBtn) {
+          if (isMedia) {
+            dragTargetMediaBtn.className = 'tap-btn px-2 py-0.5 rounded-full bg-cyber-yellow/25 border border-cyber-yellow text-cyber-yellow font-black transition active:scale-95 flex items-center gap-1';
+            dragTargetTextBtn.className = 'tap-btn px-2 py-0.5 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1';
+          } else {
+            dragTargetTextBtn.className = 'tap-btn px-2 py-0.5 rounded-full bg-cyber-cyan/25 border border-cyber-cyan text-cyber-cyan font-black transition active:scale-95 flex items-center gap-1';
+            dragTargetMediaBtn.className = 'tap-btn px-2 py-0.5 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1';
+          }
+        }
+
+        document.querySelectorAll('.drag-act-btn').forEach(btn => {
+          const isCur = btn.dataset.dragact === act;
+          if (isCur) {
+            btn.className = `drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-${actColor}/20 border border-${actColor} text-${actColor} font-bold transition active:scale-95`;
+          } else {
+            btn.className = 'drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 font-bold transition active:scale-95';
+          }
+        });
+      }
+
       function applyMode() {
         const m = MODES[state.interaction.mode] || MODES.drag;
         if (diamondToggleBtn) {
@@ -5149,17 +5406,100 @@ RAW SIGNAL</textarea>
         if (diamondIcon) diamondIcon.textContent = m.icon;
         if (diamondText) diamondText.textContent = m.text;
 
-        const is3D = ['spiral', 'cube', 'sphere'].includes(state.type.layout);
+        if (dragTransformBar) {
+          if (state.interaction.mode === 'drag') dragTransformBar.classList.remove('hidden');
+          else dragTransformBar.classList.add('hidden');
+        }
+
+        updateDragUI();
+
         if (touchModeLabel) {
-          touchModeLabel.textContent = (state.interaction.mode === 'drag' && is3D)
-            ? '👆 Touch: Rotate 3D Model'
-            : m.label;
+          if (state.interaction.mode === 'drag') {
+            const tName = state.interaction.target === 'media' ? 'MEDIA' : 'TEXT';
+            const aName = (state.interaction.dragAction || 'move').toUpperCase();
+            touchModeLabel.textContent = `👆 Drag [${tName}]: ${aName} (2-Finger Pinch/Rotate)`;
+          } else {
+            touchModeLabel.textContent = m.label;
+          }
         }
         crosshair.classList.remove('mode-jam', 'mode-brush', 'mode-vector-mosh');
         if (state.interaction.mode === 'jam') crosshair.classList.add('mode-jam');
         if (state.interaction.mode === 'vectorMosh') crosshair.classList.add('mode-vector-mosh');
       }
       window.applyTouchMode = applyMode;
+
+      function setDragTarget(targetKey, silent = false) {
+        if (targetKey !== 'text' && targetKey !== 'media') return;
+        state.interaction.target = targetKey;
+        if (state.interaction.mode !== 'drag') {
+          state.interaction.mode = 'drag';
+        }
+        applyMode();
+        if (!silent) {
+          showGestureToast(targetKey === 'media' ? '🎯 DRAG TARGET: MEDIA (PAN / ZOOM / ROTATE)' : '🎯 DRAG TARGET: TEXT (MOVE / SCALE / ROTATE)');
+        }
+      }
+      window.setDragTarget = setDragTarget;
+
+      function setDragAction(actKey, silent = false) {
+        if (!['move', 'scale', 'rotate'].includes(actKey)) return;
+        state.interaction.dragAction = actKey;
+        if (state.interaction.mode !== 'drag') {
+          state.interaction.mode = 'drag';
+        }
+        applyMode();
+        if (!silent) {
+          const tName = state.interaction.target === 'media' ? 'MEDIA' : 'TEXT';
+          showGestureToast(`${tName}: ${actKey.toUpperCase()}`);
+        }
+      }
+      window.setDragAction = setDragAction;
+
+      if (dragTargetBtn) {
+        dragTargetBtn.addEventListener('click', () => {
+          const next = state.interaction.target === 'media' ? 'text' : 'media';
+          setDragTarget(next);
+        });
+      }
+      if (dragTargetTextBtn) {
+        dragTargetTextBtn.addEventListener('click', () => setDragTarget('text'));
+      }
+      if (dragTargetMediaBtn) {
+        dragTargetMediaBtn.addEventListener('click', () => setDragTarget('media'));
+      }
+      document.querySelectorAll('.drag-act-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setDragAction(btn.dataset.dragact);
+        });
+      });
+
+      if (dragActResetBtn) {
+        dragActResetBtn.addEventListener('click', () => {
+          if (state.interaction.target === 'media') {
+            state.photo.scale = 1.0;
+            state.photo.rotation = 0;
+            state.photo.panX = 0;
+            state.photo.panY = 0;
+            setSliderValue('photoScaleRange', 100);
+            setSliderValue('photoRotateRange', 0);
+            setSliderValue('photoPanXRange', 0);
+            setSliderValue('photoPanYRange', 0);
+            showGestureToast('↺ MEDIA TRANSFORM RESET');
+          } else {
+            state.type.x = WIDTH / 2;
+            state.type.y = HEIGHT / 2;
+            state.type.angle = 0;
+            state.type.rotX = 0.35;
+            state.type.rotY = 0.45;
+            state.type.rotZ = 0;
+            setSliderValue('fontSizeRange', 95);
+            setSliderValue('radius3DRange', 260);
+            setSliderValue('textRotateRange', 0);
+            showGestureToast('↺ TEXT TRANSFORM RESET');
+          }
+        });
+      }
+
       applyMode();
 
       if (diamondToggleBtn) {
@@ -5196,12 +5536,21 @@ RAW SIGNAL</textarea>
         defaultSubEngine: 'transform',
         subEngines: {
           transform: {
-            name: 'TRANSFORM & PAN',
+            name: 'ZOOM, ROT & PAN',
             icon: '🔍',
             knobs: [
               { id: 'photoScaleRange', label: 'ZOOM SCALE', unit: 'x', format: (v) => (v / 100).toFixed(1) + 'x', color: '#ffe600' },
+              { id: 'photoRotateRange', label: 'ROTATE', unit: '°', format: (v) => v + '°', color: '#ffe600' },
+              { id: 'photoPanXRange', label: 'PAN X', unit: 'px', format: (v) => v + 'px', color: '#ffe600' }
+            ]
+          },
+          pan: {
+            name: 'PAN X / Y & SCALE',
+            icon: '✥',
+            knobs: [
               { id: 'photoPanXRange', label: 'PAN X', unit: 'px', format: (v) => v + 'px', color: '#ffe600' },
-              { id: 'photoPanYRange', label: 'PAN Y', unit: 'px', format: (v) => v + 'px', color: '#ffe600' }
+              { id: 'photoPanYRange', label: 'PAN Y', unit: 'px', format: (v) => v + 'px', color: '#ffe600' },
+              { id: 'photoScaleRange', label: 'ZOOM SCALE', unit: 'x', format: (v) => (v / 100).toFixed(1) + 'x', color: '#ffe600' }
             ]
           },
           color: {
@@ -5633,6 +5982,12 @@ RAW SIGNAL</textarea>
       if (activeLeft) activeLeft.classList.remove('hidden');
       const activeRight = document.getElementById(mod.wingRight);
       if (activeRight) activeRight.classList.remove('hidden');
+
+      if (modKey === 'photo' && window.setDragTarget) {
+        window.setDragTarget('media', true);
+      } else if (modKey === 'text' && window.setDragTarget) {
+        window.setDragTarget('text', true);
+      }
 
       closeSidePopovers();
       closeSubEngineMenu();
@@ -6953,7 +7308,12 @@ RAW SIGNAL</textarea>
       const sideResetTransformBtn = document.getElementById('sideResetTransformBtn');
       if (sideResetTransformBtn) {
         sideResetTransformBtn.addEventListener('click', () => {
+          state.photo.scale = 1.0;
+          state.photo.rotation = 0;
+          state.photo.panX = 0;
+          state.photo.panY = 0;
           setSliderValue('photoScaleRange', 100);
+          setSliderValue('photoRotateRange', 0);
           setSliderValue('photoPanXRange', 0);
           setSliderValue('photoPanYRange', 0);
           showGestureToast('↺ TRANSFORM RESET');
@@ -7095,6 +7455,16 @@ RAW SIGNAL</textarea>
       }
 
       if (topTextInput) {
+        topTextInput.value = state.type.text;
+        topTextInput.addEventListener('focus', () => {
+          if (window.innerWidth < 900) {
+            document.body.classList.add('keyboard-open');
+          }
+        });
+        topTextInput.addEventListener('blur', () => {
+          state.isTyping = false;
+          document.body.classList.remove('keyboard-open');
+        });
         topTextInput.addEventListener('input', (e) => {
           state.type.text = e.target.value;
           if (textInput) textInput.value = e.target.value;
@@ -7173,6 +7543,7 @@ RAW SIGNAL</textarea>
 
       bind('fontSizeRange', state.type, 'fontSize', 'fontSizeLabel', 'px');
       bind('letterSpacingRange', state.type, 'letterSpacing', 'letterSpacingLabel', 'px');
+      bind('textRotateRange', state.type, 'angle', 'textRotateLabel', '°');
       bind('radius3DRange', state.type, 'radius3D', 'radius3DLabel', 'px');
       bind('speed3DRange', state.type, 'speed3D', 'speed3DLabel', 'x', 0.1);
 
@@ -7955,13 +8326,19 @@ RAW SIGNAL</textarea>
       bind('photoBrightnessRange', state.photo, 'brightness', 'photoBrightnessLabel', '%');
       bind('photoGammaRange', state.photo, 'gamma', 'photoGammaLabel', 'x', 0.1);
       bind('photoScaleRange', state.photo, 'scale', 'photoScaleLabel', 'x', 0.01);
+      bind('photoRotateRange', state.photo, 'rotation', 'photoRotateLabel', '°');
       bind('photoPanXRange', state.photo, 'panX', 'photoPanXLabel', 'px');
       bind('photoPanYRange', state.photo, 'panY', 'photoPanYLabel', 'px');
 
       const photoResetTransformBtn = document.getElementById('photoResetTransformBtn');
       if (photoResetTransformBtn) {
         photoResetTransformBtn.addEventListener('click', () => {
+          state.photo.scale = 1.0;
+          state.photo.rotation = 0;
+          state.photo.panX = 0;
+          state.photo.panY = 0;
           setSliderValue('photoScaleRange', 100);
+          setSliderValue('photoRotateRange', 0);
           setSliderValue('photoPanXRange', 0);
           setSliderValue('photoPanYRange', 0);
         });
@@ -8144,6 +8521,7 @@ RAW SIGNAL</textarea>
         const rand = SLOGANS[Math.floor(Math.random() * SLOGANS.length)];
         state.type.text = rand;
         document.getElementById('textInput').value = rand;
+        if (topTextInput) topTextInput.value = rand;
         state.isTyping = false;
       });
 
