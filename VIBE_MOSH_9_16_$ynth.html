@@ -4424,23 +4424,17 @@ RAW SIGNAL</textarea>
       targetCtx.putImageData(img, 0, 0);
     }
 
-    // ==================== CRT SYNC SUPPRESSION & ROLL ENGINE ====================
+    // ==================== 1990s CABLE TV SINE-WAVE SYNC SUPPRESSION ENGINE ====================
     let syncNoiseCanvas = null;
     let syncNoiseCtx = null;
+    let syncScratchCanvas = null;
+    let syncScratchCtx = null;
 
     function getSyncNoiseCanvas() {
-      if (!syncNoiseCanvas) {
+      if (!syncNoiseCanvas && typeof document !== 'undefined') {
         syncNoiseCanvas = document.createElement('canvas');
-        syncNoiseCanvas.width = 256;
-        syncNoiseCanvas.height = 256;
-        syncNoiseCtx = syncNoiseCanvas.getContext('2d');
-        const imgData = syncNoiseCtx.createImageData(256, 256);
-        const data32 = new Uint32Array(imgData.data.buffer);
-        for (let i = 0; i < data32.length; i++) {
-          const v = (Math.random() * 255) | 0;
-          data32[i] = (255 << 24) | (v << 16) | (v << 8) | v;
-        }
-        syncNoiseCtx.putImageData(imgData, 0, 0);
+        syncNoiseCanvas.width = 64;
+        syncNoiseCanvas.height = 64;
       }
       return syncNoiseCanvas;
     }
@@ -4448,8 +4442,8 @@ RAW SIGNAL</textarea>
     function applySyncSuppression(targetCtx, sync, tick) {
       if (!sync || !sync.active) return;
 
-      // 1. Step position
-      const spd = (sync.speed !== undefined ? sync.speed : 12) * 0.0015;
+      // 1. Step rolling phase & vertical blanking position
+      const spd = (sync.speed !== undefined ? sync.speed : 12) * 0.0016;
       sync.pos = ((sync.pos || 0) + spd);
       if (sync.pos > 1) sync.pos -= 1;
       if (sync.pos < 0) sync.pos += 1;
@@ -4458,173 +4452,280 @@ RAW SIGNAL</textarea>
       const widthPct = Math.min(60, Math.max(2, sync.width || 18)) / 100;
       const color = sync.color || '#000000';
       const isInvert = (color === 'invert' || color === '#difference');
-      const noiseLevel = Math.min(100, Math.max(0, sync.noise !== undefined ? sync.noise : 65)) / 100;
+      const hasCustomColor = (color && color !== '#000000' && !isInvert);
+      // sync.noise now controls 1990s SSAVI Chroma Inversion & Sine-Wave Scramble Intensity (NO gray static noise!)
+      const waveLevel = Math.min(100, Math.max(0, sync.noise !== undefined ? sync.noise : 65)) / 100;
       const tearLevel = Math.min(100, Math.max(0, sync.tear !== undefined ? sync.tear : 45)) / 100;
+
+      // Snapshot clean source canvas so circular scanline wrapping never overwrites itself mid-scan
+      let srcCanvas = targetCtx.canvas;
+      if (typeof document !== 'undefined' && targetCtx.canvas) {
+        if (!syncScratchCanvas) {
+          syncScratchCanvas = document.createElement('canvas');
+          syncScratchCanvas.width = WIDTH;
+          syncScratchCanvas.height = HEIGHT;
+          syncScratchCtx = syncScratchCanvas.getContext('2d');
+        }
+        syncScratchCtx.clearRect(0, 0, WIDTH, HEIGHT);
+        syncScratchCtx.drawImage(targetCtx.canvas, 0, 0);
+        srcCanvas = syncScratchCanvas;
+      }
+
+      const phase = sync.pos * Math.PI * 2 + (tick || 0) * 0.14;
+      const primaryToothColor = hasCustomColor ? color : '#ff1e56';
+      const secondaryToothColor = hasCustomColor ? color : '#ff6a00';
+      const tertiaryToothColor = '#b829ff';
 
       targetCtx.save();
 
       if (direction === 'horizontal') {
-        // Vertical Roll / Horizontal Blanking Band
-        const bandH = Math.round(HEIGHT * widthPct);
-        const bandY = Math.round(sync.pos * HEIGHT) - Math.round(bandH / 2);
+        // ==================== 1990s HORIZONTAL SINE-WAVE CABLE SCRAMBLER ====================
+        const sh = 4; // 4px scanline strip for crisp 60fps analog raster feel
+        const maxWaveAmp = Math.round(WIDTH * (0.09 + widthPct * 0.52 + waveLevel * 0.16));
+        const ribbonW = Math.max(18, Math.round(WIDTH * (0.035 + widthPct * 0.16)));
+        const syncTipW = Math.max(3, Math.round(ribbonW * 0.22));
+        const anchorX = Math.round(WIDTH * 0.46);
 
-        // Pre-tear & Post-tear scanline jitter along the sync edges
-        if (tearLevel > 0) {
-          const maxJitter = tearLevel * 75;
-          const tearCount = Math.floor(10 + tearLevel * 25);
-          for (let i = 0; i < tearCount; i++) {
-            const spread = (Math.random() - 0.5) * (bandH * 1.6);
-            let sy = Math.round(bandY + bandH / 2 + spread);
-            if (sy < 0) sy += HEIGHT;
-            sy %= HEIGHT;
-            const sh = Math.floor(Math.random() * 5) + 2;
-            const shift = (Math.random() - 0.5) * maxJitter;
-            targetCtx.drawImage(targetCtx.canvas, 0, sy, WIDTH, sh, shift, sy, WIDTH, sh);
+        for (let y = 0; y < HEIGHT; y += sh) {
+          const normY = y / HEIGHT;
+          // Multi-harmonic 1990s SSAVI sine-wave horizontal sync displacement
+          const w1 = Math.sin(normY * Math.PI * 2 * 2.0 + phase);
+          const w2 = Math.sin(normY * Math.PI * 2 * 5.0 - phase * 1.35) * 0.34;
+          const w3 = Math.cos(normY * Math.PI * 2 * 11.0 + phase * 2.2) * (0.10 + tearLevel * 0.25);
+
+          // High-frequency horizontal line-lock tear jitter
+          let hJitter = 0;
+          if (tearLevel > 0) {
+            const rawJit = Math.sin(y * 0.63 + (tick || 0) * 8.7) * Math.cos(y * 0.29 - (tick || 0) * 4.3);
+            hJitter = rawJit * (tearLevel * 54);
+            // Extra sharp horizontal comb tear spikes on steep wave slopes
+            if (Math.abs(rawJit) > 0.72) {
+              hJitter += (rawJit > 0 ? 1 : -1) * tearLevel * 42;
+            }
+          }
+
+          const rawShift = Math.round((w1 + w2 + w3) * maxWaveAmp + hJitter);
+          let shiftX = rawShift % WIDTH;
+          if (shiftX < 0) shiftX += WIDTH;
+
+          // 1. Circularly wrap scanline strip (preserves 100% of media & text!)
+          if (shiftX > 0) {
+            const rightPart = WIDTH - shiftX;
+            targetCtx.drawImage(srcCanvas, 0, y, rightPart, sh, shiftX, y, rightPart, sh);
+            targetCtx.drawImage(srcCanvas, rightPart, y, shiftX, sh, 0, y, shiftX, sh);
+          } else {
+            targetCtx.drawImage(srcCanvas, 0, y, WIDTH, sh, 0, y, WIDTH, sh);
+          }
+
+          // 2. 1990s SSAVI Video Polarity & Chroma Phase Inversion Bands (keeps all media detail!)
+          if (waveLevel > 0 || isInvert) {
+            const carrier = Math.sin(normY * Math.PI * 2 * 3.0 - phase * 1.15) +
+                            Math.cos(normY * Math.PI * 2 * 7.0 + phase * 0.75) * 0.45;
+            const thresh = isInvert ? -2.0 : (1.12 - waveLevel * 0.92);
+            if (carrier > thresh || (waveLevel > 0.45 && Math.abs(w1) > (1.08 - waveLevel * 0.55))) {
+              targetCtx.save();
+              targetCtx.globalCompositeOperation = 'difference';
+              const bandIdx = ((y / sh) | 0);
+              if (isInvert) {
+                targetCtx.globalAlpha = 0.88;
+                targetCtx.fillStyle = '#ffffff';
+              } else if (carrier > thresh + 0.32) {
+                // Classic 1990s inverted cable magenta/crimson/amber solarization
+                targetCtx.globalAlpha = Math.min(0.86, 0.32 + waveLevel * 0.52);
+                targetCtx.fillStyle = (bandIdx % 6 < 3) ? '#e040fb' : '#ff2a55';
+              } else {
+                targetCtx.globalAlpha = Math.min(0.75, 0.24 + waveLevel * 0.44);
+                targetCtx.fillStyle = hasCustomColor ? color : '#ff7700';
+              }
+              targetCtx.fillRect(0, y, WIDTH, sh);
+              targetCtx.restore();
+            }
+          }
+
+          // 3. Snaking S-Curve Horizontal Blanking Interval (HBI) Ribbon + Sawtooth Colorburst Teeth
+          const seamX = (anchorX + shiftX) % WIDTH;
+          const ribX = seamX - (ribbonW >> 1);
+
+          // Front & Back Porch dark analog blanking slot
+          targetCtx.fillStyle = 'rgba(8, 3, 18, 0.78)';
+          targetCtx.fillRect(ribX, y, ribbonW, sh);
+          if (ribX < 0) targetCtx.fillRect(ribX + WIDTH, y, ribbonW, sh);
+          if (ribX + ribbonW > WIDTH) targetCtx.fillRect(ribX - WIDTH, y, ribbonW, sh);
+
+          // High-voltage white/cyan Sync Tip stripe inside the S-curve ribbon
+          const tipX = seamX - (syncTipW >> 1);
+          targetCtx.fillStyle = '#f4ffff';
+          targetCtx.fillRect(tipX, y, syncTipW, sh);
+
+          // Serrated Red/Orange/Magenta Sawtooth Colorburst Fringe on trailing edge of S-curve
+          const rowIndex = (y / sh) | 0;
+          const sawMod = rowIndex % 3;
+          const toothBase = 14 + Math.round((widthPct * 85 + tearLevel * 65) * (0.35 + 0.65 * Math.abs(Math.sin(y * 0.19 + phase * 2.0))));
+          const toothLen = (sawMod === 0) ? toothBase : ((sawMod === 1) ? Math.round(toothBase * 0.58) : Math.round(toothBase * 0.25));
+          const toothStartX = (ribX + ribbonW) % WIDTH;
+
+          targetCtx.fillStyle = (sawMod === 0) ? primaryToothColor : ((sawMod === 1) ? secondaryToothColor : tertiaryToothColor);
+          targetCtx.fillRect(toothStartX, y, toothLen, sh);
+          if (toothStartX + toothLen > WIDTH) {
+            targetCtx.fillRect(toothStartX - WIDTH, y, toothLen, sh);
+          }
+
+          // Crisp white/cyan sawtooth step highlight on leading edge of every 3rd scanline tooth
+          if (sawMod === 0) {
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.fillRect(toothStartX, y, Math.min(8, Math.max(3, toothLen >> 2)), Math.max(2, sh - 1));
           }
         }
 
-        // Draw blanking bar across wrapped coordinates
-        const drawHorizontalBarAt = (yPos) => {
-          if (isInvert) {
-            targetCtx.save();
-            targetCtx.globalCompositeOperation = 'difference';
+        // 4. Rolling V-Blanking Interval (VBI) Bar with VITS & Closed-Caption Sync Dashes (Zero Gray Noise!)
+        const vbiH = Math.max(16, Math.round(HEIGHT * (0.018 + widthPct * 0.08)));
+        const vbiY = Math.round(sync.pos * HEIGHT) - (vbiH >> 1);
+
+        const drawVbiBar = (yPos) => {
+          // Sleek dark VBI hammerhead slot (translucent so underlying media still shines through)
+          targetCtx.fillStyle = 'rgba(6, 2, 16, 0.82)';
+          targetCtx.fillRect(0, yPos, WIDTH, vbiH);
+
+          // Glowing purple/magenta top & bottom equalizing lines
+          targetCtx.fillStyle = hasCustomColor ? color : '#b829ff';
+          targetCtx.fillRect(0, yPos, WIDTH, 2);
+          targetCtx.fillRect(0, yPos + vbiH - 2, WIDTH, 2);
+
+          // VITS (Vertical Interval Test Signal) white & cyan sync pulse dashes across center
+          const dashY = yPos + (vbiH >> 1) - 2;
+          const dashStep = 48;
+          const dashShift = Math.round(((tick || 0) * 14) % dashStep);
+          for (let dx = -dashStep + dashShift; dx < WIDTH; dx += dashStep) {
             targetCtx.fillStyle = '#ffffff';
-            targetCtx.fillRect(0, yPos, WIDTH, bandH);
-            targetCtx.restore();
-          } else {
-            targetCtx.save();
-            targetCtx.fillStyle = color;
-            targetCtx.fillRect(0, yPos, WIDTH, bandH);
-
-            // Classic analog sync pulse stripe inside the blanking interval
-            targetCtx.fillStyle = 'rgba(255, 255, 255, 0.18)';
-            targetCtx.fillRect(0, yPos + Math.round(bandH * 0.42), WIDTH, Math.max(2, Math.round(bandH * 0.16)));
-            targetCtx.restore();
-          }
-
-          // Raster Noise Hash overlay
-          if (noiseLevel > 0) {
-            targetCtx.save();
-            targetCtx.globalAlpha = noiseLevel * 0.7;
-            targetCtx.globalCompositeOperation = isInvert ? 'difference' : 'screen';
-            const noiseCanvas = getSyncNoiseCanvas();
-            const offX = Math.floor((tick * 83) % 256);
-            const offY = Math.floor((tick * 97) % 256);
-            for (let ny = yPos; ny < yPos + bandH; ny += 256) {
-              for (let nx = 0; nx < WIDTH; nx += 256) {
-                targetCtx.drawImage(noiseCanvas, offX, offY, 128, 128, nx, ny, 256, 256);
-              }
-            }
-            targetCtx.restore();
+            targetCtx.fillRect(dx, dashY, 22, 3);
+            targetCtx.fillStyle = '#00f5d4';
+            targetCtx.fillRect(dx + 26, dashY, 8, 3);
           }
         };
 
-        drawHorizontalBarAt(bandY);
-        if (bandY < 0) drawHorizontalBarAt(bandY + HEIGHT);
-        if (bandY + bandH > HEIGHT) drawHorizontalBarAt(bandY - HEIGHT);
+        drawVbiBar(vbiY);
+        if (vbiY < 0) drawVbiBar(vbiY + HEIGHT);
+        if (vbiY + vbiH > HEIGHT) drawVbiBar(vbiY - HEIGHT);
 
       } else if (direction === 'vertical') {
-        // Horizontal Drift / Vertical Blanking Band
-        const bandW = Math.round(WIDTH * widthPct);
-        const bandX = Math.round(sync.pos * WIDTH) - Math.round(bandW / 2);
+        // ==================== 1990s VERTICAL SINE-WAVE CABLE SCRAMBLER ====================
+        const sw = 4;
+        const maxWaveAmp = Math.round(HEIGHT * (0.08 + widthPct * 0.45 + waveLevel * 0.14));
+        const ribbonH = Math.max(18, Math.round(HEIGHT * (0.03 + widthPct * 0.14)));
+        const syncTipH = Math.max(3, Math.round(ribbonH * 0.22));
+        const anchorY = Math.round(HEIGHT * 0.48);
 
-        if (tearLevel > 0) {
-          const maxJitter = tearLevel * 60;
-          const tearCount = Math.floor(10 + tearLevel * 25);
-          for (let i = 0; i < tearCount; i++) {
-            const spread = (Math.random() - 0.5) * (bandW * 1.6);
-            let sx = Math.round(bandX + bandW / 2 + spread);
-            if (sx < 0) sx += WIDTH;
-            sx %= WIDTH;
-            const sw = Math.floor(Math.random() * 5) + 2;
-            const shift = (Math.random() - 0.5) * maxJitter;
-            targetCtx.drawImage(targetCtx.canvas, sx, 0, sw, HEIGHT, sx, shift, sw, HEIGHT);
+        for (let x = 0; x < WIDTH; x += sw) {
+          const normX = x / WIDTH;
+          const w1 = Math.sin(normX * Math.PI * 2 * 2.0 + phase);
+          const w2 = Math.sin(normX * Math.PI * 2 * 5.0 - phase * 1.35) * 0.34;
+          let vJitter = 0;
+          if (tearLevel > 0) {
+            vJitter = Math.sin(x * 0.61 + (tick || 0) * 8.1) * (tearLevel * 48);
+          }
+
+          const rawShift = Math.round((w1 + w2) * maxWaveAmp + vJitter);
+          let shiftY = rawShift % HEIGHT;
+          if (shiftY < 0) shiftY += HEIGHT;
+
+          if (shiftY > 0) {
+            const bottomPart = HEIGHT - shiftY;
+            targetCtx.drawImage(srcCanvas, x, 0, sw, bottomPart, x, shiftY, sw, bottomPart);
+            targetCtx.drawImage(srcCanvas, x, bottomPart, sw, shiftY, x, 0, sw, shiftY);
+          } else {
+            targetCtx.drawImage(srcCanvas, x, 0, sw, HEIGHT, x, 0, sw, HEIGHT);
+          }
+
+          if (waveLevel > 0 || isInvert) {
+            const carrier = Math.sin(normX * Math.PI * 2 * 3.0 - phase * 1.15);
+            const thresh = isInvert ? -2.0 : (0.85 - waveLevel * 0.75);
+            if (carrier > thresh) {
+              targetCtx.save();
+              targetCtx.globalCompositeOperation = 'difference';
+              targetCtx.globalAlpha = isInvert ? 0.88 : Math.min(0.84, 0.30 + waveLevel * 0.50);
+              targetCtx.fillStyle = isInvert ? '#ffffff' : (((x / sw) | 0) % 4 < 2 ? '#e040fb' : primaryToothColor);
+              targetCtx.fillRect(x, 0, sw, HEIGHT);
+              targetCtx.restore();
+            }
+          }
+
+          const seamY = (anchorY + shiftY) % HEIGHT;
+          const ribY = seamY - (ribbonH >> 1);
+          targetCtx.fillStyle = 'rgba(8, 3, 18, 0.78)';
+          targetCtx.fillRect(x, ribY, sw, ribbonH);
+
+          targetCtx.fillStyle = '#f4ffff';
+          targetCtx.fillRect(x, seamY - (syncTipH >> 1), sw, syncTipH);
+
+          const colIndex = (x / sw) | 0;
+          const sawMod = colIndex % 3;
+          const toothBase = 16 + Math.round((widthPct * 80 + tearLevel * 60) * Math.abs(Math.sin(x * 0.17 + phase)));
+          const toothLen = (sawMod === 0) ? toothBase : Math.round(toothBase * 0.45);
+          targetCtx.fillStyle = (sawMod === 0) ? primaryToothColor : secondaryToothColor;
+          targetCtx.fillRect(x, (ribY + ribbonH) % HEIGHT, sw, toothLen);
+        }
+
+        const vbiW = Math.max(16, Math.round(WIDTH * (0.02 + widthPct * 0.08)));
+        const vbiX = Math.round(sync.pos * WIDTH) - (vbiW >> 1);
+        targetCtx.fillStyle = 'rgba(6, 2, 16, 0.82)';
+        targetCtx.fillRect(vbiX, 0, vbiW, HEIGHT);
+        targetCtx.fillStyle = '#ffffff';
+        for (let dy = 0; dy < HEIGHT; dy += 48) {
+          targetCtx.fillRect(vbiX + (vbiW >> 1) - 1, dy, 3, 22);
+        }
+
+      } else if (direction === 'diagonal') {
+        // ==================== 1990s DIAGONAL 45° SINE-WAVE CABLE SCRAMBLER ====================
+        const sh = 6;
+        const maxWaveAmp = Math.round(WIDTH * (0.06 + widthPct * 0.35));
+        for (let y = 0; y < HEIGHT; y += sh) {
+          const normY = y / HEIGHT;
+          const shift = Math.round(Math.sin(normY * Math.PI * 2 * 2.5 + phase) * maxWaveAmp);
+          let sx = shift % WIDTH;
+          if (sx < 0) sx += WIDTH;
+          if (sx > 0) {
+            const rightPart = WIDTH - sx;
+            targetCtx.drawImage(srcCanvas, 0, y, rightPart, sh, sx, y, rightPart, sh);
+            targetCtx.drawImage(srcCanvas, rightPart, y, sx, sh, 0, y, sx, sh);
           }
         }
 
-        const drawVerticalBarAt = (xPos) => {
-          if (isInvert) {
-            targetCtx.save();
-            targetCtx.globalCompositeOperation = 'difference';
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.fillRect(xPos, 0, bandW, HEIGHT);
-            targetCtx.restore();
-          } else {
-            targetCtx.save();
-            targetCtx.fillStyle = color;
-            targetCtx.fillRect(xPos, 0, bandW, HEIGHT);
-
-            targetCtx.fillStyle = 'rgba(255, 255, 255, 0.18)';
-            targetCtx.fillRect(xPos + Math.round(bandW * 0.42), 0, Math.max(2, Math.round(bandW * 0.16)), HEIGHT);
-            targetCtx.restore();
-          }
-
-          if (noiseLevel > 0) {
-            targetCtx.save();
-            targetCtx.globalAlpha = noiseLevel * 0.7;
-            targetCtx.globalCompositeOperation = isInvert ? 'difference' : 'screen';
-            const noiseCanvas = getSyncNoiseCanvas();
-            const offX = Math.floor((tick * 83) % 256);
-            const offY = Math.floor((tick * 97) % 256);
-            for (let ny = 0; ny < HEIGHT; ny += 256) {
-              for (let nx = xPos; nx < xPos + bandW; nx += 256) {
-                targetCtx.drawImage(noiseCanvas, offX, offY, 128, 128, nx, ny, 256, 256);
-              }
-            }
-            targetCtx.restore();
-          }
-        };
-
-        drawVerticalBarAt(bandX);
-        if (bandX < 0) drawVerticalBarAt(bandX + WIDTH);
-        if (bandX + bandW > WIDTH) drawVerticalBarAt(bandX - WIDTH);
-
-      } else if (direction === 'diagonal') {
-        // Diagonal 45 degree loss-of-sync bar
         const diagLen = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
-        const bandH = Math.round(diagLen * widthPct);
-        const diagY = Math.round(sync.pos * diagLen) - Math.round(bandH / 2);
+        const ribbonW = Math.max(20, Math.round(diagLen * (0.025 + widthPct * 0.12)));
 
         targetCtx.save();
         targetCtx.translate(WIDTH / 2, HEIGHT / 2);
         targetCtx.rotate(Math.PI / 4);
         targetCtx.translate(-diagLen / 2, -diagLen / 2);
 
-        const drawDiagBarAt = (yPos) => {
-          if (isInvert) {
-            targetCtx.save();
-            targetCtx.globalCompositeOperation = 'difference';
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.fillRect(0, yPos, diagLen, bandH);
-            targetCtx.restore();
-          } else {
-            targetCtx.save();
-            targetCtx.fillStyle = color;
-            targetCtx.fillRect(0, yPos, diagLen, bandH);
-            targetCtx.fillStyle = 'rgba(255, 255, 255, 0.18)';
-            targetCtx.fillRect(0, yPos + Math.round(bandH * 0.42), diagLen, Math.max(2, Math.round(bandH * 0.16)));
-            targetCtx.restore();
-          }
+        const step = 6;
+        const anchorX = Math.round(diagLen * sync.pos);
+        for (let dy = 0; dy < diagLen; dy += step) {
+          const normD = dy / diagLen;
+          const waveX = Math.round(Math.sin(normD * Math.PI * 2 * 2.5 + phase) * (45 + widthPct * 160));
+          const curX = (anchorX + waveX + Math.round(diagLen)) % Math.round(diagLen);
 
-          if (noiseLevel > 0) {
-            targetCtx.save();
-            targetCtx.globalAlpha = noiseLevel * 0.7;
-            targetCtx.globalCompositeOperation = isInvert ? 'difference' : 'screen';
-            const noiseCanvas = getSyncNoiseCanvas();
-            const offX = Math.floor((tick * 83) % 256);
-            const offY = Math.floor((tick * 97) % 256);
-            for (let ny = yPos; ny < yPos + bandH; ny += 256) {
-              for (let nx = 0; nx < diagLen; nx += 256) {
-                targetCtx.drawImage(noiseCanvas, offX, offY, 128, 128, nx, ny, 256, 256);
-              }
+          if (waveLevel > 0 || isInvert) {
+            const carrier = Math.sin(normD * Math.PI * 2 * 4.0 - phase);
+            if (carrier > (0.9 - waveLevel * 0.75) || isInvert) {
+              targetCtx.save();
+              targetCtx.globalCompositeOperation = 'difference';
+              targetCtx.globalAlpha = isInvert ? 0.85 : Math.min(0.80, 0.28 + waveLevel * 0.48);
+              targetCtx.fillStyle = isInvert ? '#ffffff' : '#e040fb';
+              targetCtx.fillRect(0, dy, diagLen, step);
+              targetCtx.restore();
             }
-            targetCtx.restore();
           }
-        };
 
-        drawDiagBarAt(diagY);
-        if (diagY < 0) drawDiagBarAt(diagY + diagLen);
-        if (diagY + bandH > diagLen) drawDiagBarAt(diagY - diagLen);
+          targetCtx.fillStyle = 'rgba(8, 3, 18, 0.78)';
+          targetCtx.fillRect(curX - (ribbonW >> 1), dy, ribbonW, step);
+          targetCtx.fillStyle = '#ffffff';
+          targetCtx.fillRect(curX - 2, dy, 4, step);
+
+          const toothLen = (((dy / step) | 0) % 2 === 0) ? Math.round(20 + tearLevel * 55 + widthPct * 60) : 10;
+          targetCtx.fillStyle = primaryToothColor;
+          targetCtx.fillRect(curX + (ribbonW >> 1), dy, toothLen, step);
+        }
 
         targetCtx.restore();
       }
@@ -5976,18 +6077,18 @@ RAW SIGNAL</textarea>
             name: 'SYNC SUPPRESSION',
             icon: '⚡',
             knobs: [
-              { id: 'syncWidthRange', label: 'SYNC BAND', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'syncWidthRange', label: 'S-WAVE AMP', unit: '%', format: (v) => v + '%', color: '#ffe600' },
               { id: 'syncSpeedRange', label: 'ROLL SPD', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
-              { id: 'syncNoiseRange', label: 'NOISE HASH', unit: '%', format: (v) => v + '%', color: '#ff0055' }
+              { id: 'syncNoiseRange', label: 'CHROMA INV', unit: '%', format: (v) => v + '%', color: '#ff0055' }
             ]
           },
           syncTear: {
-            name: 'SYNC TEAR & HASH',
+            name: 'CABLE WAVE & TEAR',
             icon: '📻',
             knobs: [
-              { id: 'syncTearRange', label: 'EDGE TEAR', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
-              { id: 'syncNoiseRange', label: 'NOISE HASH', unit: '%', format: (v) => v + '%', color: '#ff0055' },
-              { id: 'syncWidthRange', label: 'SYNC BAND', unit: '%', format: (v) => v + '%', color: '#ffe600' }
+              { id: 'syncTearRange', label: 'COMB TEAR', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
+              { id: 'syncNoiseRange', label: 'CHROMA INV', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'syncWidthRange', label: 'S-WAVE AMP', unit: '%', format: (v) => v + '%', color: '#ffe600' }
             ]
           }
         }
@@ -6014,9 +6115,9 @@ RAW SIGNAL</textarea>
             name: 'SYNC SUPPRESSION',
             icon: '⚡',
             knobs: [
-              { id: 'syncWidthRange', label: 'SYNC BAND', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'syncWidthRange', label: 'S-WAVE AMP', unit: '%', format: (v) => v + '%', color: '#ffe600' },
               { id: 'syncSpeedRange', label: 'ROLL SPD', unit: 'x', format: (v) => (v / 10).toFixed(1) + 'x', color: '#ffe600' },
-              { id: 'syncNoiseRange', label: 'NOISE HASH', unit: '%', format: (v) => v + '%', color: '#ff0055' }
+              { id: 'syncNoiseRange', label: 'CHROMA INV', unit: '%', format: (v) => v + '%', color: '#ff0055' }
             ]
           },
           presets: {
@@ -7110,10 +7211,10 @@ RAW SIGNAL</textarea>
       if (sideSyncNoiseBtn) {
         sideSyncNoiseBtn.addEventListener('click', () => {
           const levels = [
-            { noise: 25, tear: 20, name: 'SUBTLE DRIFT' },
-            { noise: 65, tear: 45, name: 'STANDARD CRT' },
-            { noise: 90, tear: 80, name: 'HEAVY CORRUPT' },
-            { noise: 0, tear: 0, name: 'CLEAN BLANK' }
+            { noise: 25, tear: 20, name: 'SUBTLE S-WAVE' },
+            { noise: 65, tear: 45, name: '90s CABLE TV' },
+            { noise: 90, tear: 80, name: 'HEAVY SCRAMBLE' },
+            { noise: 0, tear: 0, name: 'PURE SINE WRAP' }
           ];
           const curNoise = state.fx.sync.noise;
           let next = levels[1];
@@ -7128,7 +7229,7 @@ RAW SIGNAL</textarea>
           const chk = document.getElementById('syncActiveCheck');
           if (chk) chk.checked = true;
           if (sideSyncToggleBtn) sideSyncToggleBtn.classList.add('active');
-          showGestureToast(`TEAR: ${next.name}`);
+          showGestureToast(`📺 SYNC: ${next.name}`);
         });
       }
 
