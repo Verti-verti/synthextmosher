@@ -2284,6 +2284,8 @@ RAW SIGNAL</textarea>
         thickness: 2,          // 1 - 16px (Thickness of individual linear streaks)
         spread: 28,            // 5 - 100% (Wideness/density of streak pattern across contours)
         speed: 0.7,            // 0.0 - 3.0x (Gentle organic animation speed)
+        opacity: 92,           // 15 - 100% (Streak blend opacity, modulated in Jam mode)
+        rgbShift: 0,           // 0 - 100% (Intra-streak R/G/B chromatic separation, modulated in Jam mode)
         phase: 0
       },
 
@@ -4004,6 +4006,9 @@ RAW SIGNAL</textarea>
       const lineThick = Math.max(1, Math.min(16, Math.round(opt.thickness !== undefined ? opt.thickness : 2)));
       const spreadPct = Math.max(0.05, Math.min(1.0, (opt.spread !== undefined ? opt.spread : 28) / 100));
       const flowSpeed = opt.speed !== undefined ? opt.speed : 0.7;
+      const sortOpacity = Math.max(0.15, Math.min(1.0, (opt.opacity !== undefined ? opt.opacity : 92) / 100));
+      const baseMaxAlpha = Math.round(235 * sortOpacity);
+      const rgbShiftNorm = Math.max(0, Math.min(1.0, (opt.rgbShift || 0) / 100));
 
       // Jam Finger Distortion Mask linkage (when Jam style is sortDrip or hybridVortex)
       const jamBurst = state.interaction.jamSortBurst || 0;
@@ -4045,6 +4050,7 @@ RAW SIGNAL</textarea>
         return false;
       };
 
+      // Direction is strictly determined ONLY by the Pixel Sorting mode (never overridden by Jam mode)
       const isVertical = opt.direction === 'vertical';
 
       if (isVertical) {
@@ -4164,18 +4170,25 @@ RAW SIGNAL</textarea>
                   else if (sampleT < 0.0) sampleT = 0.0;
 
                   const palIdx = sub[(sampleT * lastIdx) | 0];
+                  let rawSorted = sortPixels[palIdx];
+                  if (rgbShiftNorm > 0.02) {
+                    const tR = Math.min(0.999, Math.max(0.0, sampleT - rgbShiftNorm * 0.24));
+                    const tB = Math.min(0.999, Math.max(0.0, sampleT + rgbShiftNorm * 0.24));
+                    const pR = sortPixels[sub[(tR * lastIdx) | 0]];
+                    const pB = sortPixels[sub[(tB * lastIdx) | 0]];
+                    rawSorted = (pR & 0xff) | (rawSorted & 0xff00) | (pB & 0xff0000) | 0xff000000;
+                  }
                   // Soft silk low-pass filter along the drip so color transitions are never harsh or jagged
-                  const rawSorted = sortPixels[palIdx];
                   const silkyPixel = blendPixel32(rawSorted, prevSorted, 175);
                   prevSorted = silkyPixel;
 
-                  // Smooth organic root emergence + quadratic tail feathering (never overly sharp!)
-                  let alpha256 = 225;
+                  // Smooth organic root emergence + quadratic tail feathering scaled by sortOpacity
+                  let alpha256 = baseMaxAlpha;
                   if (prog < 0.16) {
-                    alpha256 = ((prog / 0.16) * 225) | 0;
+                    alpha256 = ((prog / 0.16) * baseMaxAlpha) | 0;
                   } else if (prog > 0.55) {
                     const tailT = (1.0 - prog) / 0.45;
-                    alpha256 = (tailT * tailT * 225) | 0;
+                    alpha256 = (tailT * tailT * baseMaxAlpha) | 0;
                   }
                   data32[destIdx] = blendPixel32(silkyPixel, destP, alpha256);
                 }
@@ -4295,16 +4308,23 @@ RAW SIGNAL</textarea>
                   else if (sampleT < 0.0) sampleT = 0.0;
 
                   const palIdx = sub[(sampleT * lastIdx) | 0];
-                  const rawSorted = sortPixels[palIdx];
+                  let rawSorted = sortPixels[palIdx];
+                  if (rgbShiftNorm > 0.02) {
+                    const tR = Math.min(0.999, Math.max(0.0, sampleT - rgbShiftNorm * 0.24));
+                    const tB = Math.min(0.999, Math.max(0.0, sampleT + rgbShiftNorm * 0.24));
+                    const pR = sortPixels[sub[(tR * lastIdx) | 0]];
+                    const pB = sortPixels[sub[(tB * lastIdx) | 0]];
+                    rawSorted = (pR & 0xff) | (rawSorted & 0xff00) | (pB & 0xff0000) | 0xff000000;
+                  }
                   const silkyPixel = blendPixel32(rawSorted, prevSorted, 175);
                   prevSorted = silkyPixel;
 
-                  let alpha256 = 225;
+                  let alpha256 = baseMaxAlpha;
                   if (prog < 0.16) {
-                    alpha256 = ((prog / 0.16) * 225) | 0;
+                    alpha256 = ((prog / 0.16) * baseMaxAlpha) | 0;
                   } else if (prog > 0.55) {
                     const tailT = (1.0 - prog) / 0.45;
-                    alpha256 = (tailT * tailT * 225) | 0;
+                    alpha256 = (tailT * tailT * baseMaxAlpha) | 0;
                   }
                   data32[destIdx] = blendPixel32(silkyPixel, destP, alpha256);
                 }
@@ -5653,25 +5673,30 @@ RAW SIGNAL</textarea>
         const rect = box.getBoundingClientRect();
         const nx = Math.min(1, Math.max(0, (cx - rect.left) / (rect.width || 1)));
         const ny = Math.min(1, Math.max(0, (cy - rect.top) / (rect.height || 1)));
+        const invY = 1 - ny; // 0.0 at bottom (diminish) -> 1.0 at top (increment)
         const style = state.interaction.jamStyle || 'sortDrip';
 
         if (style === 'sortDrip') {
-          // Style 1: PIXEL DRIP — links finger mask & XY directly to contour-following Pixel Sorting
-          state.interaction.jamSortBurst = 1.0;
-          const dripLen = Math.round(35 + (1 - ny) * 290);
-          const spreadVal = Math.round(18 + nx * 72);
-          const speedVal = Math.round(6 + (1 - ny) * 20);
+          // Style 1: PIXEL DRIP — XY increments/diminishes Pixel Sorting & modulates Opacity + RGB (Direction stays strictly locked to Pixel Sort mode)
+          const intensity = Math.max(0.08, Math.min(1.0, invY * 0.72 + nx * 0.28));
+          state.interaction.jamSortBurst = 0.20 + intensity * 0.95;
+
+          // Increment or diminish pixel sorting length & spread based on Y/X coordinates
+          const dripLen = Math.round(15 + invY * 335);
+          const spreadVal = Math.round(8 + invY * 52 + nx * 32);
+          const speedVal = Math.round(4 + invY * 18);
           setSliderValue('sortLengthRange', dripLen);
           setSliderValue('sortSpreadRange', spreadVal);
           setSliderValue('sortSpeedRange', speedVal);
-          // Dynamic directional response if user swipes strongly horizontally vs vertically
-          if (Math.abs(state.mosh.touchVx) > Math.abs(state.mosh.touchVy) * 1.8 && Math.abs(state.mosh.touchVx) > 10) {
-            state.sort.direction = 'horizontal';
-          } else if (Math.abs(state.mosh.touchVy) > Math.abs(state.mosh.touchVx) * 1.4 && Math.abs(state.mosh.touchVy) > 8) {
-            state.sort.direction = 'vertical';
-          }
+
+          // Modulate Pixel Sort Streak Opacity (25% translucent -> 100% opaque) & Intra-Streak RGB Shift + Chromatic RGB Split
+          state.sort.opacity = Math.round(25 + nx * 50 + invY * 25);
+          state.sort.rgbShift = Math.round(nx * 90);
+          state.fx.active = true;
+          setSliderValue('rgbSplitRange', Math.round(nx * 26));
+          setSliderValue('rgbAngleRange', Math.round((nx * 180 + invY * 180) % 360));
         } else if (style === 'smearBlocks') {
-          // Style 2: SMEAR BLOCK — links finger mask & XY to P-Frame Macroblocks & Slice Shear
+          // Style 2: SMEAR BLOCK — links finger mask & XY to P-Frame Macroblocks, Opacity & RGB
           const shearInput = document.getElementById('moshSliceRange');
           const smearInput = document.getElementById('moshSmearRange');
           if (shearInput) {
@@ -5680,28 +5705,35 @@ RAW SIGNAL</textarea>
           }
           if (smearInput) {
             const smearMax = parseFloat(smearInput.max) || 95;
-            setSliderValue('moshSmearRange', Math.round((1 - ny) * smearMax));
+            setSliderValue('moshSmearRange', Math.round(invY * smearMax));
           }
           const vectorForceInput = document.getElementById('vectorForceRange');
           if (vectorForceInput) {
             const vMax = parseFloat(vectorForceInput.max) || 60;
-            setSliderValue('vectorForceRange', Math.round(10 + nx * (vMax - 10)));
+            setSliderValue('vectorForceRange', Math.round(8 + nx * (vMax - 8)));
           }
           const persistInput = document.getElementById('pframePersistenceRange');
           if (persistInput) {
             const pMin = parseFloat(persistInput.min) || 60;
             const pMax = parseFloat(persistInput.max) || 98;
-            const pVal = Math.round(pMin + (1 - ny) * (pMax - pMin));
+            const pVal = Math.round(pMin + invY * (pMax - pMin));
             setSliderValue('pframePersistenceRange', pVal);
           }
+          state.fx.active = true;
+          setSliderValue('rgbSplitRange', Math.round(nx * 22));
         } else {
-          // Style 3: VORTEX MIX (hybridVortex) — combines Pixel Sort Drips + P-Frame Melt + Chromatic Split inside Finger Mask
-          state.interaction.jamSortBurst = 1.15;
-          setSliderValue('sortLengthRange', Math.round(45 + (1 - ny) * 220));
-          setSliderValue('sortSpreadRange', Math.round(24 + nx * 58));
-          setSliderValue('vectorForceRange', Math.round(14 + nx * 42));
-          setSliderValue('pframePersistenceRange', Math.round(66 + (1 - ny) * 28));
-          setSliderValue('rgbSplitRange', Math.round(4 + nx * 24));
+          // Style 3: VORTEX MIX (hybridVortex) — increments/diminishes Pixel Sort + P-Frame Melt + Opacity + RGB (Direction locked to Pixel Sort mode)
+          const intensity = Math.max(0.10, Math.min(1.0, invY * 0.65 + nx * 0.35));
+          state.interaction.jamSortBurst = 0.25 + intensity * 1.05;
+          setSliderValue('sortLengthRange', Math.round(18 + invY * 260));
+          setSliderValue('sortSpreadRange', Math.round(12 + invY * 42 + nx * 32));
+          state.sort.opacity = Math.round(28 + nx * 47 + invY * 25);
+          state.sort.rgbShift = Math.round(nx * 95);
+          setSliderValue('vectorForceRange', Math.round(10 + nx * 44));
+          setSliderValue('pframePersistenceRange', Math.round(62 + invY * 32));
+          state.fx.active = true;
+          setSliderValue('rgbSplitRange', Math.round(2 + nx * 28));
+          setSliderValue('rgbAngleRange', Math.round((nx * 220 + invY * 140) % 360));
         }
       }
 
