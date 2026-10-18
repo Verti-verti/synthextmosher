@@ -485,7 +485,7 @@
 
   <!-- ==================== FLOATING TOP BAR & MODULAR PIPELINE ==================== -->
   <header id="topBar" class="absolute top-0 inset-x-0 z-30 pointer-events-none p-1.5 sm:p-2 flex flex-col items-center gap-1.5">
-    <!-- Top row: Clean Hold + Module Selector + Tap-to-Write Trigger -->
+    <!-- Top row: Clean Hold + Module Selector + CHAOS Button (Green Circle Position) -->
     <div class="w-full max-w-md pointer-events-auto flex items-center justify-between gap-2 px-1">
       <button id="holdCleanBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-cyan/20 active:text-cyber-cyan border border-white/15 text-[10px] text-slate-300 font-bold transition shadow-lg shrink-0" title="Hold to preview clean unmoshed frame">
         👁️ Clean
@@ -497,10 +497,10 @@
         <span class="text-[9px] text-slate-400">▾</span>
       </button>
 
-      <!-- Subtle Tap-to-Write Pill (Shown when Text module is active; tapping screen also opens editor) -->
-      <button id="tapToWriteBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md border border-cyber-cyan/50 text-cyber-cyan text-[10px] font-bold flex items-center gap-1 shadow-lg active:scale-95 transition shrink-0" title="Tap screen or click here to write text">
-        <span>✏️</span>
-        <span>WRITE</span>
+      <!-- Original CHAOS Button in Top-Right Green Circle Position (Triggers 8 Multi-Effect Combinations of >=3 FX) -->
+      <button id="topChaosBtn" type="button" class="tap-btn px-3 py-1.5 rounded-xl bg-cyber-pink/20 backdrop-blur-md border-2 border-cyber-pink text-white text-[10px] font-black tracking-wider flex items-center gap-1 shadow-[0_0_14px_rgba(255,0,85,0.45)] active:scale-90 transition hover:bg-cyber-pink hover:text-black shrink-0" title="Chaos: Random Aesthetic Combination of 3+ Effects">
+        <span>🎲</span>
+        <span>CHAOS</span>
       </button>
     </div>
 
@@ -607,7 +607,7 @@ RAW SIGNAL</textarea>
   <!-- ==================== FLOATING SIDE WINGS & CONTEXTUAL MENUS ==================== -->
   <!-- LEFT SIDE WING (Docked vertically on left edge) -->
   <aside id="leftSideWing" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-30 pointer-events-auto flex flex-col gap-2">
-    <!-- Text Module Tools: Font & Animation -->
+    <!-- Text Module Tools: Font, Animation, Write & Hide/Show Text -->
     <div id="wingGroupTextLeft" class="flex flex-col gap-2">
       <button id="sideFontBtn" type="button" class="side-wing-btn" title="Choose Font">
         <span class="text-sm">🔤</span>
@@ -616,6 +616,10 @@ RAW SIGNAL</textarea>
       <button id="sideAnimBtn" type="button" class="side-wing-btn" title="Motion Animation">
         <span class="text-sm">✨</span>
         <span class="text-[8px] font-bold text-slate-300">ANIM</span>
+      </button>
+      <button id="tapToWriteBtn" type="button" class="side-wing-btn" title="Tap to Write Text">
+        <span class="text-sm">✏️</span>
+        <span class="text-[8px] font-bold text-slate-300">WRITE</span>
       </button>
     </div>
 
@@ -671,8 +675,12 @@ RAW SIGNAL</textarea>
       </button>
     </div>
 
-    <!-- Media Module Tools: Sources & Live/Playback Controls -->
+    <!-- Media Module Tools: Sources & Live Feed & Playback Controls -->
     <div id="wingGroupPhotoLeft" class="hidden flex flex-col gap-2">
+      <button id="sideLiveFeedBtn" type="button" class="side-wing-btn" title="Toggle Live Camera Feed (Front/Back, Lenses, 16:9 / 1:1)">
+        <span id="sideLiveFeedIcon" class="text-sm">🔴</span>
+        <span id="sideLiveFeedLabel" class="text-[8px] font-bold text-slate-300">LIVE</span>
+      </button>
       <label class="side-wing-btn cursor-pointer" title="Import from Gallery">
         <span class="text-sm">🖼️</span>
         <span class="text-[8px] font-bold text-slate-300">FILE</span>
@@ -704,8 +712,12 @@ RAW SIGNAL</textarea>
 
   <!-- RIGHT SIDE WING (Docked vertically on right edge) -->
   <aside id="rightSideWing" class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-30 pointer-events-auto flex flex-col gap-2">
-    <!-- Text Module: Color & Alignment & Chaos -->
+    <!-- Text Module: Hide/Show Text Toggle, Color, Alignment & Zine -->
     <div id="wingGroupTextRight" class="flex flex-col gap-2">
+      <button id="sideTextToggleBtn" type="button" class="side-wing-btn active" title="Hide / Show Text On Screen (Toggle Text Visibility)">
+        <span id="sideTextToggleIcon" class="text-sm">👁️</span>
+        <span id="sideTextToggleLabel" class="text-[8px] font-bold text-slate-300">TEXT</span>
+      </button>
       <button id="sideColorBtn" type="button" class="side-wing-btn" title="Colors & Gradients">
         <span class="text-sm">🎨</span>
         <span class="text-[8px] font-bold text-slate-300">COLOR</span>
@@ -714,14 +726,18 @@ RAW SIGNAL</textarea>
         <span id="sideAlignIcon" class="text-sm">⏸️</span>
         <span id="sideAlignLabel" class="text-[8px] font-bold text-slate-300">MID</span>
       </button>
-      <button id="sideChaosBtn" type="button" class="side-wing-btn" title="Zine / Ransom Chaos (2-Finger Tap)">
-        <span class="text-sm">🎲</span>
-        <span class="text-[8px] font-bold text-slate-300">CHAOS</span>
+      <button id="sideChaosBtn" type="button" class="side-wing-btn" title="Zine / Ransom Letter Size Toggle">
+        <span class="text-sm">🔠</span>
+        <span class="text-[8px] font-bold text-slate-300">ZINE</span>
       </button>
     </div>
 
-    <!-- Mosh Module: Video Coupling & Buffer Clear -->
+    <!-- Mosh Module: Power Toggle, Video Coupling & Buffer Clear -->
     <div id="wingGroupMoshRight" class="hidden flex flex-col gap-2">
+      <button id="sideMoshPowerBtn" type="button" class="side-wing-btn" title="Toggle Mosh Engine Active / Inactive">
+        <span class="text-sm">⏻</span>
+        <span class="text-[8px] font-bold text-slate-300">MOSH</span>
+      </button>
       <button id="sideVideoCouplingBtn" type="button" class="side-wing-btn" title="Toggle Motion Coupling with Video">
         <span class="text-sm">🔗</span>
         <span class="text-[8px] font-bold text-slate-300">LINK</span>
@@ -732,8 +748,12 @@ RAW SIGNAL</textarea>
       </button>
     </div>
 
-    <!-- Heat/Wire Module: Palettes & Wire Style -->
+    <!-- Heat/Wire Module: Power Toggle, Palettes & Wire Style -->
     <div id="wingGroupGlitchRight" class="hidden flex flex-col gap-2">
+      <button id="sideHwPowerBtn" type="button" class="side-wing-btn" title="Toggle Heat/Wire Engine Active / Inactive">
+        <span class="text-sm">⏻</span>
+        <span class="text-[8px] font-bold text-slate-300">HEAT</span>
+      </button>
       <button id="sideHwPaletteBtn" type="button" class="side-wing-btn" title="Heatmap Palette">
         <span class="text-sm">🔥</span>
         <span class="text-[8px] font-bold text-slate-300">PAL</span>
@@ -825,7 +845,34 @@ RAW SIGNAL</textarea>
   </div>
 
   <!-- ==================== BASE DECK (3 KNOBS + SUB-ENGINE SELECTOR) ==================== -->
-  <footer id="baseDeck" class="absolute bottom-0 inset-x-0 z-30 pointer-events-auto bg-gradient-to-t from-black via-black/95 to-transparent pt-2 px-3 sm:px-6 flex flex-col items-center gap-2 backdrop-blur-md border-t border-white/10">
+  <footer id="baseDeck" class="absolute bottom-0 inset-x-0 z-30 pointer-events-auto bg-gradient-to-t from-black via-black/95 to-transparent pt-2 px-3 sm:px-6 flex flex-col items-center gap-1.5 backdrop-blur-md border-t border-white/10">
+
+    <!-- Purple-Zone Live Camera Bar (Appears automatically when Live Feed is active: Front/Back — Lenses — 16:9 / 1:1 — Stop) -->
+    <div id="liveFeedQuickBar" class="hidden w-full max-w-md flex items-center justify-between gap-1.5 bg-black/90 border border-cyber-yellow/60 rounded-full px-2.5 py-1 text-[9.5px] font-black shadow-[0_0_15px_rgba(255,230,0,0.22)]">
+      <!-- 1. Front / Back Camera Toggle -->
+      <button id="liveBarFlipBtn" type="button" class="tap-btn px-2.5 py-1 rounded-full bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan flex items-center gap-1 active:scale-95 transition" title="Switch Front / Back Camera">
+        <span>🔄</span>
+        <span id="liveBarFlipLabel">BACK</span>
+      </button>
+
+      <!-- 2. Smartphone Camera Lenses / Optical Field-of-View Selector -->
+      <button id="liveBarLensBtn" type="button" class="tap-btn px-2.5 py-1 rounded-full bg-cyber-yellow/15 border border-cyber-yellow text-cyber-yellow flex items-center gap-1 active:scale-95 transition" title="Cycle Smartphone Camera Lenses / Optical Zoom (0.5x Ultra / 1x Wide / 2x Tele)">
+        <span>🔭</span>
+        <span id="liveBarLensLabel">1x WIDE</span>
+      </button>
+
+      <!-- 3. Native Aspect Ratio Toggle: 16:9 (Full Native) vs 1:1 (Square) -->
+      <button id="liveBarAspectBtn" type="button" class="tap-btn px-2.5 py-1 rounded-full bg-cyber-pink/15 border border-cyber-pink text-cyber-pink flex items-center gap-1 active:scale-95 transition" title="Toggle Live Feed Aspect Ratio: 16:9 Native vs 1:1 Square">
+        <span>📐</span>
+        <span id="liveBarAspectLabel">16:9</span>
+      </button>
+
+      <!-- 4. Stop Live Feed Button -->
+      <button id="liveBarStopBtn" type="button" class="tap-btn px-2 py-1 rounded-full bg-red-500/20 border border-red-500/70 text-red-400 flex items-center gap-1 active:scale-95 transition" title="Stop Live Camera Feed">
+        <span>⏹️</span>
+        <span>OFF</span>
+      </button>
+    </div>
 
     <!-- Classic Smartphone Camera Bar: SNAP — RECORD — SPEED -->
     <div id="cameraShutterBar" class="w-full max-w-md flex items-center justify-between gap-2 bg-black/85 border border-white/15 rounded-full px-3 py-1 text-[10px] font-bold shadow-lg">
@@ -857,7 +904,7 @@ RAW SIGNAL</textarea>
       </select>
     </div>
 
-    <!-- Deployable Compact Drag Target + Reset Mini-Menu (Opens when tapping #dragTargetBtn) -->
+    <!-- Deployable Compact Drag Target + Reset Mini-Menu (Opens when tapping #dragTargetBtn in DRAG mode) -->
     <div id="dragTransformBar" class="hidden absolute bottom-56 right-3 sm:right-6 z-40 flex items-center gap-1 bg-black/95 backdrop-blur-xl border border-cyber-cyan/60 rounded-full p-1 text-[9.5px] font-bold shadow-[0_0_18px_rgba(0,0,0,0.9)]">
       <button id="dragTargetTextBtn" type="button" class="tap-btn px-2.5 py-1 rounded-full bg-cyber-cyan/25 border border-cyber-cyan text-cyber-cyan font-black transition active:scale-95 flex items-center gap-1" title="Drag Text (Move, Pinch-Scale, Rotate)">
         <span>🔤</span><span>TEXT</span>
@@ -875,8 +922,41 @@ RAW SIGNAL</textarea>
       </div>
     </div>
 
-    <!-- Second row: Diamond Drag/Jam + Sub-Engine Selector + Deployable Drag Target Pill -->
-    <div class="w-full max-w-md flex items-center justify-between gap-2.5 px-1">
+    <!-- Deployable Jam Distortion Styles & Finger Mask Size Bar (3 Jam Presets + Mask Radius Slider) -->
+    <div id="jamStyleBar" class="hidden absolute bottom-56 inset-x-3 max-w-sm mx-auto z-40 bg-black/95 backdrop-blur-2xl border border-cyber-pink/70 rounded-2xl p-2.5 text-[9.5px] font-bold shadow-[0_0_24px_rgba(255,0,85,0.4)] space-y-2">
+      <div class="flex items-center justify-between border-b border-white/10 pb-1">
+        <span class="text-cyber-pink font-black tracking-wider flex items-center gap-1">
+          <span>🎛️</span><span>JAM DISTORTION STYLE &amp; MASK</span>
+        </span>
+        <button id="closeJamStyleBarBtn" type="button" class="text-slate-400 hover:text-white px-1">✕</button>
+      </div>
+      <!-- 3 Jam Distortion Presets -->
+      <div class="grid grid-cols-3 gap-1.5">
+        <button type="button" data-jamstyle="sortDrip" class="jam-style-btn py-1.5 px-1.5 rounded-xl border bg-cyber-cyan/20 border-cyber-cyan text-cyber-cyan font-black flex flex-col items-center gap-0.5 active:scale-95 transition">
+          <span class="text-xs">🌊</span>
+          <span>PIXEL DRIP</span>
+        </button>
+        <button type="button" data-jamstyle="smearBlocks" class="jam-style-btn py-1.5 px-1.5 rounded-xl border bg-white/5 border-white/15 text-slate-300 font-black flex flex-col items-center gap-0.5 active:scale-95 transition">
+          <span class="text-xs">🧱</span>
+          <span>SMEAR BLOCK</span>
+        </button>
+        <button type="button" data-jamstyle="hybridVortex" class="jam-style-btn py-1.5 px-1.5 rounded-xl border bg-white/5 border-white/15 text-slate-300 font-black flex flex-col items-center gap-0.5 active:scale-95 transition">
+          <span class="text-xs">⚡</span>
+          <span>VORTEX MIX</span>
+        </button>
+      </div>
+      <!-- Finger Distortion Mask Radius Control -->
+      <div class="pt-1 border-t border-white/10">
+        <div class="flex items-center justify-between text-[9px] mb-0.5">
+          <span class="text-slate-300 font-bold">⭕ FINGER MASK SIZE</span>
+          <span id="jamRadiusLabel" class="text-cyber-pink font-mono font-bold">220px</span>
+        </div>
+        <input id="jamRadiusRange" type="range" min="60" max="500" value="220" class="w-full accent-cyber-pink" />
+      </div>
+    </div>
+
+    <!-- Second row: Diamond Drag/Jam + Sub-Engine Selector + Active/Inactive Toggle + Deployable Target/Jam Pill -->
+    <div class="w-full max-w-md flex items-center justify-between gap-1.5 px-1">
       <!-- Diamond Drag or Jam Toggle Button -->
       <button id="dragJamToggleBtn" type="button" class="diamond-btn mode-drag tap-btn shrink-0" title="Toggle Drag / Jam / Mosh Touch Mode">
         <div class="flex flex-col items-center justify-center pointer-events-none">
@@ -886,14 +966,20 @@ RAW SIGNAL</textarea>
       </button>
 
       <!-- Center Sub-Engine / Param Selector Button -->
-      <button id="subEngineBtn" type="button" class="tap-btn flex-1 py-1.5 px-3 rounded-full bg-cyber-card/90 border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.3)] active:scale-95 transition" title="Choose Active Engine Parameters">
+      <button id="subEngineBtn" type="button" class="tap-btn flex-1 py-1.5 px-2.5 rounded-full bg-cyber-card/90 border-2 border-cyber-cyan text-cyber-cyan text-[11px] font-black tracking-wider flex items-center justify-center gap-1 shadow-[0_0_14px_rgba(0,255,204,0.3)] active:scale-95 transition min-w-0" title="Choose Active Engine Parameters">
         <span id="subEngineIcon">📐</span>
         <span id="subEngineLabel" class="truncate">2D: STACK</span>
         <span class="text-[9px] text-slate-400">▾</span>
       </button>
 
-      <!-- Deployable Drag Target Button (Tap to deploy TEXT / MEDIA / ↺ Reset mini-pill) -->
-      <button id="dragTargetBtn" type="button" class="tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex items-center gap-1 leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0" title="Open Drag Target & Reset Menu">
+      <!-- Quick Active / Inactive Power Toggle for Current Controller -->
+      <button id="subEnginePowerBtn" type="button" class="tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex items-center gap-1 leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0" title="Toggle Current Controller / Effect Active or Inactive">
+        <span>⏻</span>
+        <span id="subEnginePowerLabel">ON</span>
+      </button>
+
+      <!-- Deployable Drag Target / Jam Style Button -->
+      <button id="dragTargetBtn" type="button" class="tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex items-center gap-1 leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0" title="Open Drag Target or Jam Distortion Style Menu">
         <span id="dragTargetIcon" class="text-xs">🔤</span>
         <span id="dragTargetLabel" class="text-[8px] tracking-tighter">TEXT</span>
         <span class="text-[8px] opacity-70">▾</span>
@@ -912,7 +998,10 @@ RAW SIGNAL</textarea>
           <span>⚡</span>
           <span>SELECT CONTROLLER / PARAMS</span>
         </span>
-        <button id="closeSubEngineMenuBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
+        <div class="flex items-center gap-1.5">
+          <button id="menuEnginePowerBtn" type="button" class="px-2 py-0.5 rounded-full text-[9px] font-black border border-cyber-cyan bg-cyber-cyan/20 text-cyber-cyan">⏻ ACTIVE</button>
+          <button id="closeSubEngineMenuBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
+        </div>
       </div>
       <div id="subEngineMenuList" class="grid grid-cols-2 gap-1.5 text-xs"></div>
     </div>
@@ -1404,9 +1493,9 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Streak Length</span>
-              <span id="sortLengthLabel" class="text-cyber-cyan">85px</span>
+              <span id="sortLengthLabel" class="text-cyber-cyan">55px</span>
             </div>
-            <input type="range" id="sortLengthRange" min="15" max="600" value="85">
+            <input type="range" id="sortLengthRange" min="15" max="600" value="55">
           </div>
         </div>
 
@@ -1422,16 +1511,16 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Pattern Wide</span>
-              <span id="sortSpreadLabel" class="text-cyber-yellow">32%</span>
+              <span id="sortSpreadLabel" class="text-cyber-yellow">28%</span>
             </div>
-            <input type="range" id="sortSpreadRange" min="5" max="100" value="32">
+            <input type="range" id="sortSpreadRange" min="5" max="100" value="28">
           </div>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Flow Speed</span>
-              <span id="sortSpeedLabel" class="text-cyber-pink">0.8x</span>
+              <span id="sortSpeedLabel" class="text-cyber-pink">0.6x</span>
             </div>
-            <input type="range" id="sortSpeedRange" min="0" max="30" value="8">
+            <input type="range" id="sortSpeedRange" min="0" max="30" value="6">
           </div>
         </div>
 
@@ -1440,9 +1529,9 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Min Threshold</span>
-              <span id="sortLowLabel" class="text-cyber-cyan">20%</span>
+              <span id="sortLowLabel" class="text-cyber-cyan">18%</span>
             </div>
-            <input type="range" id="sortLowRange" min="0" max="100" value="20">
+            <input type="range" id="sortLowRange" min="0" max="100" value="18">
           </div>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
@@ -1594,7 +1683,7 @@ RAW SIGNAL</textarea>
         <div class="flex items-center justify-between border-b border-cyber-border pb-1">
           <span class="text-cyber-pink font-bold text-[11px]">P-FRAME COMPRESSION MOSH</span>
           <label class="flex items-center space-x-1 text-[10px] text-slate-300">
-            <input type="checkbox" id="moshActiveCheck" checked class="accent-cyber-pink">
+            <input type="checkbox" id="moshActiveCheck" class="accent-cyber-pink">
             <span>Active</span>
           </label>
         </div>
@@ -1612,7 +1701,7 @@ RAW SIGNAL</textarea>
               <span>🌊</span> P-FRAME CODEC VECTOR ENGINE
             </span>
             <label class="flex items-center space-x-1 text-[9px] text-slate-300">
-              <input type="checkbox" id="vectorMoshActiveCheck" checked class="accent-cyber-cyan">
+              <input type="checkbox" id="vectorMoshActiveCheck" class="accent-cyber-cyan">
               <span>Enable</span>
             </label>
           </div>
@@ -1641,9 +1730,9 @@ RAW SIGNAL</textarea>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
                 <span>Vector Push Force</span>
-                <span id="vectorForceLabel" class="text-cyber-cyan">28</span>
+                <span id="vectorForceLabel" class="text-cyber-cyan">22</span>
               </div>
-              <input type="range" id="vectorForceRange" min="0" max="60" value="28">
+              <input type="range" id="vectorForceRange" min="0" max="60" value="22">
             </div>
 
             <div class="space-y-0.5">
@@ -1660,17 +1749,17 @@ RAW SIGNAL</textarea>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
                 <span>Melt Persistence</span>
-                <span id="pframePersistenceLabel" class="text-cyber-cyan">65%</span>
+                <span id="pframePersistenceLabel" class="text-cyber-cyan">60%</span>
               </div>
-              <input type="range" id="pframePersistenceRange" min="20" max="98" value="65">
+              <input type="range" id="pframePersistenceRange" min="20" max="98" value="60">
             </div>
 
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
                 <span>Chroma Bleed</span>
-                <span id="chromaBleedLabel" class="text-cyber-cyan">12px</span>
+                <span id="chromaBleedLabel" class="text-cyber-cyan">10px</span>
               </div>
-              <input type="range" id="chromaBleedRange" min="0" max="30" value="12">
+              <input type="range" id="chromaBleedRange" min="0" max="30" value="10">
             </div>
           </div>
 
@@ -1692,17 +1781,17 @@ RAW SIGNAL</textarea>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
                 <span>Feedback Smear</span>
-                <span id="moshSmearLabel" class="text-cyber-pink">48%</span>
+                <span id="moshSmearLabel" class="text-cyber-pink">30%</span>
               </div>
-              <input type="range" id="moshSmearRange" min="0" max="95" value="48">
+              <input type="range" id="moshSmearRange" min="0" max="95" value="30">
             </div>
 
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
                 <span>Slice Shear</span>
-                <span id="moshSliceLabel" class="text-cyber-pink">24px</span>
+                <span id="moshSliceLabel" class="text-cyber-pink">12px</span>
               </div>
-              <input type="range" id="moshSliceRange" min="0" max="70" value="24">
+              <input type="range" id="moshSliceRange" min="0" max="70" value="12">
             </div>
           </div>
 
@@ -1710,9 +1799,9 @@ RAW SIGNAL</textarea>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
                 <span>Random Blocks</span>
-                <span id="moshBlockLabel" class="text-cyber-pink">35</span>
+                <span id="moshBlockLabel" class="text-cyber-pink">18</span>
               </div>
-              <input type="range" id="moshBlockRange" min="0" max="100" value="35">
+              <input type="range" id="moshBlockRange" min="0" max="100" value="18">
             </div>
 
             <div class="space-y-0.5">
@@ -1822,17 +1911,17 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>RGB Split</span>
-              <span id="rgbSplitLabel" class="text-cyber-lime">14px</span>
+              <span id="rgbSplitLabel" class="text-cyber-lime">4px</span>
             </div>
-            <input type="range" id="rgbSplitRange" min="0" max="45" value="14">
+            <input type="range" id="rgbSplitRange" min="0" max="45" value="4">
           </div>
 
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Aberration Angle</span>
-              <span id="rgbAngleLabel" class="text-cyber-lime">20°</span>
+              <span id="rgbAngleLabel" class="text-cyber-lime">15°</span>
             </div>
-            <input type="range" id="rgbAngleRange" min="0" max="360" value="20">
+            <input type="range" id="rgbAngleRange" min="0" max="360" value="15">
           </div>
         </div>
 
@@ -1841,17 +1930,17 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Scanlines</span>
-              <span id="scanlinesLabel" class="text-cyber-lime">40%</span>
+              <span id="scanlinesLabel" class="text-cyber-lime">18%</span>
             </div>
-            <input type="range" id="scanlinesRange" min="0" max="100" value="40">
+            <input type="range" id="scanlinesRange" min="0" max="100" value="18">
           </div>
 
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Tape Noise</span>
-              <span id="noiseLabel" class="text-cyber-lime">25%</span>
+              <span id="noiseLabel" class="text-cyber-lime">6%</span>
             </div>
-            <input type="range" id="noiseRange" min="0" max="100" value="25">
+            <input type="range" id="noiseRange" min="0" max="100" value="6">
           </div>
         </div>
 
@@ -2118,6 +2207,7 @@ RAW SIGNAL</textarea>
     const state = {
       // Typography & 3D Text
       type: {
+        active: true,
         text: "VIBE//MOSH\nRAW SIGNAL",
         fontFamily: "Syne, sans-serif",
         layout: 'stack', // 'stack', 'marquee', 'vertical', 'spiral', 'cube', 'sphere'
@@ -2154,6 +2244,11 @@ RAW SIGNAL</textarea>
         isVideo: false,
         isLive: false,
         facingMode: 'environment',
+        aspectMode: '16:9', // '16:9' (native full portrait) | '1:1' (square frame)
+        lenses: [],
+        lensIndex: 0,
+        zoomPresets: [0.5, 1.0, 2.0],
+        zoomIndex: 1, // default 1.0x un-zoomed native lens
         startTime: 0,
         endTime: 9,
         segmentDuration: 9,
@@ -2178,21 +2273,21 @@ RAW SIGNAL</textarea>
         blend: 'behind' // 'behind', 'inFront', 'photoOnly'
       },
 
-      // Pixel Sorter (Subtle Linear Streak Defaults — Readable Text + Crisp Lines)
+      // Pixel Sorter (Subtle Organic Contour Streak Default — Effect #1 of 2 on Launch)
       sort: {
         active: true,
         direction: 'vertical', // 'vertical', 'horizontal', 'diagonal'
         criterion: 'brightness',
         thresholdLow: 20,
         thresholdHigh: 100,
-        maxLength: 85,         // 15 - 600px (Dialed down default so text stays readable)
+        maxLength: 55,         // 15 - 600px (Subtle default so text & media stay clean and readable)
         thickness: 2,          // 1 - 16px (Thickness of individual linear streaks)
-        spread: 32,            // 5 - 100% (Wideness/density of streak pattern across glyphs)
-        speed: 0.8,            // 0.0 - 3.0x (Animation speed of streaks)
+        spread: 28,            // 5 - 100% (Wideness/density of streak pattern across contours)
+        speed: 0.7,            // 0.0 - 3.0x (Gentle organic animation speed)
         phase: 0
       },
 
-      // Heatmap & Wireframe Engine
+      // Heatmap & Wireframe Engine (Inactive on Launch)
       heatWire: {
         active: false,
         mode: 'both', // 'both' | 'heatmap' | 'wireframe'
@@ -2210,16 +2305,16 @@ RAW SIGNAL</textarea>
         wireThick: 1  // 1 - 4px
       },
 
-      // Datamosh & Smear
+      // Datamosh & Smear (Inactive on Launch so max 2 subtle effects are active initially)
       mosh: {
-        active: true,
+        active: false,
         smear: 48,
         macroblocks: 35,
         sliceShear: 24,
         speed: 1.0,
         tick: 0,
         // P-Frame Codec Vector Engine (Reference Style)
-        vectorMoshActive: true,
+        vectorMoshActive: false,
         pframeMode: 'melt', // 'melt' | 'shear' | 'decay'
         blockSize: 16,
         vectorForce: 28,
@@ -2234,13 +2329,13 @@ RAW SIGNAL</textarea>
         isSwiping: false
       },
 
-      // CRT & Analog FX
+      // CRT & Analog FX (Subtle Default — Effect #2 of 2 on Launch)
       fx: {
         active: true,
-        rgbSplit: 14,
+        rgbSplit: 4,
         rgbAngle: 20,
-        scanlines: 40,
-        noise: 25,
+        scanlines: 18,
+        noise: 6,
         bgMode: 'cyberGradient',
         customBg: false,
         bgColor1: '#04020a',
@@ -2272,6 +2367,9 @@ RAW SIGNAL</textarea>
         mode: 'drag', // 'drag' | 'jam' | 'vectorMosh'
         target: 'text', // 'text' | 'media'
         dragAction: 'move', // 'move' | 'scale' | 'rotate'
+        jamStyle: 'sortDrip', // 'sortDrip' | 'smearBlocks' | 'hybridVortex'
+        jamRadius: 220, // 60 - 500px finger distortion mask radius
+        jamSortBurst: 0, // Active finger-mask pixel sort impulse
         isInteracting: false,
         lastX: 0,
         lastY: 0,
@@ -2780,10 +2878,47 @@ RAW SIGNAL</textarea>
 
       const imgAspect = imgW / imgH;
       const canvasAspect = WIDTH / HEIGHT;
+      const isSquareMode = pState.aspectMode === '1:1';
 
-      const baseW = (imgAspect > canvasAspect) ? HEIGHT * imgAspect : WIDTH;
-      const baseH = (imgAspect > canvasAspect) ? HEIGHT : WIDTH / imgAspect;
-      const scale = pState.scale || 1.0;
+      let baseW, baseH;
+      if (isSquareMode) {
+        // 1:1 Square Frame (720x720 centered) — fit sensor cleanly without vertical HEIGHT over-zoom
+        baseW = (imgAspect >= 1) ? WIDTH * Math.min(imgAspect, 1.25) : WIDTH;
+        baseH = baseW / imgAspect;
+        if (baseH < WIDTH) {
+          baseH = WIDTH;
+          baseW = baseH * imgAspect;
+        }
+      } else if (pState.isLive) {
+        // Un-zoomed Native Live Camera Framing (avoids aggressive 2.5x cover crop on 4:3 / 16:9 sensors)
+        if (imgAspect <= 1.0) {
+          // Portrait stream (e.g. 9:16 or 3:4): preserve full horizontal field of view
+          baseW = WIDTH;
+          baseH = WIDTH / imgAspect;
+          if (baseH < HEIGHT) {
+            // Gentle blend between contain-width and cover-height so sensor isn't heavily zoomed
+            baseH = HEIGHT;
+            baseW = Math.min(HEIGHT * imgAspect, WIDTH * 1.12);
+          }
+        } else {
+          // Landscape stream (e.g. 16:9 or 4:3 webcam): avoid 3x HEIGHT*imgAspect crop
+          baseW = Math.min(HEIGHT * imgAspect, WIDTH * 1.35);
+          baseH = baseW / imgAspect;
+          if (baseH < HEIGHT * 0.82) {
+            baseH = HEIGHT * 0.82;
+            baseW = baseH * imgAspect;
+          }
+        }
+      } else {
+        baseW = (imgAspect > canvasAspect) ? HEIGHT * imgAspect : WIDTH;
+        baseH = (imgAspect > canvasAspect) ? HEIGHT : WIDTH / imgAspect;
+      }
+
+      // Apply Live Lens Zoom Factor (0.5x Ultra-Wide / 1.0x Native Wide / 2.0x Tele) when Hardware Zoom isn't handling it
+      const lensZoom = (pState.isLive && !pState.hwZoomApplied && pState.zoomPresets)
+        ? (pState.zoomPresets[pState.zoomIndex] === 0.5 ? 0.82 : (pState.zoomPresets[pState.zoomIndex] === 2.0 ? 1.65 : 1.0))
+        : 1.0;
+      const scale = (pState.scale || 1.0) * lensZoom;
       const drawW = baseW * scale;
       const drawH = baseH * scale;
       const centerX = WIDTH / 2 + (pState.panX || 0);
@@ -2799,8 +2934,17 @@ RAW SIGNAL</textarea>
 
       photoSourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
       photoSourceCtx.save();
+      if (isSquareMode) {
+        const sqTop = (HEIGHT - WIDTH) / 2;
+        photoSourceCtx.beginPath();
+        photoSourceCtx.rect(0, sqTop, WIDTH, WIDTH);
+        photoSourceCtx.clip();
+      }
       photoSourceCtx.filter = `brightness(${bVal}%) contrast(${cVal}%) saturate(${satVal}%)`;
       photoSourceCtx.translate(centerX, centerY);
+      if (pState.isLive && pState.facingMode === 'user') {
+        photoSourceCtx.scale(-1, 1); // Natural mirror for front selfie camera
+      }
       if (rotRad !== 0) {
         photoSourceCtx.rotate(rotRad);
       }
@@ -3623,6 +3767,7 @@ RAW SIGNAL</textarea>
 
     function renderTypographyLayer(tCtx, t, tick) {
       tCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      if (t.active === false || !t.text || !t.text.trim()) return;
 
       // Branch to 3D layouts
       if (t.layout === 'spiral') {
@@ -3840,22 +3985,36 @@ RAW SIGNAL</textarea>
       return (r & 0xff) | ((g & 0xff) << 8) | ((b & 0xff) << 16) | 0xff000000;
     }
 
-    function pixelSortPass(targetCtx, opt) {
+    function pixelSortPass(targetCtx, opt, jamMaskOnly = false) {
       const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
       const data32 = new Uint32Array(img.data.buffer);
 
-      const low = Math.max(0.02, (opt.thresholdLow || 0) / 100);
+      // Read Foreground Content Masks (Text + Media) so Pixel Sorting NEVER floats in empty background space!
+      const hasTextMask = state.type.active !== false && state.type.text && state.type.text.trim().length > 0 && (!state.photo.active || state.photo.blend !== 'photoOnly');
+      const hasMediaMask = state.photo.active && state.photo.loaded;
+      const textData32 = hasTextMask ? new Uint32Array(textCtx.getImageData(0, 0, WIDTH, HEIGHT).data.buffer) : null;
+      const photoData32 = hasMediaMask ? new Uint32Array(photoCtx.getImageData(0, 0, WIDTH, HEIGHT).data.buffer) : null;
+
+      const low = Math.max(0.04, (opt.thresholdLow || 0) / 100);
       const rawHigh = (opt.thresholdHigh !== undefined ? opt.thresholdHigh : 100) / 100;
       const high = rawHigh >= 0.88 ? 1.01 : Math.max(low + 0.05, rawHigh);
 
-      // Dialed-down default maxLength (85px) so text stays crisp & readable while streaks are subtly noticeable
-      const maxSpan = Math.min(Math.max(15, opt.maxLength !== undefined ? opt.maxLength : 85), sortMaxLen);
+      // Subtle contour-hugging default length (55px) so text & media stay readable and organic
+      const maxSpan = Math.min(Math.max(15, opt.maxLength !== undefined ? opt.maxLength : 55), sortMaxLen);
       const lineThick = Math.max(1, Math.min(16, Math.round(opt.thickness !== undefined ? opt.thickness : 2)));
-      const spreadPct = Math.max(0.05, Math.min(1.0, (opt.spread !== undefined ? opt.spread : 32) / 100));
-      const flowSpeed = opt.speed !== undefined ? opt.speed : 0.8;
+      const spreadPct = Math.max(0.05, Math.min(1.0, (opt.spread !== undefined ? opt.spread : 28) / 100));
+      const flowSpeed = opt.speed !== undefined ? opt.speed : 0.7;
+
+      // Jam Finger Distortion Mask linkage (when Jam style is sortDrip or hybridVortex)
+      const jamBurst = state.interaction.jamSortBurst || 0;
+      const jamActive = jamBurst > 0.02 && (state.interaction.jamStyle === 'sortDrip' || state.interaction.jamStyle === 'hybridVortex');
+      const jamX = state.mosh.touchX !== undefined ? state.mosh.touchX : (WIDTH / 2);
+      const jamY = state.mosh.touchY !== undefined ? state.mosh.touchY : (HEIGHT / 2);
+      const jamRad = Math.max(60, Math.min(500, state.interaction.jamRadius || 220));
+      const jamRadSq = jamRad * jamRad;
 
       // Advance streak animation phase according to Flow Speed
-      opt.phase = (opt.phase || 0) + flowSpeed * 0.045;
+      opt.phase = (opt.phase || 0) + flowSpeed * 0.04;
       const phase = opt.phase;
 
       const getMetric = (pixel) => {
@@ -3873,39 +4032,53 @@ RAW SIGNAL</textarea>
         return (r + g + b) / (255 * 3);
       };
 
+      // Helper: checks if pixel index belongs to actual Foreground Content (Text glyph or Media mask)
+      const isForegroundContour = (idx, metricVal) => {
+        if (textData32) {
+          const tAlpha = (textData32[idx] >>> 24) & 0xff;
+          if (tAlpha > 32) return true;
+        }
+        if (photoData32) {
+          const pAlpha = (photoData32[idx] >>> 24) & 0xff;
+          if (pAlpha > 36 && metricVal >= low && metricVal <= high) return true;
+        }
+        return false;
+      };
+
       const isVertical = opt.direction === 'vertical';
 
       if (isVertical) {
-        // Precompute discrete, flat-edged LINE bands of width `lineThick` (NO smooth triangular fangs!)
+        // Compute soft, organic contour-following wave envelope across columns
         for (let x = 0; x < WIDTH; x++) {
           const bandIdx = (x / lineThick) | 0;
-          // Independent deterministic hash per line band so adjacent lines have discrete lengths, never triangular cones
           const rawH1 = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
           const hash1 = rawH1 - Math.floor(rawH1);
           const rawH2 = Math.sin(bandIdx * 269.5 + 183.3) * 28461.7123;
           const hash2 = rawH2 - Math.floor(rawH2);
 
-          // Pattern wideness / density gate with gentle kinetic breathing
+          // Smooth organic contour wave + band modulation so adjacent drips flow together gracefully
+          const contourWave = Math.sin(x * 0.045 + phase * 0.7) * 0.5 + 0.5;
           const patMod = Math.sin(bandIdx * 0.55 - phase * 0.45) * 0.5 + 0.5;
-          const gateVal = hash1 * 0.78 + patMod * 0.22;
+          const gateVal = hash1 * 0.58 + patMod * 0.22 + contourWave * 0.20;
 
-          if (gateVal <= spreadPct) {
-            // Active straight line streak: uniform across all `lineThick` pixels of this line band
-            const animPulse = 0.68 + 0.32 * Math.sin(bandIdx * 3.71 + phase * 1.4);
-            sortDripFactors[x] = (0.25 + 0.75 * hash2) * animPulse;
+          if (!jamMaskOnly && gateVal <= spreadPct) {
+            const animPulse = 0.65 + 0.35 * Math.sin(bandIdx * 2.4 + phase * 1.25);
+            const softEdge = Math.min(1.0, Math.max(0.2, (spreadPct - gateVal) / Math.max(0.08, spreadPct * 0.45)));
+            sortDripFactors[x] = (0.28 + 0.72 * hash2) * animPulse * softEdge;
           } else {
-            // Untouched column so the letters remain super crisp and readable
             sortDripFactors[x] = 0;
           }
         }
 
         for (let x = 0; x < WIDTH; x++) {
-          const colDripFactor = sortDripFactors[x];
-          if (colDripFactor <= 0.01) continue; // Keep non-streak columns 100% pristine!
+          let colDripFactor = sortDripFactors[x];
+          const dxJam = x - jamX;
+          const colInJamX = jamActive && (dxJam * dxJam < jamRadSq);
 
-          const dripTailLimit = Math.max(4, (maxSpan * colDripFactor) | 0);
+          if (colDripFactor <= 0.01 && !colInJamX) continue;
+
           const bandIdx = (x / lineThick) | 0;
-          const lineFlowOffset = Math.sin(bandIdx * 2.13 - phase * 1.8) * 0.14;
+          const lineFlowOffset = Math.sin(bandIdx * 1.85 - phase * 1.4) * 0.11;
 
           let y = 0;
           while (y < HEIGHT) {
@@ -3913,18 +4086,36 @@ RAW SIGNAL</textarea>
             const p = data32[idx];
             const val = getMetric(p);
 
-            if (val >= low && val <= high) {
+            // Check Jam finger mask weight at (x, y)
+            let localJamWeight = 0;
+            if (colInJamX) {
+              const dyJam = y - jamY;
+              const distSq = dxJam * dxJam + dyJam * dyJam;
+              if (distSq < jamRadSq) {
+                const distNorm = Math.sqrt(distSq) / jamRad;
+                localJamWeight = Math.pow(1.0 - distNorm, 1.35) * jamBurst;
+              }
+            }
+
+            const effectiveFactor = Math.max(colDripFactor, localJamWeight * 1.65);
+            if (effectiveFactor <= 0.015) {
+              y++;
+              continue;
+            }
+
+            // Strictly require Foreground Contour (Text glyph or Media mask) or active Jam finger touch
+            if (isForegroundContour(idx, val) || (localJamWeight > 0.15 && val >= low * 0.6)) {
               const startY = y;
               let gLen = 0;
               let gapCount = 0;
               let glyphEndY = startY;
-              const maxGlyphScan = Math.min(HEIGHT, startY + 220);
+              const maxGlyphScan = Math.min(HEIGHT, startY + 200);
 
-              // Scan contiguous glyph stroke/fill without bridging across separate text lines
               while (y < maxGlyphScan) {
-                const curP = data32[y * WIDTH + x];
+                const curIdx = y * WIDTH + x;
+                const curP = data32[curIdx];
                 const curVal = getMetric(curP);
-                if (curVal >= low && curVal <= high) {
+                if (isForegroundContour(curIdx, curVal) || (localJamWeight > 0.25 && curVal >= low * 0.6 && y - startY < 75)) {
                   gapCount = 0;
                   glyphEndY = y;
                   if (gLen < 120) {
@@ -3935,8 +4126,8 @@ RAW SIGNAL</textarea>
                   }
                 } else {
                   gapCount++;
-                  // Capture 2px of border/glow fringe at the trailing edge of the letter
-                  if (gapCount <= 2 && gLen < 124) {
+                  // Capture 3px of soft contour glow at trailing edge of the letter/mask
+                  if (gapCount <= 3 && gLen < 124) {
                     sortVals[gLen] = curVal;
                     sortPixels[gLen] = curP;
                     sortIndices[gLen] = gLen;
@@ -3951,35 +4142,42 @@ RAW SIGNAL</textarea>
                 const sub = sortIndices.subarray(0, gLen);
                 sub.sort((a, b) => sortVals[a] - sortVals[b]);
 
+                const spanBoost = localJamWeight > 0.05 ? (maxSpan + jamRad * 0.72 * localJamWeight) : maxSpan;
+                const dripTailLimit = Math.max(6, Math.min(480, (spanBoost * effectiveFactor) | 0));
+
                 const glyphH = Math.max(1, glyphEndY - startY);
-                // Keep the upper ~75% of the letter untouched so text is always easy to read;
-                // start the linear streak from the lower border zone of the glyph!
-                const borderAnchor = Math.min(8, (glyphH * 0.25) | 0);
+                // Anchor streak smoothly inside the lower 30% contour of the glyph/mask
+                const borderAnchor = Math.min(12, Math.max(3, (glyphH * 0.30) | 0));
                 const streakStartY = Math.max(startY, glyphEndY - borderAnchor);
                 const shaftEndY = Math.min(HEIGHT - 1, glyphEndY + dripTailLimit);
                 const shaftSpan = Math.max(1, shaftEndY - streakStartY);
                 const lastIdx = gLen - 1;
+                let prevSorted = sortPixels[sub[lastIdx]];
 
                 for (let dy = streakStartY; dy <= shaftEndY; dy++) {
                   const destIdx = dy * WIDTH + x;
                   const destP = data32[destIdx];
 
-                  const prog = (dy - streakStartY) / shaftSpan; // 0.0 at glyph border -> 1.0 at line tip
-                  // Pure 1D linear gradient along the straight line (brightest glyph core -> border glow at tip)
-                  let sampleT = (1.0 - prog * 0.88) + lineFlowOffset * prog;
+                  const prog = (dy - streakStartY) / shaftSpan; // 0.0 at contour -> 1.0 at drip tip
+                  let sampleT = (1.0 - prog * 0.85) + lineFlowOffset * prog;
                   if (sampleT > 0.999) sampleT = 0.999;
                   else if (sampleT < 0.0) sampleT = 0.0;
 
                   const palIdx = sub[(sampleT * lastIdx) | 0];
-                  const sortedPixel = sortPixels[palIdx];
+                  // Soft silk low-pass filter along the drip so color transitions are never harsh or jagged
+                  const rawSorted = sortPixels[palIdx];
+                  const silkyPixel = blendPixel32(rawSorted, prevSorted, 175);
+                  prevSorted = silkyPixel;
 
-                  // Crisp linear streak with clean tip fade in the last 15%
-                  if (prog > 0.85) {
-                    const fadeAlpha = ((1.0 - prog) / 0.15 * 255) | 0;
-                    data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
-                  } else {
-                    data32[destIdx] = sortedPixel;
+                  // Smooth organic root emergence + quadratic tail feathering (never overly sharp!)
+                  let alpha256 = 225;
+                  if (prog < 0.16) {
+                    alpha256 = ((prog / 0.16) * 225) | 0;
+                  } else if (prog > 0.55) {
+                    const tailT = (1.0 - prog) / 0.45;
+                    alpha256 = (tailT * tailT * 225) | 0;
                   }
+                  data32[destIdx] = blendPixel32(silkyPixel, destP, alpha256);
                 }
 
                 y = Math.max(y, shaftEndY + 1);
@@ -3990,7 +4188,7 @@ RAW SIGNAL</textarea>
           }
         }
       } else {
-        // Horizontal Tear / Diagonal Slant with discrete straight LINE streaks
+        // Horizontal Tear / Diagonal Slant with soft organic contour-following streaks
         const isDiag = opt.direction === 'diagonal';
         for (let y = 0; y < HEIGHT; y++) {
           const bandIdx = (y / lineThick) | 0;
@@ -3999,14 +4197,20 @@ RAW SIGNAL</textarea>
           const rawH2 = Math.sin(bandIdx * 269.5 + 183.3) * 28461.7123;
           const hash2 = rawH2 - Math.floor(rawH2);
 
+          const contourWave = Math.sin(y * 0.045 + phase * 0.7) * 0.5 + 0.5;
           const patMod = Math.sin(bandIdx * 0.55 - phase * 0.45) * 0.5 + 0.5;
-          const gateVal = hash1 * 0.78 + patMod * 0.22;
-          if (gateVal > spreadPct) continue; // Keep non-streak rows 100% pristine!
+          const gateVal = hash1 * 0.58 + patMod * 0.22 + contourWave * 0.20;
 
-          const animPulse = 0.68 + 0.32 * Math.sin(bandIdx * 3.71 + phase * 1.4);
-          const rowDripFactor = (0.25 + 0.75 * hash2) * animPulse;
-          const dripTailLimit = Math.max(4, (maxSpan * rowDripFactor) | 0);
-          const lineFlowOffset = Math.sin(bandIdx * 2.13 - phase * 1.8) * 0.14;
+          const dyJam = y - jamY;
+          const rowInJamY = jamActive && (dyJam * dyJam < jamRadSq);
+          if ((jamMaskOnly || gateVal > spreadPct) && !rowInJamY) continue;
+
+          const animPulse = 0.65 + 0.35 * Math.sin(bandIdx * 2.4 + phase * 1.25);
+          const softEdge = (!jamMaskOnly && gateVal <= spreadPct)
+            ? Math.min(1.0, Math.max(0.2, (spreadPct - gateVal) / Math.max(0.08, spreadPct * 0.45)))
+            : 0;
+          const rowDripFactor = (0.28 + 0.72 * hash2) * animPulse * softEdge;
+          const lineFlowOffset = Math.sin(bandIdx * 1.85 - phase * 1.4) * 0.11;
 
           let x = 0;
           while (x < WIDTH) {
@@ -4015,18 +4219,35 @@ RAW SIGNAL</textarea>
             const p = data32[idx];
             const val = getMetric(p);
 
-            if (val >= low && val <= high) {
+            let localJamWeight = 0;
+            if (rowInJamY) {
+              const dxJam = px - jamX;
+              const distSq = dxJam * dxJam + dyJam * dyJam;
+              if (distSq < jamRadSq) {
+                const distNorm = Math.sqrt(distSq) / jamRad;
+                localJamWeight = Math.pow(1.0 - distNorm, 1.35) * jamBurst;
+              }
+            }
+
+            const effectiveFactor = Math.max(rowDripFactor, localJamWeight * 1.65);
+            if (effectiveFactor <= 0.015) {
+              x++;
+              continue;
+            }
+
+            if (isForegroundContour(idx, val) || (localJamWeight > 0.15 && val >= low * 0.6)) {
               const startX = x;
               let gLen = 0;
               let gapCount = 0;
               let glyphEndX = startX;
-              const maxGlyphScan = Math.min(WIDTH, startX + 220);
+              const maxGlyphScan = Math.min(WIDTH, startX + 200);
 
               while (x < maxGlyphScan) {
                 const curPx = isDiag ? (x + y) % WIDTH : x;
-                const curP = data32[y * WIDTH + curPx];
+                const curIdx = y * WIDTH + curPx;
+                const curP = data32[curIdx];
                 const curVal = getMetric(curP);
-                if (curVal >= low && curVal <= high) {
+                if (isForegroundContour(curIdx, curVal) || (localJamWeight > 0.25 && curVal >= low * 0.6 && x - startX < 75)) {
                   gapCount = 0;
                   glyphEndX = x;
                   if (gLen < 120) {
@@ -4037,7 +4258,7 @@ RAW SIGNAL</textarea>
                   }
                 } else {
                   gapCount++;
-                  if (gapCount <= 2 && gLen < 124) {
+                  if (gapCount <= 3 && gLen < 124) {
                     sortVals[gLen] = curVal;
                     sortPixels[gLen] = curP;
                     sortIndices[gLen] = gLen;
@@ -4052,12 +4273,16 @@ RAW SIGNAL</textarea>
                 const sub = sortIndices.subarray(0, gLen);
                 sub.sort((a, b) => sortVals[a] - sortVals[b]);
 
+                const spanBoost = localJamWeight > 0.05 ? (maxSpan + jamRad * 0.72 * localJamWeight) : maxSpan;
+                const dripTailLimit = Math.max(6, Math.min(480, (spanBoost * effectiveFactor) | 0));
+
                 const glyphW = Math.max(1, glyphEndX - startX);
-                const borderAnchor = Math.min(8, (glyphW * 0.25) | 0);
+                const borderAnchor = Math.min(12, Math.max(3, (glyphW * 0.30) | 0));
                 const streakStartX = Math.max(startX, glyphEndX - borderAnchor);
                 const shaftEndX = Math.min(WIDTH - 1, glyphEndX + dripTailLimit);
                 const shaftSpan = Math.max(1, shaftEndX - streakStartX);
                 const lastIdx = gLen - 1;
+                let prevSorted = sortPixels[sub[lastIdx]];
 
                 for (let dx = streakStartX; dx <= shaftEndX; dx++) {
                   const writeX = isDiag ? (dx + y) % WIDTH : dx;
@@ -4065,19 +4290,23 @@ RAW SIGNAL</textarea>
                   const destP = data32[destIdx];
 
                   const prog = (dx - streakStartX) / shaftSpan;
-                  let sampleT = (1.0 - prog * 0.88) + lineFlowOffset * prog;
+                  let sampleT = (1.0 - prog * 0.85) + lineFlowOffset * prog;
                   if (sampleT > 0.999) sampleT = 0.999;
                   else if (sampleT < 0.0) sampleT = 0.0;
 
                   const palIdx = sub[(sampleT * lastIdx) | 0];
-                  const sortedPixel = sortPixels[palIdx];
+                  const rawSorted = sortPixels[palIdx];
+                  const silkyPixel = blendPixel32(rawSorted, prevSorted, 175);
+                  prevSorted = silkyPixel;
 
-                  if (prog > 0.85) {
-                    const fadeAlpha = ((1.0 - prog) / 0.15 * 255) | 0;
-                    data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
-                  } else {
-                    data32[destIdx] = sortedPixel;
+                  let alpha256 = 225;
+                  if (prog < 0.16) {
+                    alpha256 = ((prog / 0.16) * 225) | 0;
+                  } else if (prog > 0.55) {
+                    const tailT = (1.0 - prog) / 0.45;
+                    alpha256 = (tailT * tailT * 225) | 0;
                   }
+                  data32[destIdx] = blendPixel32(silkyPixel, destP, alpha256);
                 }
 
                 x = Math.max(x, shaftEndX + 1);
@@ -4341,18 +4570,19 @@ RAW SIGNAL</textarea>
     }
 
     // P-Frame Codec Vector Datamosh Engine (Reference Style: #datamoshing a kiss)
-    function applyPFrameVectorMosh(targetCtx, mosh, tick) {
-      if (!mosh.vectorMoshActive) return;
+    function applyPFrameVectorMosh(targetCtx, mosh, tick, forceTouchMaskOnly = false) {
+      if (!mosh.vectorMoshActive && !forceTouchMaskOnly) return;
 
       const blockSize = mosh.blockSize || 16;
       const baseForce = mosh.vectorForce || 28;
       const mode = mosh.pframeMode || 'melt';
       const chroma = mosh.chromaBleed || 12;
 
-      // Motion vector field generation
+      // Motion vector field generation + Adjustable Finger Distortion Mask Radius
       const hasTouch = (Math.abs(mosh.touchVx) > 0.1 || Math.abs(mosh.touchVy) > 0.1);
       const touchX = mosh.touchX || (WIDTH / 2);
       const touchY = mosh.touchY || (HEIGHT / 2);
+      const maskRadius = Math.max(60, Math.min(500, (state.interaction && state.interaction.jamRadius) || 220));
 
       // Check if video is playing to couple video motion
       const isVideoPlaying = (state.photo.active && state.photo.isVideo && state.photo.video && !state.photo.video.paused && !state.photo.isLive);
@@ -4384,10 +4614,11 @@ RAW SIGNAL</textarea>
       for (let i = 0; i < numBlocks; i++) {
         let bx, by;
 
-        if (hasTouch && Math.random() < 0.72) {
-          // Cluster around user's active touch gesture
+        if (forceTouchMaskOnly || (hasTouch && Math.random() < 0.78)) {
+          if (!hasTouch) continue;
+          // Cluster strictly inside user's resizable finger distortion mask
           const angle = Math.random() * Math.PI * 2;
-          const dist = Math.pow(Math.random(), 0.6) * 240;
+          const dist = Math.pow(Math.random(), 0.65) * maskRadius;
           bx = Math.floor((touchX + Math.cos(angle) * dist) / blockSize) * blockSize;
           by = Math.floor((touchY + Math.sin(angle) * dist) / blockSize) * blockSize;
         } else {
@@ -4405,10 +4636,13 @@ RAW SIGNAL</textarea>
           const dxToTouch = bx - touchX;
           const dyToTouch = by - touchY;
           const dist = Math.sqrt(dxToTouch * dxToTouch + dyToTouch * dyToTouch);
-          if (dist < 300) {
-            const influence = 1 - (dist / 300);
+          const influenceRad = maskRadius * 1.15;
+          if (dist < influenceRad) {
+            const influence = 1 - (dist / influenceRad);
             vx = vx * (1 - influence) + (mosh.touchVx * (baseForce / 12)) * influence;
             vy = vy * (1 - influence) + (mosh.touchVy * (baseForce / 12)) * influence;
+          } else if (forceTouchMaskOnly) {
+            continue;
           }
         }
 
@@ -4919,8 +5153,14 @@ RAW SIGNAL</textarea>
       }
 
       // 2. PIPELINE STEP 3: Pixel Sorting (Text + Media -> Pixel Sort)
-      if (state.sort.active && !state.isTyping) {
-        pixelSortPass(cleanCompositeCtx, state.sort);
+      const jamSortActive = (state.interaction.jamSortBurst || 0) > 0.02 &&
+        (state.interaction.jamStyle === 'sortDrip' || state.interaction.jamStyle === 'hybridVortex');
+      if ((state.sort.active || jamSortActive) && !state.isTyping) {
+        pixelSortPass(cleanCompositeCtx, state.sort, !state.sort.active && jamSortActive);
+      }
+      if (state.interaction.jamSortBurst > 0) {
+        state.interaction.jamSortBurst *= 0.88;
+        if (state.interaction.jamSortBurst < 0.01) state.interaction.jamSortBurst = 0;
       }
 
       // 3. PIPELINE STEP 4: CRT & Analog FX + Sync Suppression (Pixel Sort -> CRT)
@@ -4934,11 +5174,19 @@ RAW SIGNAL</textarea>
       // 4. PIPELINE STEP 5: Datamosh Engine (CRT -> Mosh)
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
+      const hasTouchMotion = (Math.abs(state.mosh.touchVx) > 0.15 || Math.abs(state.mosh.touchVy) > 0.15);
+      const jamMoshTouchOnly = !state.mosh.active && hasTouchMotion && (
+        state.interaction.mode === 'vectorMosh' ||
+        (state.interaction.mode === 'jam' && (state.interaction.jamStyle === 'smearBlocks' || state.interaction.jamStyle === 'hybridVortex'))
+      );
+
       if (state.mosh.freezeIFrame) {
         // Drop I-Frames: keep feedback frame intact and continuous
         ctx.drawImage(feedbackCanvas, 0, 0);
-      } else if (state.mosh.active) {
-        const persistence = (state.mosh.vectorMoshActive ? (state.mosh.persistence || 95) : state.mosh.smear) || 48;
+      } else if (state.mosh.active || jamMoshTouchOnly) {
+        const persistence = jamMoshTouchOnly
+          ? 72
+          : ((state.mosh.vectorMoshActive ? (state.mosh.persistence || 95) : state.mosh.smear) || 48);
         if (persistence > 0) {
           const smearAlpha = Math.max(0.015, 1 - (persistence / 100));
           ctx.drawImage(feedbackCanvas, 0, 0);
@@ -4956,8 +5204,10 @@ RAW SIGNAL</textarea>
       if (state.mosh.active) {
         applyDatamoshBlocks(ctx, state.mosh, state.mosh.tick);
         if (state.mosh.vectorMoshActive) {
-          applyPFrameVectorMosh(ctx, state.mosh, state.mosh.tick);
+          applyPFrameVectorMosh(ctx, state.mosh, state.mosh.tick, false);
         }
+      } else if (jamMoshTouchOnly) {
+        applyPFrameVectorMosh(ctx, state.mosh, state.mosh.tick, true);
       }
 
       // 5. PIPELINE STEP 6: Heatmap & Wireframe Pass (Mosh -> Heatmap/Wireframe)
@@ -5383,35 +5633,75 @@ RAW SIGNAL</textarea>
         };
       }
 
-      // Jam mode: dragging directly on the text screen modulates Smear/Persistence (Y) x Slice Shear/Vector Force (X) live
+      const jamStyleBar = document.getElementById('jamStyleBar');
+      const jamRadiusRange = document.getElementById('jamRadiusRange');
+      const jamRadiusLabel = document.getElementById('jamRadiusLabel');
+      const closeJamStyleBarBtn = document.getElementById('closeJamStyleBarBtn');
+
+      function updateCrosshairMaskSize() {
+        if (!crosshair || !moshCanvas) return;
+        const rect = moshCanvas.getBoundingClientRect();
+        const scale = (rect.width || 360) / WIDTH;
+        const radPx = Math.max(60, Math.min(500, state.interaction.jamRadius || 220));
+        const screenDiameter = Math.round(radPx * 2 * scale);
+        crosshair.style.width = `${screenDiameter}px`;
+        crosshair.style.height = `${screenDiameter}px`;
+      }
+
+      // Jam mode: 3 Deployable Distortion Styles (sortDrip = Pixel Sort Link, smearBlocks = Smear/Macroblocks, hybridVortex = Sort + P-Frame + RGB)
       function jamAt(cx, cy) {
         const rect = box.getBoundingClientRect();
-        const nx = Math.min(1, Math.max(0, (cx - rect.left) / rect.width));
-        const ny = Math.min(1, Math.max(0, (cy - rect.top) / rect.height));
+        const nx = Math.min(1, Math.max(0, (cx - rect.left) / (rect.width || 1)));
+        const ny = Math.min(1, Math.max(0, (cy - rect.top) / (rect.height || 1)));
+        const style = state.interaction.jamStyle || 'sortDrip';
 
-        const shearInput = document.getElementById('moshSliceRange');
-        const smearInput = document.getElementById('moshSmearRange');
-        if (shearInput) {
-          const shearMax = parseFloat(shearInput.max) || 70;
-          setSliderValue('moshSliceRange', Math.round(nx * shearMax));
-        }
-        if (smearInput) {
-          const smearMax = parseFloat(smearInput.max) || 95;
-          setSliderValue('moshSmearRange', Math.round((1 - ny) * smearMax));
-        }
-
-        // Modulation of Vector Mosh Force (X) and Melt Persistence (Y)
-        const vectorForceInput = document.getElementById('vectorForceRange');
-        if (vectorForceInput) {
-          const vMax = parseFloat(vectorForceInput.max) || 60;
-          setSliderValue('vectorForceRange', Math.round(nx * vMax));
-        }
-        const persistInput = document.getElementById('pframePersistenceRange');
-        if (persistInput) {
-          const pMin = parseFloat(persistInput.min) || 60;
-          const pMax = parseFloat(persistInput.max) || 98;
-          const pVal = Math.round(pMin + (1 - ny) * (pMax - pMin));
-          setSliderValue('pframePersistenceRange', pVal);
+        if (style === 'sortDrip') {
+          // Style 1: PIXEL DRIP — links finger mask & XY directly to contour-following Pixel Sorting
+          state.interaction.jamSortBurst = 1.0;
+          const dripLen = Math.round(35 + (1 - ny) * 290);
+          const spreadVal = Math.round(18 + nx * 72);
+          const speedVal = Math.round(6 + (1 - ny) * 20);
+          setSliderValue('sortLengthRange', dripLen);
+          setSliderValue('sortSpreadRange', spreadVal);
+          setSliderValue('sortSpeedRange', speedVal);
+          // Dynamic directional response if user swipes strongly horizontally vs vertically
+          if (Math.abs(state.mosh.touchVx) > Math.abs(state.mosh.touchVy) * 1.8 && Math.abs(state.mosh.touchVx) > 10) {
+            state.sort.direction = 'horizontal';
+          } else if (Math.abs(state.mosh.touchVy) > Math.abs(state.mosh.touchVx) * 1.4 && Math.abs(state.mosh.touchVy) > 8) {
+            state.sort.direction = 'vertical';
+          }
+        } else if (style === 'smearBlocks') {
+          // Style 2: SMEAR BLOCK — links finger mask & XY to P-Frame Macroblocks & Slice Shear
+          const shearInput = document.getElementById('moshSliceRange');
+          const smearInput = document.getElementById('moshSmearRange');
+          if (shearInput) {
+            const shearMax = parseFloat(shearInput.max) || 70;
+            setSliderValue('moshSliceRange', Math.round(nx * shearMax));
+          }
+          if (smearInput) {
+            const smearMax = parseFloat(smearInput.max) || 95;
+            setSliderValue('moshSmearRange', Math.round((1 - ny) * smearMax));
+          }
+          const vectorForceInput = document.getElementById('vectorForceRange');
+          if (vectorForceInput) {
+            const vMax = parseFloat(vectorForceInput.max) || 60;
+            setSliderValue('vectorForceRange', Math.round(10 + nx * (vMax - 10)));
+          }
+          const persistInput = document.getElementById('pframePersistenceRange');
+          if (persistInput) {
+            const pMin = parseFloat(persistInput.min) || 60;
+            const pMax = parseFloat(persistInput.max) || 98;
+            const pVal = Math.round(pMin + (1 - ny) * (pMax - pMin));
+            setSliderValue('pframePersistenceRange', pVal);
+          }
+        } else {
+          // Style 3: VORTEX MIX (hybridVortex) — combines Pixel Sort Drips + P-Frame Melt + Chromatic Split inside Finger Mask
+          state.interaction.jamSortBurst = 1.15;
+          setSliderValue('sortLengthRange', Math.round(45 + (1 - ny) * 220));
+          setSliderValue('sortSpreadRange', Math.round(24 + nx * 58));
+          setSliderValue('vectorForceRange', Math.round(14 + nx * 42));
+          setSliderValue('pframePersistenceRange', Math.round(66 + (1 - ny) * 28));
+          setSliderValue('rgbSplitRange', Math.round(4 + nx * 24));
         }
       }
 
@@ -5433,6 +5723,7 @@ RAW SIGNAL</textarea>
         state.mosh.isSwiping = true;
 
         if (state.interaction.mode === 'jam' || state.interaction.mode === 'vectorMosh') {
+          updateCrosshairMaskSize();
           crosshair.style.left = `${cx}px`;
           crosshair.style.top = `${cy}px`;
           crosshair.classList.remove('hidden');
@@ -5780,13 +6071,19 @@ RAW SIGNAL</textarea>
       const dragTargetMediaBtn = document.getElementById('dragTargetMediaBtn');
       const dragActResetBtn = document.getElementById('dragActResetBtn');
 
+      const JAM_STYLE_LABELS = {
+        sortDrip: '🌊 PIXEL DRIP',
+        smearBlocks: '🧱 SMEAR BLOCK',
+        hybridVortex: '⚡ VORTEX MIX'
+      };
+
       const MODES = {
         drag: {
           icon: '👆', text: 'DRAG', label: 'Tap screen to write • Drag to move/pinch',
           cls: 'mode-drag'
         },
         jam: {
-          icon: '🎛️', text: 'JAM', label: '🎛️ Touch: Jam XY (Vector × Persistence)',
+          icon: '🎛️', text: 'JAM', label: '🎛️ Touch: Jam Mask (Pixel Drip / Smear / Vortex)',
           cls: 'mode-jam'
         },
         vectorMosh: {
@@ -5795,6 +6092,52 @@ RAW SIGNAL</textarea>
         }
       };
       const ORDER = ['drag', 'jam', 'vectorMosh'];
+
+      function updateJamStyleUI() {
+        const curStyle = state.interaction.jamStyle || 'sortDrip';
+        document.querySelectorAll('.jam-style-btn').forEach(btn => {
+          if (btn.dataset.jamstyle === curStyle) {
+            btn.className = 'jam-style-btn tap-btn px-2 py-1 rounded-full bg-cyber-pink/25 border border-cyber-pink text-cyber-pink font-black transition active:scale-95';
+          } else {
+            btn.className = 'jam-style-btn tap-btn px-2 py-1 rounded-full text-slate-300 border border-white/10 hover:text-white font-black transition active:scale-95';
+          }
+        });
+        if (jamRadiusRange) jamRadiusRange.value = state.interaction.jamRadius || 220;
+        if (jamRadiusLabel) jamRadiusLabel.textContent = `${state.interaction.jamRadius || 220}px`;
+        updateCrosshairMaskSize();
+      }
+
+      document.querySelectorAll('.jam-style-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const st = btn.dataset.jamstyle;
+          if (!st) return;
+          state.interaction.jamStyle = st;
+          if (state.interaction.mode !== 'jam') {
+            state.interaction.mode = 'jam';
+            applyMode();
+          } else {
+            updateJamStyleUI();
+          }
+          showGestureToast(`JAM: ${JAM_STYLE_LABELS[st] || st}`);
+        });
+      });
+
+      if (jamRadiusRange) {
+        jamRadiusRange.addEventListener('input', (e) => {
+          const val = Math.max(60, Math.min(500, parseInt(e.target.value, 10) || 220));
+          state.interaction.jamRadius = val;
+          if (jamRadiusLabel) jamRadiusLabel.textContent = `${val}px`;
+          updateCrosshairMaskSize();
+        });
+      }
+
+      if (closeJamStyleBarBtn && jamStyleBar) {
+        closeJamStyleBarBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          jamStyleBar.classList.add('hidden');
+        });
+      }
 
       function updateDragUI() {
         const isMedia = state.interaction.target === 'media';
@@ -5830,14 +6173,25 @@ RAW SIGNAL</textarea>
         if (state.interaction.mode !== 'drag' && dragTransformBar) {
           dragTransformBar.classList.add('hidden');
         }
+        if (jamStyleBar) {
+          if (state.interaction.mode === 'jam') {
+            jamStyleBar.classList.remove('hidden');
+            updateJamStyleUI();
+          } else {
+            jamStyleBar.classList.add('hidden');
+          }
+        }
 
         updateDragUI();
+        updateCrosshairMaskSize();
 
         if (touchModeLabel) {
           if (state.interaction.mode === 'drag') {
             touchModeLabel.textContent = currentModuleKey === 'text'
               ? 'Tap screen to write • Drag to move/pinch'
               : `👆 Drag [${state.interaction.target === 'media' ? 'MEDIA' : 'TEXT'}]: Move & Pinch`;
+          } else if (state.interaction.mode === 'jam') {
+            touchModeLabel.textContent = `🎛️ Jam [${JAM_STYLE_LABELS[state.interaction.jamStyle] || 'PIXEL DRIP'} • ${state.interaction.jamRadius}px]`;
           } else {
             touchModeLabel.textContent = m.label;
           }
@@ -6479,6 +6833,160 @@ RAW SIGNAL</textarea>
       bindBaseDeckKnobs();
     }
 
+    function isCurrentControllerActive() {
+      if (currentModuleKey === 'text') return state.type.active !== false;
+      if (currentModuleKey === 'photo') return !!(state.photo.active && state.photo.loaded);
+      if (currentModuleKey === 'sort') return !!state.sort.active;
+      if (currentModuleKey === 'fx') {
+        if (currentSubEngineKey === 'sync' || currentSubEngineKey === 'syncTear') {
+          return !!(state.fx.sync && state.fx.sync.active);
+        }
+        return !!state.fx.active;
+      }
+      if (currentModuleKey === 'mosh') {
+        if (currentSubEngineKey === 'pframe') {
+          return !!(state.mosh.active && state.mosh.vectorMoshActive);
+        }
+        return !!state.mosh.active;
+      }
+      if (currentModuleKey === 'glitch') return !!state.heatWire.active;
+      if (currentModuleKey === 'vibe') {
+        if (currentSubEngineKey === 'sync') return !!(state.fx.sync && state.fx.sync.active);
+        return state.vibe.graphic !== 'none';
+      }
+      return true;
+    }
+
+    function syncAllPowerButtonsUI() {
+      const isAct = isCurrentControllerActive();
+      const pwrBtn = document.getElementById('subEnginePowerBtn');
+      const pwrLbl = document.getElementById('subEnginePowerLabel');
+      const menuPwrBtn = document.getElementById('menuEnginePowerBtn');
+
+      if (pwrBtn) {
+        pwrBtn.className = isAct
+          ? 'tap-btn h-8 px-2.5 rounded-full bg-cyber-lime/20 border border-cyber-lime text-cyber-lime font-black text-[9px] flex items-center gap-1 shadow-[0_0_10px_rgba(57,255,20,0.3)] active:scale-90 transition shrink-0'
+          : 'tap-btn h-8 px-2.5 rounded-full bg-white/5 border border-white/20 text-slate-400 font-black text-[9px] flex items-center gap-1 active:scale-90 transition shrink-0';
+      }
+      if (pwrLbl) pwrLbl.textContent = isAct ? 'ON' : 'OFF';
+      if (menuPwrBtn) {
+        menuPwrBtn.textContent = isAct ? '⚡ ACTIVE' : '○ INACTIVE';
+        menuPwrBtn.className = isAct
+          ? 'px-2.5 py-0.5 rounded-full bg-cyber-lime/20 border border-cyber-lime text-cyber-lime text-[9px] font-black active:scale-95 transition'
+          : 'px-2.5 py-0.5 rounded-full bg-white/5 border border-white/20 text-slate-400 text-[9px] font-black active:scale-95 transition';
+      }
+
+      // Sync side wing toggle buttons
+      const sideTextBtn = document.getElementById('sideTextToggleBtn');
+      const sideTextIcon = document.getElementById('sideTextToggleIcon');
+      const sideTextLbl = document.getElementById('sideTextToggleLabel');
+      if (sideTextBtn) {
+        const tOn = state.type.active !== false;
+        sideTextBtn.classList.toggle('active', tOn);
+        if (sideTextIcon) sideTextIcon.textContent = tOn ? '👁️' : '🙈';
+        if (sideTextLbl) sideTextLbl.textContent = tOn ? 'TEXT' : 'HIDDEN';
+      }
+
+      const sideSortBtn = document.getElementById('sideSortPowerBtn');
+      if (sideSortBtn) sideSortBtn.classList.toggle('active', !!state.sort.active);
+
+      const sideFxBtn = document.getElementById('sideFxToggleBtn');
+      if (sideFxBtn) sideFxBtn.classList.toggle('active', !!state.fx.active);
+
+      const sideSyncBtn = document.getElementById('sideSyncToggleBtn');
+      if (sideSyncBtn) sideSyncBtn.classList.toggle('active', !!(state.fx.sync && state.fx.sync.active));
+
+      const sideMoshBtn = document.getElementById('sideMoshPowerBtn');
+      const sideMoshLbl = document.getElementById('sideMoshPowerLabel');
+      if (sideMoshBtn) {
+        const mOn = !!state.mosh.active;
+        sideMoshBtn.classList.toggle('active', mOn);
+        if (sideMoshLbl) sideMoshLbl.textContent = mOn ? 'MOSH ON' : 'MOSH OFF';
+      }
+
+      const sideHwBtn = document.getElementById('sideHwPowerBtn');
+      const sideHwLbl = document.getElementById('sideHwPowerLabel');
+      if (sideHwBtn) {
+        const hwOn = !!state.heatWire.active;
+        sideHwBtn.classList.toggle('active', hwOn);
+        if (sideHwLbl) sideHwLbl.textContent = hwOn ? 'POWER ON' : 'POWER OFF';
+      }
+
+      const sideLiveBtn = document.getElementById('sideLiveFeedBtn');
+      const sideLiveLbl = document.getElementById('sideLiveFeedLabel');
+      const liveQuickBar = document.getElementById('liveFeedQuickBar');
+      const isLiveNow = !!(state.photo.active && state.photo.loaded && state.photo.isLive);
+      if (sideLiveBtn) {
+        sideLiveBtn.classList.toggle('active', isLiveNow);
+        if (sideLiveLbl) sideLiveLbl.textContent = isLiveNow ? 'STOP' : 'LIVE';
+      }
+      if (liveQuickBar) {
+        liveQuickBar.classList.toggle('hidden', !isLiveNow);
+      }
+
+      // Sync hidden checkboxes
+      const sChk = document.getElementById('sortActiveCheck');
+      if (sChk) sChk.checked = !!state.sort.active;
+      const fChk = document.getElementById('fxActiveCheck');
+      if (fChk) fChk.checked = !!state.fx.active;
+      const syChk = document.getElementById('syncActiveCheck');
+      if (syChk) syChk.checked = !!(state.fx.sync && state.fx.sync.active);
+      const mChk = document.getElementById('moshActiveCheck');
+      if (mChk) mChk.checked = !!state.mosh.active;
+      const vmChk = document.getElementById('vectorMoshActiveCheck');
+      if (vmChk) vmChk.checked = !!state.mosh.vectorMoshActive;
+      const hwChk = document.getElementById('heatWireActiveCheck');
+      if (hwChk) hwChk.checked = !!state.heatWire.active;
+      const pChk = document.getElementById('photoActiveCheck');
+      if (pChk) pChk.checked = !!state.photo.active;
+    }
+    window.syncAllPowerButtonsUI = syncAllPowerButtonsUI;
+
+    function toggleCurrentControllerActive() {
+      const next = !isCurrentControllerActive();
+      if (currentModuleKey === 'text') {
+        state.type.active = next;
+        showGestureToast(next ? '👁️ TEXT VISIBLE' : '🙈 TEXT HIDDEN');
+      } else if (currentModuleKey === 'photo') {
+        if (!state.photo.loaded && next) {
+          if (window.startLiveCamera) window.startLiveCamera(state.photo.facingMode || 'environment');
+          return;
+        }
+        state.photo.active = next;
+        showGestureToast(next ? '🎬 MEDIA ON' : '🎬 MEDIA OFF');
+      } else if (currentModuleKey === 'sort') {
+        state.sort.active = next;
+        showGestureToast(next ? '🌊 PIXEL SORT: ON' : '🌊 PIXEL SORT: OFF');
+      } else if (currentModuleKey === 'fx') {
+        if (currentSubEngineKey === 'sync' || currentSubEngineKey === 'syncTear') {
+          state.fx.sync.active = next;
+          showGestureToast(next ? '⚡ CABLE SYNC: ON' : '⚡ CABLE SYNC: OFF');
+        } else {
+          state.fx.active = next;
+          showGestureToast(next ? '📺 CRT FX: ON' : '📺 CRT FX: OFF');
+        }
+      } else if (currentModuleKey === 'mosh') {
+        state.mosh.active = next;
+        if (currentSubEngineKey === 'pframe') {
+          state.mosh.vectorMoshActive = next;
+        }
+        showGestureToast(next ? '📼 DATAMOSH: ON' : '📼 DATAMOSH: OFF');
+      } else if (currentModuleKey === 'glitch') {
+        state.heatWire.active = next;
+        showGestureToast(next ? '🔥 HEAT/WIRE: ON' : '🔥 HEAT/WIRE: OFF');
+      } else if (currentModuleKey === 'vibe') {
+        if (currentSubEngineKey === 'sync') {
+          state.fx.sync.active = next;
+          showGestureToast(next ? '⚡ CABLE SYNC: ON' : '⚡ CABLE SYNC: OFF');
+        } else {
+          state.vibe.graphic = next ? 'mechaHudGlyphs' : 'none';
+          showGestureToast(next ? '⛩️ VIBE FRAME: ON' : '⛩️ VIBE FRAME: OFF');
+        }
+      }
+      syncAllPowerButtonsUI();
+    }
+    window.toggleCurrentControllerActive = toggleCurrentControllerActive;
+
     function updateSubEngineUI() {
       const mod = MODULE_CONFIG[currentModuleKey];
       if (!mod) return;
@@ -6495,6 +7003,7 @@ RAW SIGNAL</textarea>
         btn.style.color = mod.color;
         btn.style.boxShadow = `0 0 14px ${mod.color}44`;
       }
+      syncAllPowerButtonsUI();
     }
 
     function toggleSubEngineMenu() {
@@ -6539,6 +7048,7 @@ RAW SIGNAL</textarea>
         list.appendChild(itemBtn);
       });
 
+      syncAllPowerButtonsUI();
       menu.classList.remove('hidden');
     }
 
@@ -6612,11 +7122,25 @@ RAW SIGNAL</textarea>
         });
       });
 
-      // ===== SUB-ENGINE SELECTOR IN LOWER THIRD =====
+      // ===== SUB-ENGINE SELECTOR & ACTIVE/INACTIVE POWER TOGGLE IN LOWER THIRD =====
       const subEngineBtn = document.getElementById('subEngineBtn');
       if (subEngineBtn) subEngineBtn.addEventListener('click', toggleSubEngineMenu);
       const closeSubEngineMenuBtn = document.getElementById('closeSubEngineMenuBtn');
       if (closeSubEngineMenuBtn) closeSubEngineMenuBtn.addEventListener('click', closeSubEngineMenu);
+      const subEnginePowerBtn = document.getElementById('subEnginePowerBtn');
+      if (subEnginePowerBtn) {
+        subEnginePowerBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleCurrentControllerActive();
+        });
+      }
+      const menuEnginePowerBtn = document.getElementById('menuEnginePowerBtn');
+      if (menuEnginePowerBtn) {
+        menuEnginePowerBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleCurrentControllerActive();
+        });
+      }
 
       // ===== POPOVER CLOSE BUTTONS =====
       document.querySelectorAll('.close-popover-btn').forEach(btn => {
@@ -6882,7 +7406,27 @@ RAW SIGNAL</textarea>
         });
       }
 
+      const sideTextToggleBtn = document.getElementById('sideTextToggleBtn');
+      if (sideTextToggleBtn) {
+        sideTextToggleBtn.addEventListener('click', () => {
+          state.type.active = state.type.active === false ? true : false;
+          syncAllPowerButtonsUI();
+          showGestureToast(state.type.active ? '👁️ TEXT VISIBLE' : '🙈 TEXT HIDDEN');
+        });
+      }
+
       // 2. MOSH MODULE WINGS
+      const sideMoshPowerBtn = document.getElementById('sideMoshPowerBtn');
+      if (sideMoshPowerBtn) {
+        sideMoshPowerBtn.addEventListener('click', () => {
+          const next = !state.mosh.active;
+          state.mosh.active = next;
+          state.mosh.vectorMoshActive = next;
+          syncAllPowerButtonsUI();
+          showGestureToast(next ? '📼 DATAMOSH: ON' : '📼 DATAMOSH: OFF');
+        });
+      }
+
       const sideMoshModeBtn = document.getElementById('sideMoshModeBtn');
       if (sideMoshModeBtn) {
         sideMoshModeBtn.addEventListener('click', () => {
@@ -6918,10 +7462,13 @@ RAW SIGNAL</textarea>
               btn.addEventListener('click', () => {
                 const nextMode = btn.dataset.pframemode;
                 state.mosh.pframeMode = nextMode;
+                state.mosh.active = true;
+                state.mosh.vectorMoshActive = true;
                 const lbl = document.getElementById('sideMoshModeLabel');
                 if (lbl) lbl.textContent = nextMode.toUpperCase();
                 const origBtn = document.querySelector(`.pframe-mode-btn[data-mode="${nextMode}"]`);
                 if (origBtn) origBtn.click();
+                syncAllPowerButtonsUI();
                 closeSidePopovers();
                 showGestureToast(`MOSH: ${nextMode.toUpperCase()}`);
               });
@@ -6930,16 +7477,15 @@ RAW SIGNAL</textarea>
             if (vChk) {
               vChk.addEventListener('change', (e) => {
                 state.mosh.vectorMoshActive = e.target.checked;
-                const domChk = document.getElementById('vectorMoshActiveCheck');
-                if (domChk) domChk.checked = e.target.checked;
+                if (e.target.checked) state.mosh.active = true;
+                syncAllPowerButtonsUI();
               });
             }
             const cChk = container.querySelector('#popClassicMoshChk');
             if (cChk) {
               cChk.addEventListener('change', (e) => {
                 state.mosh.active = e.target.checked;
-                const domChk = document.getElementById('moshActiveCheck');
-                if (domChk) domChk.checked = e.target.checked;
+                syncAllPowerButtonsUI();
               });
             }
           });
@@ -6983,6 +7529,15 @@ RAW SIGNAL</textarea>
       }
 
       // 3. HEAT / WIRE MODULE WINGS
+      const sideHwPowerBtn = document.getElementById('sideHwPowerBtn');
+      if (sideHwPowerBtn) {
+        sideHwPowerBtn.addEventListener('click', () => {
+          state.heatWire.active = !state.heatWire.active;
+          syncAllPowerButtonsUI();
+          showGestureToast(state.heatWire.active ? '🔥 HEAT/WIRE: ON' : '🔥 HEAT/WIRE: OFF');
+        });
+      }
+
       const sideHwModeBtn = document.getElementById('sideHwModeBtn');
       if (sideHwModeBtn) {
         sideHwModeBtn.addEventListener('click', () => {
@@ -6991,8 +7546,7 @@ RAW SIGNAL</textarea>
           const next = modes[(curIdx + 1) % modes.length];
           state.heatWire.mode = next;
           state.heatWire.active = true;
-          const chk = document.getElementById('heatWireActiveCheck');
-          if (chk) chk.checked = true;
+          syncAllPowerButtonsUI();
           document.querySelectorAll('.hw-mode-btn').forEach(b => {
             b.className = b.dataset.hwmode === state.heatWire.mode
               ? 'hw-mode-btn py-2 rounded bg-cyber-card border border-cyber-pink text-cyber-pink font-bold text-[10px] active:scale-95 transition'
@@ -7038,8 +7592,7 @@ RAW SIGNAL</textarea>
                 state.heatWire.active = true;
                 const sel = document.getElementById('hwTriggerSelect');
                 if (sel) sel.value = t.key;
-                const chk = document.getElementById('heatWireActiveCheck');
-                if (chk) chk.checked = true;
+                syncAllPowerButtonsUI();
                 closeSidePopovers();
                 showGestureToast(`MASK: ${t.key.toUpperCase()}`);
               });
@@ -7049,8 +7602,7 @@ RAW SIGNAL</textarea>
             if (actChk) {
               actChk.addEventListener('change', (e) => {
                 state.heatWire.active = e.target.checked;
-                const chk = document.getElementById('heatWireActiveCheck');
-                if (chk) chk.checked = e.target.checked;
+                syncAllPowerButtonsUI();
               });
             }
             const invChk = container.querySelector('#popHwInvertChk');
@@ -7093,6 +7645,7 @@ RAW SIGNAL</textarea>
                   state.heatWire.active = true;
                   updateHeatmapLUT(state.heatWire.palette, state.heatWire.customColorA, state.heatWire.customColorB);
                 }
+                syncAllPowerButtonsUI();
                 closeSidePopovers();
                 showGestureToast(`PALETTE: ${p.name}`);
               });
@@ -7123,6 +7676,7 @@ RAW SIGNAL</textarea>
               if (domA) domA.value = colA.value;
               if (domB) domB.value = colB.value;
               updateHeatmapLUT('custom', colA.value, colB.value);
+              syncAllPowerButtonsUI();
             };
             colA.addEventListener('input', syncCustomGrad);
             colB.addEventListener('input', syncCustomGrad);
@@ -7151,6 +7705,7 @@ RAW SIGNAL</textarea>
                 if (origBtn) origBtn.click();
                 else state.heatWire.wireStyle = s.key;
                 state.heatWire.active = true;
+                syncAllPowerButtonsUI();
                 closeSidePopovers();
                 showGestureToast(`MESH: ${s.name}`);
               });
@@ -7222,8 +7777,8 @@ RAW SIGNAL</textarea>
         sideSortStyleBtn.addEventListener('click', () => {
           openLeftPopover('STREAK LINES & PATTERN', (container) => {
             const linePresets = [
-              { name: '✨ Subtle Fine Lines (Default)', len: 85, thick: 2, spread: 32, spd: 8 },
-              { name: '🌧️ 1px Needle Rain', len: 135, thick: 1, spread: 40, spd: 12 },
+              { name: '✨ Subtle Contour Lines (Default)', len: 55, thick: 2, spread: 28, spd: 7 },
+              { name: '🌧️ 1px Silk Rain', len: 135, thick: 1, spread: 40, spd: 12 },
               { name: '📊 4px Barcode Lines', len: 110, thick: 4, spread: 38, spd: 8 },
               { name: '🧱 8px Brutal Tape Bars', len: 155, thick: 8, spread: 48, spd: 9 },
               { name: '❄️ Static Frozen Lines (0x)', len: 95, thick: 2, spread: 35, spd: 0 }
@@ -7249,16 +7804,16 @@ RAW SIGNAL</textarea>
                   <div>
                     <div class="flex justify-between text-[9px] text-slate-300 font-bold">
                       <span>Pattern Wideness</span>
-                      <span id="popSortSpreadVal" class="text-cyber-yellow">${state.sort.spread || 32}%</span>
+                      <span id="popSortSpreadVal" class="text-cyber-yellow">${state.sort.spread || 28}%</span>
                     </div>
-                    <input type="range" id="popSortSpreadRange" min="5" max="100" value="${state.sort.spread || 32}" class="w-full accent-cyber-yellow">
+                    <input type="range" id="popSortSpreadRange" min="5" max="100" value="${state.sort.spread || 28}" class="w-full accent-cyber-yellow">
                   </div>
                   <div>
                     <div class="flex justify-between text-[9px] text-slate-300 font-bold">
                       <span>Flow Speed</span>
-                      <span id="popSortSpdVal" class="text-cyber-pink">${(state.sort.speed !== undefined ? state.sort.speed : 0.8).toFixed(1)}x</span>
+                      <span id="popSortSpdVal" class="text-cyber-pink">${(state.sort.speed !== undefined ? state.sort.speed : 0.7).toFixed(1)}x</span>
                     </div>
-                    <input type="range" id="popSortSpdRange" min="0" max="30" value="${Math.round((state.sort.speed !== undefined ? state.sort.speed : 0.8) * 10)}" class="w-full accent-cyber-pink">
+                    <input type="range" id="popSortSpdRange" min="0" max="30" value="${Math.round((state.sort.speed !== undefined ? state.sort.speed : 0.7) * 10)}" class="w-full accent-cyber-pink">
                   </div>
                 </div>
               </div>
@@ -7273,9 +7828,7 @@ RAW SIGNAL</textarea>
                 setSliderValue('sortSpreadRange', p.spread);
                 setSliderValue('sortSpeedRange', p.spd);
                 state.sort.active = true;
-                const chk = document.getElementById('sortActiveCheck');
-                if (chk) chk.checked = true;
-                if (sideSortPowerBtn) sideSortPowerBtn.classList.add('active');
+                syncAllPowerButtonsUI();
                 closeSidePopovers();
                 showGestureToast(p.name);
               });
@@ -7335,9 +7888,7 @@ RAW SIGNAL</textarea>
       if (sideSortPowerBtn) {
         sideSortPowerBtn.addEventListener('click', () => {
           state.sort.active = !state.sort.active;
-          sideSortPowerBtn.classList.toggle('active', state.sort.active);
-          const chk = document.getElementById('sortActiveCheck');
-          if (chk) chk.checked = state.sort.active;
+          syncAllPowerButtonsUI();
           showGestureToast(state.sort.active ? '🌊 SORT ON' : 'SORT OFF');
         });
       }
@@ -7347,9 +7898,7 @@ RAW SIGNAL</textarea>
       if (sideFxToggleBtn) {
         sideFxToggleBtn.addEventListener('click', () => {
           state.fx.active = !state.fx.active;
-          const chk = document.getElementById('fxActiveCheck');
-          if (chk) chk.checked = state.fx.active;
-          sideFxToggleBtn.classList.toggle('active', state.fx.active);
+          syncAllPowerButtonsUI();
           showGestureToast(state.fx.active ? '📺 CRT ON' : '📺 CRT OFF');
         });
       }
@@ -7358,9 +7907,7 @@ RAW SIGNAL</textarea>
       if (sideSyncToggleBtn) {
         sideSyncToggleBtn.addEventListener('click', () => {
           state.fx.sync.active = !state.fx.sync.active;
-          const chk = document.getElementById('syncActiveCheck');
-          if (chk) chk.checked = state.fx.sync.active;
-          sideSyncToggleBtn.classList.toggle('active', state.fx.sync.active);
+          syncAllPowerButtonsUI();
           showGestureToast(state.fx.sync.active ? '⚡ SYNC ON' : '⚡ SYNC OFF');
         });
       }
@@ -8495,7 +9042,41 @@ RAW SIGNAL</textarea>
         return `${mm}:${ss}.${ms}`;
       }
 
+      const liveFeedQuickBar = document.getElementById('liveFeedQuickBar');
+      const liveBarFlipBtn = document.getElementById('liveBarFlipBtn');
+      const liveBarFlipText = document.getElementById('liveBarFlipText');
+      const liveBarLensBtn = document.getElementById('liveBarLensBtn');
+      const liveBarLensText = document.getElementById('liveBarLensText');
+      const liveBarAspectBtn = document.getElementById('liveBarAspectBtn');
+      const liveBarAspectText = document.getElementById('liveBarAspectText');
+      const liveBarStopBtn = document.getElementById('liveBarStopBtn');
+      const sideLiveFeedBtn = document.getElementById('sideLiveFeedBtn');
+
+      function syncLiveFeedBarUI() {
+        const isLive = !!(state.photo && state.photo.isLive && state.photo.loaded);
+        if (liveFeedQuickBar) {
+          liveFeedQuickBar.classList.toggle('hidden', !isLive);
+        }
+        if (sideLiveFeedBtn) {
+          sideLiveFeedBtn.classList.toggle('active', isLive);
+        }
+        if (liveBarFlipText) {
+          liveBarFlipText.textContent = (state.photo.facingMode === 'user') ? 'FRONT CAM' : 'BACK CAM';
+        }
+        if (liveBarLensText) {
+          const z = state.photo.lensZoom || 1.0;
+          const devCount = (state.photo.availableDevices && state.photo.availableDevices.length) ? state.photo.availableDevices.length : 0;
+          const lensTag = z < 0.8 ? '0.5x WIDE' : (z > 1.3 ? '2.0x TELE' : '1.0x LENS');
+          liveBarLensText.textContent = devCount > 1 ? `${lensTag} (${(state.photo.lensIndex % devCount) + 1}/${devCount})` : lensTag;
+        }
+        if (liveBarAspectText) {
+          liveBarAspectText.textContent = (state.photo.liveAspect === '1:1') ? '1:1' : '16:9';
+        }
+      }
+
       function updateMediaStatusUI(label, isVid, isLive) {
+        syncLiveFeedBarUI();
+        if (window.syncAllPowerButtonsUI) window.syncAllPowerButtonsUI();
         if (!mediaStatusBox) return;
         if (!state.photo.loaded) {
           mediaStatusBox.classList.add('hidden');
@@ -8812,10 +9393,6 @@ RAW SIGNAL</textarea>
           video.loop = true;
           video.autoplay = true;
           video.preload = 'auto';
-          // CRITICAL: DO NOT set video.crossOrigin = 'anonymous' on local blob URLs!
-          // In Android Chrome / mobile WebKit, setting crossOrigin on a blob: URL causes MediaCodec
-          // and Chromium's demuxer to reject the stream or fail decoding with MEDIA_ERR_SRC_NOT_SUPPORTED or MEDIA_ERR_DECODE!
-          // Local blobs never taint the canvas anyway.
 
           const url = URL.createObjectURL(file);
           video.src = url;
@@ -8831,10 +9408,8 @@ RAW SIGNAL</textarea>
             state.photo.totalDuration = duration;
 
             if (duration > 9.0) {
-              // Automatically open trimmer modal so user can choose their 9s segment
               openVideoTrimModal(file, video, duration);
             } else {
-              // Video <= 9s: use full video
               state.photo.startTime = 0;
               state.photo.endTime = duration;
               state.photo.segmentDuration = duration;
@@ -8860,7 +9435,6 @@ RAW SIGNAL</textarea>
           });
 
           video.addEventListener('error', (e) => {
-            // Ignore if src was cleared or revoked by stopCurrentMedia()
             if (!video.src || video.src === window.location.href || video.src === 'about:blank') return;
             console.error('Video load error:', e, video.error);
             const errCode = video.error ? video.error.code : 0;
@@ -8903,24 +9477,59 @@ RAW SIGNAL</textarea>
         }
       }
       window.loadMediaFile = loadMediaFile;
-      window.loadPhotoFile = loadMediaFile; // backward compatibility
+      window.loadPhotoFile = loadMediaFile;
 
-      async function startLiveCamera(facing = 'environment') {
+      async function startLiveCamera(facing = 'environment', specificDeviceId = null) {
         try {
           stopCurrentMedia();
           if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             alert('Live camera streaming is not supported by this browser. Please use the Video/Photo Cam buttons.');
             return;
           }
-          const constraints = {
-            video: {
-              facingMode: { ideal: facing },
-              width: { ideal: 1080 },
-              height: { ideal: 1920 }
-            },
-            audio: false
+
+          // Request un-cropped native sensor frame (prefer full 16:9 / 9:16 FOV without aggressive digital crop)
+          const videoConstraints = {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            resizeMode: 'none'
           };
-          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          if (specificDeviceId) {
+            videoConstraints.deviceId = { exact: specificDeviceId };
+          } else {
+            videoConstraints.facingMode = { ideal: facing };
+          }
+
+          let stream;
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: false });
+          } catch (fallbackErr) {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: { ideal: facing } },
+              audio: false
+            });
+          }
+
+          // Enumerate camera lenses after permission is granted
+          try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoInputs = devices.filter(d => d.kind === 'videoinput');
+            state.photo.availableDevices = videoInputs;
+          } catch (enumErr) {
+            state.photo.availableDevices = [];
+          }
+
+          // Apply hardware zoom / wide FOV if supported by the smartphone camera track
+          const vTrack = stream.getVideoTracks()[0];
+          if (vTrack && vTrack.getCapabilities) {
+            try {
+              const caps = vTrack.getCapabilities();
+              if (caps.zoom) {
+                const desiredZoom = Math.max(caps.zoom.min, Math.min(caps.zoom.max, state.photo.lensZoom || 1.0));
+                await vTrack.applyConstraints({ advanced: [{ zoom: desiredZoom }] });
+              }
+            } catch (zoomErr) {}
+          }
+
           const video = document.createElement('video');
           video.setAttribute('playsinline', '');
           video.setAttribute('webkit-playsinline', '');
@@ -8933,13 +9542,15 @@ RAW SIGNAL</textarea>
           state.photo.video = video;
           state.photo.img = video;
           state.photo.facingMode = facing;
+          state.photo.deviceId = specificDeviceId || null;
           state.photo.isVideo = true;
           state.photo.isLive = true;
           state.photo.loaded = true;
           state.photo.active = true;
           const photoActiveCheck = document.getElementById('photoActiveCheck');
           if (photoActiveCheck) photoActiveCheck.checked = true;
-          updateMediaStatusUI(`Live Feed (${facing === 'user' ? 'Front' : 'Rear'})`, true, true);
+          const trackLabel = (vTrack && vTrack.label) ? vTrack.label : (facing === 'user' ? 'Front Camera' : 'Rear Camera');
+          updateMediaStatusUI(`Live (${trackLabel})`, true, true);
         } catch (err) {
           console.warn('Camera stream error:', err);
           alert('Camera stream unavailable: ' + (err.message || err.name) + '. Please check browser camera permissions.');
@@ -8948,7 +9559,10 @@ RAW SIGNAL</textarea>
       window.startLiveCamera = startLiveCamera;
 
       // Event listeners for file and camera inputs
-      document.getElementById('photoActiveCheck').addEventListener('change', (e) => state.photo.active = e.target.checked);
+      document.getElementById('photoActiveCheck').addEventListener('change', (e) => {
+        state.photo.active = e.target.checked;
+        if (window.syncAllPowerButtonsUI) window.syncAllPowerButtonsUI();
+      });
 
       const photoFileInput = document.getElementById('photoFileInput');
       if (photoFileInput) {
@@ -8987,14 +9601,79 @@ RAW SIGNAL</textarea>
         });
       }
 
+      function toggleLiveCameraFeed() {
+        if (state.photo.isLive) {
+          stopCurrentMedia();
+        } else {
+          startLiveCamera(state.photo.facingMode || 'environment');
+        }
+      }
+
       if (liveCameraBtn) {
-        liveCameraBtn.addEventListener('click', () => {
-          if (state.photo.isLive) {
-            stopCurrentMedia();
-          } else {
-            startLiveCamera(state.photo.facingMode || 'environment');
-          }
+        liveCameraBtn.addEventListener('click', toggleLiveCameraFeed);
+      }
+      if (sideLiveFeedBtn) {
+        sideLiveFeedBtn.addEventListener('click', toggleLiveCameraFeed);
+      }
+
+      if (liveBarFlipBtn) {
+        liveBarFlipBtn.addEventListener('click', () => {
+          if (!state.photo.isLive) return;
+          const nextFacing = (state.photo.facingMode === 'user') ? 'environment' : 'user';
+          state.photo.lensIndex = 0;
+          state.photo.lensZoom = 1.0;
+          startLiveCamera(nextFacing, null);
         });
+      }
+
+      if (liveBarLensBtn) {
+        liveBarLensBtn.addEventListener('click', async () => {
+          if (!state.photo.isLive) return;
+          const presets = [1.0, 0.5, 2.0];
+          state.photo.lensIndex = ((state.photo.lensIndex || 0) + 1);
+          const nextZoom = presets[state.photo.lensIndex % presets.length];
+          state.photo.lensZoom = nextZoom;
+
+          // If multiple rear/front hardware camera lenses are exposed by the browser, cycle deviceId or apply hardware zoom
+          const devs = (state.photo.availableDevices || []).filter(d => {
+            const lbl = (d.label || '').toLowerCase();
+            if (state.photo.facingMode === 'user') return lbl.includes('front') || lbl.includes('user') || lbl.includes('selfie');
+            return lbl.includes('back') || lbl.includes('rear') || lbl.includes('environment') || lbl.includes('wide') || lbl.includes('tele') || (!lbl.includes('front') && !lbl.includes('user'));
+          });
+
+          if (devs.length > 1) {
+            const targetDev = devs[state.photo.lensIndex % devs.length];
+            if (targetDev && targetDev.deviceId && targetDev.deviceId !== state.photo.deviceId) {
+              await startLiveCamera(state.photo.facingMode, targetDev.deviceId);
+              return;
+            }
+          }
+
+          if (state.photo.stream) {
+            const vTrack = state.photo.stream.getVideoTracks()[0];
+            if (vTrack && vTrack.getCapabilities) {
+              try {
+                const caps = vTrack.getCapabilities();
+                if (caps.zoom) {
+                  const zVal = Math.max(caps.zoom.min, Math.min(caps.zoom.max, nextZoom));
+                  await vTrack.applyConstraints({ advanced: [{ zoom: zVal }] });
+                }
+              } catch (e) {}
+            }
+          }
+          syncLiveFeedBarUI();
+        });
+      }
+
+      if (liveBarAspectBtn) {
+        liveBarAspectBtn.addEventListener('click', () => {
+          state.photo.liveAspect = (state.photo.liveAspect === '1:1') ? '16:9' : '1:1';
+          syncLiveFeedBarUI();
+        });
+      }
+
+      if (liveBarStopBtn) {
+        liveBarStopBtn.addEventListener('click', stopCurrentMedia);
       }
 
       if (mediaPlayPauseBtn) {
@@ -9065,7 +9744,10 @@ RAW SIGNAL</textarea>
       }
 
       // CRT & FX controls
-      document.getElementById('fxActiveCheck').addEventListener('change', (e) => state.fx.active = e.target.checked);
+      document.getElementById('fxActiveCheck').addEventListener('change', (e) => {
+        state.fx.active = e.target.checked;
+        if (window.syncAllPowerButtonsUI) window.syncAllPowerButtonsUI();
+      });
       bind('rgbSplitRange', state.fx, 'rgbSplit', 'rgbSplitLabel', 'px');
       bind('rgbAngleRange', state.fx, 'rgbAngle', 'rgbAngleLabel', '°');
       bind('scanlinesRange', state.fx, 'scanlines', 'scanlinesLabel', '%');
@@ -9096,8 +9778,7 @@ RAW SIGNAL</textarea>
       if (syncActiveCheck) {
         syncActiveCheck.addEventListener('change', (e) => {
           state.fx.sync.active = e.target.checked;
-          const sideBtn = document.getElementById('sideSyncToggleBtn');
-          if (sideBtn) sideBtn.classList.toggle('active', state.fx.sync.active);
+          if (window.syncAllPowerButtonsUI) window.syncAllPowerButtonsUI();
         });
       }
 
@@ -9208,6 +9889,7 @@ RAW SIGNAL</textarea>
           if (document.getElementById('randomLetterSizeCheck')) {
             document.getElementById('randomLetterSizeCheck').checked = !!state.type.randomSize;
           }
+          if (window.syncAllPowerButtonsUI) window.syncAllPowerButtonsUI();
           if (window.applyTouchMode) window.applyTouchMode();
         });
       });
@@ -9219,7 +9901,7 @@ RAW SIGNAL</textarea>
           document.querySelectorAll('.vibe-graphic-btn').forEach(b => {
             b.className = 'vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px] font-bold';
           });
-          btn.className = 'vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan text-[10px] font-bold';
+          btn.className = 'vibe-graphic-btn py-1.5 px-1 rounded bg-cyber-card border border-cyber-border border-cyber-cyan text-cyber-cyan text-[10px] font-bold';
         });
       });
       const vibeGraphicLayerSelect = document.getElementById('vibeGraphicLayerSelect');
@@ -9248,43 +9930,211 @@ RAW SIGNAL</textarea>
         state.isTyping = false;
       });
 
-      // Chaos Randomizer
-      document.getElementById('chaosBtn').addEventListener('click', () => {
-        state.sort.direction = ['vertical', 'horizontal', 'diagonal'][Math.floor(Math.random() * 3)];
+      // Chaos Multi-Effect Combo Engine (8 Curated Combinations, each activating >= 3 effects simultaneously)
+      let chaosComboIndex = -1;
+      const CHAOS_COMBINATIONS = [
+        {
+          name: 'LIQUID DRIP + VECTOR MOSH + CHROMATIC CRT',
+          apply: () => {
+            state.sort.active = true;
+            state.sort.direction = 'vertical';
+            state.sort.pattern = 'drip';
+            setSliderValue('sortLengthRange', Math.floor(240 + Math.random() * 140));
+            setSliderValue('sortThicknessRange', 4);
+            setSliderValue('sortSpreadRange', 62);
+            state.mosh.active = true;
+            state.mosh.vectorMoshActive = true;
+            setSliderValue('moshSmearRange', Math.floor(38 + Math.random() * 25));
+            setSliderValue('vectorForceRange', Math.floor(26 + Math.random() * 20));
+            state.heatWire.active = false;
+            state.fx.active = true;
+            state.fx.sync.active = false;
+            setSliderValue('rgbSplitRange', Math.floor(14 + Math.random() * 12));
+            setSliderValue('scanlinesRange', 35);
+          }
+        },
+        {
+          name: 'CABLE SYNC SCRAMBLE + HORIZ SORT + SLICE SHEAR',
+          apply: () => {
+            state.sort.active = true;
+            state.sort.direction = 'horizontal';
+            state.sort.pattern = 'streak';
+            setSliderValue('sortLengthRange', Math.floor(180 + Math.random() * 130));
+            setSliderValue('sortThicknessRange', 3);
+            setSliderValue('sortSpreadRange', 50);
+            state.mosh.active = true;
+            state.mosh.vectorMoshActive = false;
+            setSliderValue('moshSliceRange', Math.floor(25 + Math.random() * 25));
+            setSliderValue('moshSmearRange', 22);
+            state.heatWire.active = false;
+            state.fx.active = true;
+            state.fx.sync.active = true;
+            state.fx.sync.direction = 'horizontal';
+            setSliderValue('syncWidthRange', Math.floor(35 + Math.random() * 25));
+            setSliderValue('syncTearRange', Math.floor(45 + Math.random() * 35));
+            setSliderValue('rgbSplitRange', 12);
+          }
+        },
+        {
+          name: 'THERMAL HEATMAP + WIREFRAME + PIXEL DRIP',
+          apply: () => {
+            state.heatWire.active = true;
+            state.heatWire.heatmapOn = true;
+            state.heatWire.wireOn = true;
+            state.heatWire.palette = ['thermal', 'cyber', 'acid'][Math.floor(Math.random() * 3)];
+            state.heatWire.wireStyle = 'iso';
+            setSliderValue('hwIntensityRange', 85);
+            setSliderValue('hwWireStepRange', 14);
+            state.sort.active = true;
+            state.sort.direction = 'vertical';
+            state.sort.pattern = 'drip';
+            setSliderValue('sortLengthRange', Math.floor(160 + Math.random() * 110));
+            state.mosh.active = false;
+            state.fx.active = true;
+            state.fx.sync.active = false;
+            setSliderValue('rgbSplitRange', 10);
+          }
+        },
+        {
+          name: 'DIAG SHATTER + P-FRAME BLOOM + RGB PRISM',
+          apply: () => {
+            state.sort.active = true;
+            state.sort.direction = 'diagonal';
+            state.sort.pattern = 'shatter';
+            setSliderValue('sortLengthRange', Math.floor(210 + Math.random() * 150));
+            setSliderValue('sortThicknessRange', 5);
+            state.mosh.active = true;
+            state.mosh.vectorMoshActive = true;
+            setSliderValue('moshBlockRange', Math.floor(24 + Math.random() * 25));
+            setSliderValue('chromaBleedRange', Math.floor(16 + Math.random() * 18));
+            setSliderValue('pframePersistenceRange', 68);
+            state.heatWire.active = false;
+            state.fx.active = true;
+            state.fx.sync.active = false;
+            setSliderValue('rgbSplitRange', Math.floor(18 + Math.random() * 14));
+            setSliderValue('rgbAngleRange', Math.floor(Math.random() * 360));
+          }
+        },
+        {
+          name: 'ACID CONTOUR WIRE + CABLE TEAR + SMEAR MOSH',
+          apply: () => {
+            state.heatWire.active = true;
+            state.heatWire.heatmapOn = true;
+            state.heatWire.wireOn = true;
+            state.heatWire.palette = 'acid';
+            state.heatWire.wireStyle = 'contour';
+            setSliderValue('hwIntensityRange', 80);
+            state.mosh.active = true;
+            state.mosh.vectorMoshActive = true;
+            setSliderValue('moshSmearRange', 45);
+            setSliderValue('moshSliceRange', 20);
+            state.sort.active = false;
+            state.fx.active = true;
+            state.fx.sync.active = true;
+            state.fx.sync.direction = 'horizontal';
+            setSliderValue('syncTearRange', 55);
+          }
+        },
+        {
+          name: 'WAVE SORT + 3D KINETIC TYPE + VHS SYNC ROLL',
+          apply: () => {
+            state.type.active = true;
+            state.type.layout = ['cylinder3d', 'torus3d', 'vortex3d', 'sphere3d'][Math.floor(Math.random() * 4)];
+            state.sort.active = true;
+            state.sort.direction = 'vertical';
+            state.sort.pattern = 'wave';
+            setSliderValue('sortLengthRange', Math.floor(190 + Math.random() * 120));
+            setSliderValue('sortSpreadRange', 58);
+            state.mosh.active = true;
+            setSliderValue('moshSmearRange', 30);
+            state.heatWire.active = false;
+            state.fx.active = true;
+            state.fx.sync.active = true;
+            setSliderValue('rgbSplitRange', 11);
+          }
+        },
+        {
+          name: 'MAGMA GRID + MACROBLOCK MOSH + STREAK SORT',
+          apply: () => {
+            state.heatWire.active = true;
+            state.heatWire.heatmapOn = true;
+            state.heatWire.wireOn = true;
+            state.heatWire.palette = 'magma';
+            state.heatWire.wireStyle = 'grid';
+            state.mosh.active = true;
+            state.mosh.vectorMoshActive = true;
+            setSliderValue('moshBlockRange', 35);
+            setSliderValue('vectorForceRange', 34);
+            state.sort.active = true;
+            state.sort.direction = 'horizontal';
+            state.sort.pattern = 'streak';
+            setSliderValue('sortLengthRange', 220);
+            state.fx.active = true;
+            state.fx.sync.active = false;
+            setSliderValue('rgbSplitRange', 9);
+          }
+        },
+        {
+          name: 'FULL OVERDRIVE: DRIP SORT + P-FRAME + SYNC + HEAT',
+          apply: () => {
+            state.sort.active = true;
+            state.sort.direction = 'vertical';
+            state.sort.pattern = 'drip';
+            setSliderValue('sortLengthRange', 310);
+            setSliderValue('sortThicknessRange', 5);
+            state.mosh.active = true;
+            state.mosh.vectorMoshActive = true;
+            setSliderValue('moshSmearRange', 48);
+            setSliderValue('vectorForceRange', 32);
+            state.heatWire.active = true;
+            state.heatWire.heatmapOn = true;
+            state.heatWire.wireOn = true;
+            state.heatWire.palette = 'rainbow';
+            state.fx.active = true;
+            state.fx.sync.active = true;
+            setSliderValue('rgbSplitRange', 16);
+            setSliderValue('syncTearRange', 48);
+          }
+        }
+      ];
+
+      function triggerChaosCombo() {
+        chaosComboIndex = (chaosComboIndex + 1) % CHAOS_COMBINATIONS.length;
+        const combo = CHAOS_COMBINATIONS[chaosComboIndex];
+        combo.apply();
+
+        // Sync UI buttons & checkboxes to reflect the new 3+ effect combination
         document.querySelectorAll('.sort-dir-btn').forEach(b => {
           b.className = b.dataset.sortdir === state.sort.direction
             ? 'sort-dir-btn py-2.5 rounded bg-cyber-card border border-cyber-cyan text-cyber-cyan font-bold text-[10px]'
             : 'sort-dir-btn py-2.5 rounded bg-cyber-black border border-cyber-border text-slate-400 text-[10px]';
         });
-
-        setSliderValue('sortLengthRange', Math.floor(80 + Math.random() * 450));
-        setSliderValue('moshSmearRange', Math.floor(Math.random() * 75));
-        setSliderValue('moshSliceRange', Math.floor(Math.random() * 45));
-        setSliderValue('vectorForceRange', Math.floor(15 + Math.random() * 40));
-        setSliderValue('pframePersistenceRange', Math.floor(50 + Math.random() * 25));
-        setSliderValue('chromaBleedRange', Math.floor(6 + Math.random() * 20));
-        setSliderValue('rgbSplitRange', Math.floor(Math.random() * 30));
-        setSliderValue('rgbAngleRange', Math.floor(Math.random() * 360));
-
-        if (state.heatWire && state.heatWire.active) {
-          const pals = ['thermal', 'cyber', 'acid', 'magma', 'rainbow'];
-          state.heatWire.palette = pals[Math.floor(Math.random() * pals.length)];
-          document.querySelectorAll('.hw-pal-btn').forEach(b => {
-            b.className = b.dataset.hwpal === state.heatWire.palette
-              ? 'hw-pal-btn py-1 px-1 rounded bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[9px] font-bold'
-              : 'hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
-          });
-          const styles = ['grid', 'iso', 'contour', 'scanlines'];
-          state.heatWire.wireStyle = styles[Math.floor(Math.random() * styles.length)];
-          document.querySelectorAll('.hw-wire-style-btn').forEach(b => {
-            b.className = b.dataset.wirestyle === state.heatWire.wireStyle
-              ? 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan text-[9px] font-bold'
-              : 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
-          });
-          setSliderValue('hwThresholdRange', Math.floor(35 + Math.random() * 45));
-          setSliderValue('hwWireStepRange', Math.floor(8 + Math.random() * 24));
+        document.querySelectorAll('.sort-pat-btn').forEach(b => {
+          b.className = b.dataset.sortpat === state.sort.pattern
+            ? 'sort-pat-btn py-1.5 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold text-[9.5px]'
+            : 'sort-pat-btn py-1.5 rounded bg-cyber-black border border-cyber-border text-slate-400 font-bold text-[9.5px]';
+        });
+        document.querySelectorAll('.hw-pal-btn').forEach(b => {
+          b.className = b.dataset.hwpal === state.heatWire.palette
+            ? 'hw-pal-btn py-1 px-1 rounded bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[9px] font-bold'
+            : 'hw-pal-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
+        });
+        document.querySelectorAll('.hw-wire-style-btn').forEach(b => {
+          b.className = b.dataset.wirestyle === state.heatWire.wireStyle
+            ? 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan text-[9px] font-bold'
+            : 'hw-wire-style-btn py-1 px-1 rounded bg-cyber-card border border-cyber-border text-slate-300 text-[9px] font-bold';
+        });
+        const topChaosBtn = document.getElementById('topChaosBtn');
+        if (topChaosBtn) {
+          topChaosBtn.title = `Chaos #${chaosComboIndex + 1}: ${combo.name}`;
         }
-      });
+        if (window.syncAllPowerButtonsUI) window.syncAllPowerButtonsUI();
+      }
+
+      const chaosBtnEl = document.getElementById('chaosBtn');
+      if (chaosBtnEl) chaosBtnEl.addEventListener('click', triggerChaosCombo);
+      const topChaosBtnEl = document.getElementById('topChaosBtn');
+      if (topChaosBtnEl) topChaosBtnEl.addEventListener('click', triggerChaosCombo);
     }
 
     // ===== Synth Knob-ification: turn every <input type=range> into a tactile rotary knob =====
@@ -9310,7 +10160,7 @@ RAW SIGNAL</textarea>
 
     function synthifyKnobs() {
       document.querySelectorAll('input[type=range]').forEach(input => {
-        if (input.dataset.knobified) return;
+        if (input.dataset.knobified || input.id === 'jamRadiusRange') return;
         input.dataset.knobified = '1';
 
         const wrap = document.createElement('span');
