@@ -1370,9 +1370,9 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Streak Length</span>
-              <span id="sortLengthLabel" class="text-cyber-cyan">280px</span>
+              <span id="sortLengthLabel" class="text-cyber-cyan">340px</span>
             </div>
-            <input type="range" id="sortLengthRange" min="30" max="600" value="280">
+            <input type="range" id="sortLengthRange" min="30" max="800" value="340">
           </div>
         </div>
 
@@ -1381,16 +1381,16 @@ RAW SIGNAL</textarea>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Min Threshold</span>
-              <span id="sortLowLabel" class="text-cyber-cyan">25%</span>
+              <span id="sortLowLabel" class="text-cyber-cyan">18%</span>
             </div>
-            <input type="range" id="sortLowRange" min="0" max="100" value="25">
+            <input type="range" id="sortLowRange" min="0" max="100" value="18">
           </div>
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>Max Threshold</span>
-              <span id="sortHighLabel" class="text-cyber-cyan">90%</span>
+              <span id="sortHighLabel" class="text-cyber-cyan">100%</span>
             </div>
-            <input type="range" id="sortHighRange" min="0" max="100" value="90">
+            <input type="range" id="sortHighRange" min="0" max="100" value="100">
           </div>
         </div>
       </div>
@@ -2121,9 +2121,9 @@ RAW SIGNAL</textarea>
         active: true,
         direction: 'vertical', // 'vertical', 'horizontal', 'diagonal'
         criterion: 'brightness',
-        thresholdLow: 25,
-        thresholdHigh: 90,
-        maxLength: 280
+        thresholdLow: 18,
+        thresholdHigh: 100,
+        maxLength: 340
       },
 
       // Heatmap & Wireframe Engine
@@ -3677,15 +3677,31 @@ RAW SIGNAL</textarea>
     const sortVals = new Float32Array(sortMaxLen);
     const sortPixels = new Uint32Array(sortMaxLen);
     const sortIndices = new Int32Array(sortMaxLen);
+    const sortDripFactors = new Float32Array(sortMaxLen);
+    const sortTearSteps = new Int32Array(sortMaxLen);
     let crtCopyBuffer = null;
+
+    function blendPixel32(pA, pB, alpha256) {
+      if (alpha256 >= 255) return pA;
+      if (alpha256 <= 0) return pB;
+      const inv = 256 - alpha256;
+      const r = (((pA & 0xff) * alpha256) + ((pB & 0xff) * inv)) >> 8;
+      const g = ((((pA >> 8) & 0xff) * alpha256) + (((pB >> 8) & 0xff) * inv)) >> 8;
+      const b = ((((pA >> 16) & 0xff) * alpha256) + (((pB >> 16) & 0xff) * inv)) >> 8;
+      return (r & 0xff) | ((g & 0xff) << 8) | ((b & 0xff) << 16) | 0xff000000;
+    }
 
     function pixelSortPass(targetCtx, opt) {
       const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
       const data32 = new Uint32Array(img.data.buffer);
 
-      const low = opt.thresholdLow / 100;
-      const high = opt.thresholdHigh / 100;
-      const maxSpan = Math.min(opt.maxLength, sortMaxLen);
+      const low = Math.max(0.02, (opt.thresholdLow || 0) / 100);
+      // Treat >= 88% high threshold as inclusive of pure white (1.0) so white/neon text always drips
+      const rawHigh = (opt.thresholdHigh !== undefined ? opt.thresholdHigh : 100) / 100;
+      const high = rawHigh >= 0.88 ? 1.01 : Math.max(low + 0.05, rawHigh);
+      const maxSpan = Math.min(Math.max(24, opt.maxLength || 340), sortMaxLen);
+      const tick = (state.mosh && state.mosh.tick) ? state.mosh.tick : 0;
+      const drift = tick * 0.28;
 
       const getMetric = (pixel) => {
         const r = pixel & 0xff;
@@ -3705,82 +3721,263 @@ RAW SIGNAL</textarea>
       const isVertical = opt.direction === 'vertical';
 
       if (isVertical) {
-        // Vertical sorting (dripping down)
-        for (let x = 0; x < WIDTH; x += 2) {
-          let startY = -1;
-          let len = 0;
+        // Precompute coherent multi-width drip shafts & stepped border tear notches across X (Ref: big curtain drips + stepped notches)
+        for (let x = 0; x < WIDTH; x++) {
+          const wideBand = (x / 26) | 0;       // 26px wide curtain shafts
+          const medBand = ((x + 9) / 8) | 0;   // 8px stepped rectangular notches
+          const fineBand = (x >> 1);           // 2px sharp icicle spikes
 
-          for (let y = 0; y < HEIGHT; y++) {
+          const wWave = Math.sin(wideBand * 2.31 + drift * 0.35) * 0.5 + 0.5;
+          const mWave = Math.cos(medBand * 3.83 - drift * 0.52) * 0.5 + 0.5;
+          const fWave = Math.sin(fineBand * 7.19 + drift * 0.85) * 0.5 + 0.5;
+
+          let dFactor;
+          if (wWave < 0.15 && mWave < 0.42) {
+            // Crisp reference island so intact letter edges contrast against huge vertical drips
+            dFactor = 0.05 + fWave * 0.08;
+          } else if (wWave > 0.58) {
+            // Massive curtain waterfall drip (up to 1.45x maxSpan)
+            dFactor = 0.78 + mWave * 0.48 + (fWave > 0.82 ? 0.22 : 0);
+          } else {
+            // Medium stepped glyph drip
+            dFactor = 0.28 + mWave * 0.54 + (fWave > 0.78 ? 0.26 : 0);
+          }
+          sortDripFactors[x] = dFactor;
+          // Stepped rectangular top-border teardown (bites into the top border of letters like the ref image)
+          sortTearSteps[x] = Math.min(38, ((dFactor * Math.min(34, maxSpan * 0.13) * (0.45 + mWave * 0.75)) | 0));
+        }
+
+        // Process EVERY column (x++) so drips are solid and tear glyph borders completely
+        for (let x = 0; x < WIDTH; x++) {
+          const colDripFactor = sortDripFactors[x];
+          const tearStep = sortTearSteps[x];
+          const dripTailLimit = (maxSpan * colDripFactor) | 0;
+          const colPhase = Math.sin(x * 0.13 + drift * 1.4) * 3.8 + Math.cos(x * 0.045 - drift * 0.7) * 2.4;
+
+          let y = 0;
+          while (y < HEIGHT) {
             const idx = y * WIDTH + x;
             const p = data32[idx];
             const val = getMetric(p);
 
             if (val >= low && val <= high) {
-              if (startY === -1) startY = y;
-              sortVals[len] = val;
-              sortPixels[len] = p;
-              sortIndices[len] = len;
-              len++;
+              const startY = y;
+              // Anchor dark/background pixel just above the glyph for top-border step teardown & wood-grain contrast
+              const upperBgY = startY > 2 ? startY - 2 : 0;
+              const upperBgPixel = data32[upperBgY * WIDTH + x];
+              const upperBgVal = getMetric(upperBgPixel);
 
-              if (len >= maxSpan || y === HEIGHT - 1) {
-                const sub = sortIndices.subarray(0, len);
-                sub.sort((a, b) => sortVals[a] - sortVals[b]);
-                for (let k = 0; k < len; k++) {
-                  data32[(startY + k) * WIDTH + x] = sortPixels[sub[k]];
+              let gLen = 0;
+              // Seed palette with dark/edge transition pixels so sorted drips have deep wood-grain ribs
+              for (let s = 0; s < 4; s++) {
+                sortVals[gLen] = upperBgVal + s * 0.01;
+                sortPixels[gLen] = upperBgPixel;
+                sortIndices[gLen] = gLen;
+                gLen++;
+              }
+
+              // Scan through the glyph (bridging small internal counter gaps up to 18px inside hollow letters like O, B, A, R)
+              let gapCount = 0;
+              let glyphEndY = startY;
+              const maxGlyphScan = Math.min(HEIGHT, startY + maxSpan);
+
+              while (y < maxGlyphScan) {
+                const curP = data32[y * WIDTH + x];
+                const curVal = getMetric(curP);
+                if (curVal >= low && curVal <= high) {
+                  gapCount = 0;
+                  glyphEndY = y;
+                  if (gLen < 120) {
+                    sortVals[gLen] = curVal;
+                    sortPixels[gLen] = curP;
+                    sortIndices[gLen] = gLen;
+                    gLen++;
+                  }
+                } else {
+                  gapCount++;
+                  // Capture anti-aliased border / glow fringe pixels just outside the glyph edge
+                  if (gapCount <= 3 && gLen < 124) {
+                    sortVals[gLen] = curVal;
+                    sortPixels[gLen] = curP;
+                    sortIndices[gLen] = gLen;
+                    gLen++;
+                  }
+                  if (gapCount > 16) break;
                 }
-                startY = -1;
-                len = 0;
+                y++;
               }
-            } else if (len > 0) {
-              const sub = sortIndices.subarray(0, len);
+
+              // Sort collected glyph + border + edge palette by metric
+              const sub = sortIndices.subarray(0, gLen);
               sub.sort((a, b) => sortVals[a] - sortVals[b]);
-              for (let k = 0; k < len; k++) {
-                data32[(startY + k) * WIDTH + x] = sortPixels[sub[k]];
+
+              // Extend the drip shaft far BELOW the bottom border of the glyph!
+              const shaftEndY = Math.min(HEIGHT - 1, glyphEndY + dripTailLimit);
+              const tearEndY = Math.min(glyphEndY, startY + tearStep);
+
+              // 1. Top-border stepped teardown: push upper background/edge down into the top border of the letter
+              for (let ty = startY; ty < tearEndY; ty++) {
+                const origP = data32[ty * WIDTH + x];
+                data32[ty * WIDTH + x] = blendPixel32(upperBgPixel, origP, 220);
               }
-              startY = -1;
-              len = 0;
+
+              // 2. Extrude & sort-stretch the glyph and its border down the entire vertical drip shaft
+              const bodyStartY = tearEndY;
+              const shaftSpan = Math.max(1, shaftEndY - bodyStartY);
+              const lastIdx = gLen - 1;
+
+              for (let dy = bodyStartY; dy <= shaftEndY; dy++) {
+                const destIdx = dy * WIDTH + x;
+                const destP = data32[destIdx];
+                const destVal = getMetric(destP);
+
+                // If the drip passes through another bright letter below, absorb its pixels into the sorted palette
+                if (dy > glyphEndY && destVal >= low && destVal <= high && gLen < 126) {
+                  sortPixels[sub[(lastIdx * 0.85) | 0]] = destP;
+                }
+
+                const prog = (dy - bodyStartY) / shaftSpan; // 0.0 at glyph -> 1.0 at drip tip
+                // 2D liquid wood-grain interference wave (matches reference image's internal drip texture)
+                const grain = Math.sin(dy * 0.09 + colPhase + Math.cos(dy * 0.027 - x * 0.08) * 2.6) * 0.24;
+                let sampleT = (1.0 - prog * 0.78) + grain;
+                if (sampleT > 0.999) sampleT = 0.999;
+                else if (sampleT < 0.0) sampleT = 0.0;
+
+                const palIdx = sub[(sampleT * lastIdx) | 0];
+                const sortedPixel = sortPixels[palIdx];
+
+                // Smooth taper at the bottom 18% of the drip tail
+                if (prog > 0.82) {
+                  const fadeAlpha = ((1.0 - prog) / 0.18 * 255) | 0;
+                  data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
+                } else {
+                  data32[destIdx] = sortedPixel;
+                }
+              }
+
+              y = shaftEndY + 1;
+            } else {
+              y++;
             }
           }
         }
       } else {
-        // Horizontal / Diagonal sorting
+        // Horizontal Tear / Diagonal Slant with coherent band teardown & long sorted streaks
         const isDiag = opt.direction === 'diagonal';
-        for (let y = 0; y < HEIGHT; y += 2) {
-          let startX = -1;
-          let len = 0;
+        for (let y = 0; y < HEIGHT; y++) {
+          const wideBand = (y / 24) | 0;
+          const medBand = ((y + 7) / 7) | 0;
+          const fineBand = (y >> 1);
 
-          for (let x = 0; x < WIDTH; x++) {
+          const wWave = Math.sin(wideBand * 2.41 + drift * 0.38) * 0.5 + 0.5;
+          const mWave = Math.cos(medBand * 3.67 - drift * 0.55) * 0.5 + 0.5;
+          const fWave = Math.sin(fineBand * 6.91 + drift * 0.82) * 0.5 + 0.5;
+
+          let rowDripFactor;
+          if (wWave < 0.15 && mWave < 0.42) {
+            rowDripFactor = 0.05 + fWave * 0.08;
+          } else if (wWave > 0.58) {
+            rowDripFactor = 0.78 + mWave * 0.48 + (fWave > 0.82 ? 0.22 : 0);
+          } else {
+            rowDripFactor = 0.28 + mWave * 0.54 + (fWave > 0.78 ? 0.26 : 0);
+          }
+          const tearStep = Math.min(34, ((rowDripFactor * Math.min(30, maxSpan * 0.12) * (0.45 + mWave * 0.75)) | 0));
+          const dripTailLimit = (maxSpan * rowDripFactor) | 0;
+          const rowPhase = Math.sin(y * 0.12 + drift * 1.3) * 3.6;
+
+          let x = 0;
+          while (x < WIDTH) {
             const px = isDiag ? (x + y) % WIDTH : x;
             const idx = y * WIDTH + px;
             const p = data32[idx];
             const val = getMetric(p);
 
             if (val >= low && val <= high) {
-              if (startX === -1) startX = x;
-              sortVals[len] = val;
-              sortPixels[len] = p;
-              sortIndices[len] = len;
-              len++;
+              const startX = x;
+              const leadBgX = startX > 2 ? startX - 2 : 0;
+              const leadBgPx = isDiag ? (leadBgX + y) % WIDTH : leadBgX;
+              const leadBgPixel = data32[y * WIDTH + leadBgPx];
+              const leadBgVal = getMetric(leadBgPixel);
 
-              if (len >= maxSpan || x === WIDTH - 1) {
-                const sub = sortIndices.subarray(0, len);
-                sub.sort((a, b) => sortVals[a] - sortVals[b]);
-                for (let k = 0; k < len; k++) {
-                  const writeX = isDiag ? (startX + k + y) % WIDTH : (startX + k);
-                  data32[y * WIDTH + writeX] = sortPixels[sub[k]];
+              let gLen = 0;
+              for (let s = 0; s < 4; s++) {
+                sortVals[gLen] = leadBgVal + s * 0.01;
+                sortPixels[gLen] = leadBgPixel;
+                sortIndices[gLen] = gLen;
+                gLen++;
+              }
+
+              let gapCount = 0;
+              let glyphEndX = startX;
+              const maxGlyphScan = Math.min(WIDTH, startX + maxSpan);
+
+              while (x < maxGlyphScan) {
+                const curPx = isDiag ? (x + y) % WIDTH : x;
+                const curP = data32[y * WIDTH + curPx];
+                const curVal = getMetric(curP);
+                if (curVal >= low && curVal <= high) {
+                  gapCount = 0;
+                  glyphEndX = x;
+                  if (gLen < 120) {
+                    sortVals[gLen] = curVal;
+                    sortPixels[gLen] = curP;
+                    sortIndices[gLen] = gLen;
+                    gLen++;
+                  }
+                } else {
+                  gapCount++;
+                  if (gapCount <= 3 && gLen < 124) {
+                    sortVals[gLen] = curVal;
+                    sortPixels[gLen] = curP;
+                    sortIndices[gLen] = gLen;
+                    gLen++;
+                  }
+                  if (gapCount > 16) break;
                 }
-                startX = -1;
-                len = 0;
+                x++;
               }
-            } else if (len > 0) {
-              const sub = sortIndices.subarray(0, len);
+
+              const sub = sortIndices.subarray(0, gLen);
               sub.sort((a, b) => sortVals[a] - sortVals[b]);
-              for (let k = 0; k < len; k++) {
-                const writeX = isDiag ? (startX + k + y) % WIDTH : (startX + k);
-                data32[y * WIDTH + writeX] = sortPixels[sub[k]];
+
+              const shaftEndX = Math.min(WIDTH - 1, glyphEndX + dripTailLimit);
+              const tearEndX = Math.min(glyphEndX, startX + tearStep);
+
+              for (let tx = startX; tx < tearEndX; tx++) {
+                const writeX = isDiag ? (tx + y) % WIDTH : tx;
+                const origP = data32[y * WIDTH + writeX];
+                data32[y * WIDTH + writeX] = blendPixel32(leadBgPixel, origP, 220);
               }
-              startX = -1;
-              len = 0;
+
+              const bodyStartX = tearEndX;
+              const shaftSpan = Math.max(1, shaftEndX - bodyStartX);
+              const lastIdx = gLen - 1;
+
+              for (let dx = bodyStartX; dx <= shaftEndX; dx++) {
+                const writeX = isDiag ? (dx + y) % WIDTH : dx;
+                const destIdx = y * WIDTH + writeX;
+                const destP = data32[destIdx];
+
+                const prog = (dx - bodyStartX) / shaftSpan;
+                const grain = Math.sin(dx * 0.09 + rowPhase + Math.cos(dx * 0.025 - y * 0.08) * 2.5) * 0.24;
+                let sampleT = (1.0 - prog * 0.78) + grain;
+                if (sampleT > 0.999) sampleT = 0.999;
+                else if (sampleT < 0.0) sampleT = 0.0;
+
+                const palIdx = sub[(sampleT * lastIdx) | 0];
+                const sortedPixel = sortPixels[palIdx];
+
+                if (prog > 0.82) {
+                  const fadeAlpha = ((1.0 - prog) / 0.18 * 255) | 0;
+                  data32[destIdx] = blendPixel32(sortedPixel, destP, fadeAlpha);
+                } else {
+                  data32[destIdx] = sortedPixel;
+                }
+              }
+
+              x = shaftEndX + 1;
+            } else {
+              x++;
             }
           }
         }
