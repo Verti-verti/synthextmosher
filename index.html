@@ -485,56 +485,27 @@
 
   <!-- ==================== FLOATING TOP BAR & MODULAR PIPELINE ==================== -->
   <header id="topBar" class="absolute top-0 inset-x-0 z-30 pointer-events-none p-1.5 sm:p-2 flex flex-col items-center gap-1.5">
-    <!-- Top row: Identity & Module Selector & Capture / Export Controls -->
-    <div class="w-full max-w-lg pointer-events-auto flex items-center justify-between gap-1.5 bg-black/85 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
-      <div class="flex items-center gap-1.5">
-        <div class="flex items-center gap-1.5 pr-1.5 border-r border-white/10">
-          <span class="w-2 h-2 rounded-full bg-cyber-cyan shadow-[0_0_8px_#00ffcc] animate-pulse"></span>
-          <span class="font-black text-xs tracking-wider text-white">VMOSH</span>
-        </div>
-        <button id="holdCleanBtn" type="button" class="tap-btn px-2 py-0.5 rounded bg-white/5 active:bg-cyber-cyan/20 active:text-cyber-cyan border border-white/10 text-[9px] text-slate-400 font-bold transition" title="Hold to preview clean unmoshed frame">
-          Clean
-        </button>
-      </div>
+    <!-- Top row: Clean Hold + Module Selector + Tap-to-Write Trigger -->
+    <div class="w-full max-w-md pointer-events-auto flex items-center justify-between gap-2 px-1">
+      <button id="holdCleanBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-cyan/20 active:text-cyber-cyan border border-white/15 text-[10px] text-slate-300 font-bold transition shadow-lg shrink-0" title="Hold to preview clean unmoshed frame">
+        👁️ Clean
+      </button>
 
-
-      <!-- Right: Snap, Speed, REC MP4 -->
-      <div class="flex items-center gap-1.5">
-        <button id="snapPicBtn" type="button" class="tap-btn px-2 py-1 rounded-lg bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold text-[10px] flex items-center gap-1 shadow-[0_0_10px_rgba(0,255,204,0.3)] active:scale-95 transition hover:bg-cyber-cyan hover:text-black">
-          <span>📸</span>
-          <span>SNAP</span>
-        </button>
-
-        <select id="recSpeedSelect" class="bg-black/90 border border-cyber-pink/70 rounded px-1.5 py-1 text-cyber-pink font-bold text-[9px] outline-none cursor-pointer active:scale-95 transition" title="Export Video Speed">
-          <option value="1.0" selected>⚡ 1x Real</option>
-          <option value="1.5">⚡ 1.5x</option>
-          <option value="2.0">⚡ 2x</option>
-          <option value="0.5">⚡ 0.5x</option>
-        </select>
-
-        <button id="recVideoBtn" type="button" class="tap-btn px-2.5 py-1 rounded-lg bg-cyber-pink/20 border border-cyber-pink text-cyber-pink font-bold text-[10px] flex items-center gap-1.5 shadow-[0_0_10px_rgba(255,0,85,0.3)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
-          <span id="recBtnDot" class="w-1.5 h-1.5 rounded-full bg-cyber-pink"></span>
-          <span id="recBtnLabel">REC MP4</span>
-        </button>
-
-        <div id="recHUD" class="hidden flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyber-pink/20 border border-cyber-pink text-cyber-pink text-[9px] font-bold">
-          <div class="w-1.5 h-1.5 rounded-full bg-cyber-pink rec-pulsing"></div>
-          <span id="recTimerText">00:00</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Second row: Module Selector (below the logo / REC safe zone) -->
-    <div class="w-full max-w-lg pointer-events-auto flex items-center justify-center">
-      <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[170px] py-1.5 px-5 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition" title="Open Module Pipeline Flow">
+      <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[155px] py-1.5 px-5 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition" title="Open Module Pipeline Flow">
         <span id="activeModuleIcon">🔤</span>
         <span id="activeModuleLabel" class="truncate font-black">TEXT</span>
         <span class="text-[9px] text-slate-400">▾</span>
       </button>
+
+      <!-- Subtle Tap-to-Write Pill (Shown when Text module is active; tapping screen also opens editor) -->
+      <button id="tapToWriteBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md border border-cyber-cyan/50 text-cyber-cyan text-[10px] font-bold flex items-center gap-1 shadow-lg active:scale-95 transition shrink-0" title="Tap screen or click here to write text">
+        <span>✏️</span>
+        <span>WRITE</span>
+      </button>
     </div>
 
     <!-- Floating Interactive Module Flow Modal (Opens when moduleSelectorBtn is clicked) -->
-    <div id="moduleFlowModal" class="hidden fixed top-24 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 max-w-sm w-full z-50 pointer-events-auto bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3.5 shadow-2xl space-y-2.5">
+    <div id="moduleFlowModal" class="hidden fixed top-16 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 max-w-sm w-full z-50 pointer-events-auto bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3.5 shadow-2xl space-y-2.5">
       <div class="flex items-center justify-between border-b border-white/10 pb-2">
         <div class="flex items-center gap-1.5">
           <span class="text-xs">⚡</span>
@@ -599,12 +570,13 @@
       <button type="button" data-module="vibe" class="mod-ribbon-btn"><span>⛩️</span><span>VIBES</span></button>
     </div>
 
-    <!-- CONTEXTUAL TOP TEXT INPUT CAPSULE (Shown when Text module is active) -->
-    <div id="textQuickInputBox" class="w-full max-w-sm pointer-events-auto flex items-center gap-1.5 bg-black/90 backdrop-blur-md px-3 py-1 rounded-2xl border border-cyber-cyan/60 shadow-[0_0_12px_rgba(0,255,204,0.25)] transition-all">
+    <!-- ON-SCREEN DIRECT TEXT EDITOR OVERLAY (Summoned when user taps/clicks screen in Text module) -->
+    <div id="textQuickInputBox" class="hidden w-full max-w-sm pointer-events-auto flex items-center gap-1.5 bg-black/95 backdrop-blur-xl px-3 py-1.5 rounded-2xl border-2 border-cyber-cyan shadow-[0_0_20px_rgba(0,255,204,0.4)] transition-all">
       <span class="text-xs">✏️</span>
-      <textarea id="topTextInput" rows="2" class="bg-transparent border-0 text-white font-mono text-[11px] leading-tight w-full outline-none placeholder-slate-500 resize-none py-0.5" placeholder="Edit text on screen...">VIBE//MOSH
+      <textarea id="topTextInput" rows="2" class="bg-transparent border-0 text-white font-mono text-xs leading-tight w-full outline-none placeholder-slate-500 resize-none py-0.5" placeholder="Write directly on screen...">VIBE//MOSH
 RAW SIGNAL</textarea>
-      <button id="clearTopTextBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
+      <button id="clearTopTextBtn" type="button" class="tap-btn text-slate-400 hover:text-white text-xs px-1.5 py-1 rounded bg-white/5" title="Clear Text">✕</button>
+      <button id="doneTopTextBtn" type="button" class="tap-btn text-black bg-cyber-cyan font-black text-[10px] px-2 py-1 rounded-lg shadow-[0_0_8px_#00ffcc]" title="Done Editing">✓</button>
     </div>
   </header>
 
@@ -621,13 +593,14 @@ RAW SIGNAL</textarea>
       <!-- Visual Touch Drag / Brush / Jam Crosshair Indicator -->
       <div id="touchCrosshair" class="pointer-events-none absolute w-8 h-8 rounded-full border border-cyber-cyan/80 -translate-x-1/2 -translate-y-1/2 hidden shadow-[0_0_12px_#00ffcc] z-20"></div>
 
-      <!-- Touch Mode Badge -->
-      <div class="absolute top-[9.5rem] left-3 z-20 pointer-events-none bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] text-slate-400 border border-white/10 flex items-center space-x-1">
-        <span id="touchModeLabel">👆 Drag Mode Active</span>
+      <!-- Subtle On-Screen 'Click / Tap to Write' Info Badge (Shown in Text Module when not actively typing) -->
+      <div id="canvasTapWriteHint" class="absolute top-14 inset-x-0 mx-auto w-max z-20 pointer-events-none bg-black/55 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[9px] text-cyber-cyan/80 border border-cyber-cyan/25 flex items-center gap-1 transition-opacity duration-200">
+        <span>✏️</span>
+        <span id="touchModeLabel">Tap screen to write • Drag to move/pinch</span>
       </div>
 
       <!-- Temporary Quick Gesture Toast Notification -->
-      <div id="gestureToast" class="pointer-events-none absolute top-[11.5rem] inset-x-0 mx-auto w-max px-3 py-1 rounded-full bg-black/90 border border-cyber-cyan text-cyber-cyan text-[10px] font-bold opacity-0 transition-opacity duration-200 z-30 shadow-xl"></div>
+      <div id="gestureToast" class="pointer-events-none absolute top-24 inset-x-0 mx-auto w-max px-3 py-1 rounded-full bg-black/90 border border-cyber-cyan text-cyber-cyan text-[10px] font-bold opacity-0 transition-opacity duration-200 z-30 shadow-xl"></div>
     </div>
   </main>
 
@@ -844,30 +817,57 @@ RAW SIGNAL</textarea>
   </div>
 
   <!-- ==================== BASE DECK (3 KNOBS + SUB-ENGINE SELECTOR) ==================== -->
-  <footer id="baseDeck" class="absolute bottom-0 inset-x-0 z-30 pointer-events-auto bg-gradient-to-t from-black via-black/95 to-transparent pt-2.5 px-3 sm:px-6 flex flex-col items-center gap-2 backdrop-blur-md border-t border-white/10">
+  <footer id="baseDeck" class="absolute bottom-0 inset-x-0 z-30 pointer-events-auto bg-gradient-to-t from-black via-black/95 to-transparent pt-2 px-3 sm:px-6 flex flex-col items-center gap-2 backdrop-blur-md border-t border-white/10">
 
-    <!-- Individual Drag System Bar (Target: Text vs Media + Move / Scale / Rotate) -->
-    <div id="dragTransformBar" class="w-full max-w-md flex items-center justify-between gap-1.5 bg-black/80 border border-white/15 rounded-full px-2 py-1 text-[9px] font-bold">
-      <!-- Target Selector: Text vs Media -->
-      <div class="flex items-center gap-1 bg-white/5 rounded-full p-0.5 border border-white/10">
-        <button id="dragTargetTextBtn" type="button" class="tap-btn px-2 py-0.5 rounded-full bg-cyber-cyan/25 border border-cyber-cyan text-cyber-cyan font-black transition active:scale-95 flex items-center gap-1" title="Manipulate Text (Move, Scale, Rotate)">
-          <span>🔤</span><span>TEXT</span>
+    <!-- Classic Smartphone Camera Bar: SNAP — RECORD — SPEED -->
+    <div id="cameraShutterBar" class="w-full max-w-md flex items-center justify-between gap-2 bg-black/85 border border-white/15 rounded-full px-3 py-1 text-[10px] font-bold shadow-lg">
+      <!-- Left: SNAP Photo Button -->
+      <button id="snapPicBtn" type="button" class="tap-btn px-3 py-1 rounded-full bg-cyber-cyan/15 border border-cyber-cyan/80 text-cyber-cyan font-black text-[10px] flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-95 transition hover:bg-cyber-cyan hover:text-black">
+        <span>📸</span>
+        <span>SNAP</span>
+      </button>
+
+      <!-- Center: Classic Camera Record Shutter Button + Live Timer HUD -->
+      <div class="flex items-center gap-1.5">
+        <button id="recVideoBtn" type="button" class="tap-btn px-4 py-1 rounded-full bg-cyber-pink/25 border-2 border-cyber-pink text-white font-black text-[10px] tracking-wider flex items-center gap-1.5 shadow-[0_0_14px_rgba(255,0,85,0.45)] active:scale-95 transition hover:bg-cyber-pink hover:text-black">
+          <span id="recBtnDot" class="w-2.5 h-2.5 rounded-full bg-cyber-pink shadow-[0_0_8px_#ff0055]"></span>
+          <span id="recBtnLabel">RECORD</span>
         </button>
-        <button id="dragTargetMediaBtn" type="button" class="tap-btn px-2 py-0.5 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1" title="Manipulate Media (Pan, Zoom, Rotate)">
-          <span>🎬</span><span>MEDIA</span>
-        </button>
+
+        <div id="recHUD" class="hidden flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyber-pink/25 border border-cyber-pink text-cyber-pink text-[9px] font-bold">
+          <div class="w-1.5 h-1.5 rounded-full bg-cyber-pink rec-pulsing"></div>
+          <span id="recTimerText">00:00</span>
+        </div>
       </div>
 
-      <!-- 1-Finger Drag Action Selector (2-Finger Pinch+Twist always Scales+Rotates simultaneously) -->
-      <div class="flex items-center gap-1">
-        <button id="dragActMoveBtn" type="button" data-dragact="move" class="drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-bold transition active:scale-95" title="1-Finger Move / Pan">✥ MOVE</button>
-        <button id="dragActScaleBtn" type="button" data-dragact="scale" class="drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 font-bold transition active:scale-95" title="1-Finger Scale / Zoom (or 2-Finger Pinch)">⤢ SCALE</button>
-        <button id="dragActRotateBtn" type="button" data-dragact="rotate" class="drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 font-bold transition active:scale-95" title="1-Finger Rotate (or 2-Finger Twist)">↻ ROT</button>
-        <button id="dragActResetBtn" type="button" class="tap-btn px-1.5 py-0.5 rounded-full bg-white/5 border border-white/15 text-slate-400 hover:text-white font-bold transition active:scale-90" title="Reset Active Target Transform">↺</button>
+      <!-- Right: Speed Selector Pill -->
+      <select id="recSpeedSelect" class="bg-white/5 border border-cyber-pink/60 rounded-full px-2.5 py-1 text-cyber-pink font-black text-[9.5px] outline-none cursor-pointer active:scale-95 transition" title="Export Video Speed">
+        <option value="0.5" class="bg-black text-white">⚡ 0.5x</option>
+        <option value="1.0" selected class="bg-black text-white">⚡ 1x</option>
+        <option value="1.5" class="bg-black text-white">⚡ 1.5x</option>
+        <option value="2.0" class="bg-black text-white">⚡ 2x</option>
+      </select>
+    </div>
+
+    <!-- Deployable Compact Drag Target + Reset Mini-Menu (Opens when tapping #dragTargetBtn) -->
+    <div id="dragTransformBar" class="hidden absolute bottom-56 right-3 sm:right-6 z-40 flex items-center gap-1 bg-black/95 backdrop-blur-xl border border-cyber-cyan/60 rounded-full p-1 text-[9.5px] font-bold shadow-[0_0_18px_rgba(0,0,0,0.9)]">
+      <button id="dragTargetTextBtn" type="button" class="tap-btn px-2.5 py-1 rounded-full bg-cyber-cyan/25 border border-cyber-cyan text-cyber-cyan font-black transition active:scale-95 flex items-center gap-1" title="Drag Text (Move, Pinch-Scale, Rotate)">
+        <span>🔤</span><span>TEXT</span>
+      </button>
+      <button id="dragTargetMediaBtn" type="button" class="tap-btn px-2.5 py-1 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1" title="Drag Media (Pan, Pinch-Zoom, Rotate)">
+        <span>🎬</span><span>MEDIA</span>
+      </button>
+      <button id="dragActResetBtn" type="button" class="tap-btn w-6 h-6 rounded-full bg-white/10 border border-white/20 text-slate-200 hover:text-cyber-cyan hover:border-cyber-cyan font-black flex items-center justify-center transition active:scale-90" title="Reset Active Target Transform">↺</button>
+
+      <!-- Hidden 1-Finger Action Buttons (preserved for DOM/State compatibility; 1-finger move + 2-finger pinch/rotate is automatic) -->
+      <div class="hidden" aria-hidden="true">
+        <button id="dragActMoveBtn" type="button" data-dragact="move" class="drag-act-btn"></button>
+        <button id="dragActScaleBtn" type="button" data-dragact="scale" class="drag-act-btn"></button>
+        <button id="dragActRotateBtn" type="button" data-dragact="rotate" class="drag-act-btn"></button>
       </div>
     </div>
 
-    <!-- Top row: Diamond Drag/Jam + Sub-Engine Selector + Quick Target Pill -->
+    <!-- Second row: Diamond Drag/Jam + Sub-Engine Selector + Deployable Drag Target Pill -->
     <div class="w-full max-w-md flex items-center justify-between gap-2.5 px-1">
       <!-- Diamond Drag or Jam Toggle Button -->
       <button id="dragJamToggleBtn" type="button" class="diamond-btn mode-drag tap-btn shrink-0" title="Toggle Drag / Jam / Mosh Touch Mode">
@@ -884,13 +884,14 @@ RAW SIGNAL</textarea>
         <span class="text-[9px] text-slate-400">▾</span>
       </button>
 
-      <!-- Quick Target Toggle Button (replaces duplicate bottom REC button) -->
-      <button id="dragTargetBtn" type="button" class="tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex flex-col items-center justify-center leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0" title="Switch Drag Target: Text vs Media">
+      <!-- Deployable Drag Target Button (Tap to deploy TEXT / MEDIA / ↺ Reset mini-pill) -->
+      <button id="dragTargetBtn" type="button" class="tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex items-center gap-1 leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0" title="Open Drag Target & Reset Menu">
         <span id="dragTargetIcon" class="text-xs">🔤</span>
-        <span id="dragTargetLabel" class="text-[7.5px] tracking-tighter mt-0.5">TEXT</span>
+        <span id="dragTargetLabel" class="text-[8px] tracking-tighter">TEXT</span>
+        <span class="text-[8px] opacity-70">▾</span>
       </button>
 
-      <!-- Legacy Hidden Deck REC Button (kept hidden in DOM for compatibility; top REC MP4 is primary) -->
+      <!-- Legacy Hidden Deck REC Button (kept hidden in DOM for compatibility) -->
       <button id="deckRecBtn" type="button" class="hidden" aria-hidden="true">
         <span id="deckRecDot"></span>
       </button>
@@ -5253,7 +5254,8 @@ RAW SIGNAL</textarea>
 
       box.addEventListener('touchend', (e) => {
         const touchDuration = Date.now() - touchStartTime;
-        if (touchDuration < 320 && touchMovedDist < 22) {
+        if (touchDuration < 320 && touchMovedDist < 18) {
+          if (dragTransformBar) dragTransformBar.classList.add('hidden');
           if (touchCountAtStart === 2) {
             // 2-Finger Screen Tap: Toggle Random Letter Sizes (Zine / Ransom Chaos)
             state.type.randomSize = !state.type.randomSize;
@@ -5261,15 +5263,13 @@ RAW SIGNAL</textarea>
             if (rCheck) rCheck.checked = state.type.randomSize;
             showGestureToast(state.type.randomSize ? '🎲 ZINE CHAOS: ON' : '🎲 ZINE CHAOS: OFF');
           } else if (touchCountAtStart === 1) {
-            // 1-Finger Screen Tap: Cycle Text Alignment (Left -> Center -> Right)
-            const aligns = ['left', 'center', 'right'];
-            const curIdx = aligns.indexOf(state.type.align);
-            state.type.align = aligns[(curIdx + 1) % aligns.length];
-            const alignLabel = document.getElementById('sideAlignLabel');
-            if (alignLabel) alignLabel.textContent = state.type.align === 'center' ? 'MID' : state.type.align.toUpperCase();
-            const alignIcon = document.getElementById('sideAlignIcon');
-            if (alignIcon) alignIcon.textContent = state.type.align === 'left' ? '◀️' : (state.type.align === 'center' ? '⏸️' : '▶️');
-            showGestureToast('ALIGN: ' + state.type.align.toUpperCase());
+            // 1-Finger Screen Tap in Text Module: Summon keyboard to write directly on screen
+            const textCapsule = document.getElementById('textQuickInputBox');
+            if (textCapsule && !textCapsule.classList.contains('hidden')) {
+              if (window.closeOnScreenTextEditor) window.closeOnScreenTextEditor();
+            } else if (currentModuleKey === 'text' && window.openOnScreenTextEditor) {
+              window.openOnScreenTextEditor();
+            }
           }
         }
         if (e.touches.length < 2) isPinching = false;
@@ -5317,6 +5317,7 @@ RAW SIGNAL</textarea>
       let mouseStartY = 0;
       box.addEventListener('mousedown', (e) => {
         if (e.target.closest('.synth-knob') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea')) return;
+        if (dragTransformBar) dragTransformBar.classList.add('hidden');
         mouseStartTime = Date.now();
         mouseStartX = e.clientX;
         mouseStartY = e.clientY;
@@ -5333,14 +5334,13 @@ RAW SIGNAL</textarea>
             if (rCheck) rCheck.checked = state.type.randomSize;
             showGestureToast(state.type.randomSize ? '🎲 ZINE CHAOS: ON' : '🎲 ZINE CHAOS: OFF');
           } else {
-            const aligns = ['left', 'center', 'right'];
-            const curIdx = aligns.indexOf(state.type.align);
-            state.type.align = aligns[(curIdx + 1) % aligns.length];
-            const alignLabel = document.getElementById('sideAlignLabel');
-            if (alignLabel) alignLabel.textContent = state.type.align === 'center' ? 'MID' : state.type.align.toUpperCase();
-            const alignIcon = document.getElementById('sideAlignIcon');
-            if (alignIcon) alignIcon.textContent = state.type.align === 'left' ? '◀️' : (state.type.align === 'center' ? '⏸️' : '▶️');
-            showGestureToast('ALIGN: ' + state.type.align.toUpperCase());
+            // Click directly on screen in Text module -> Summon keyboard to write on screen
+            const textCapsule = document.getElementById('textQuickInputBox');
+            if (textCapsule && !textCapsule.classList.contains('hidden')) {
+              if (window.closeOnScreenTextEditor) window.closeOnScreenTextEditor();
+            } else if (currentModuleKey === 'text' && window.openOnScreenTextEditor) {
+              window.openOnScreenTextEditor();
+            }
           }
         }
         onEnd();
@@ -5355,7 +5355,7 @@ RAW SIGNAL</textarea>
         }
       });
 
-      // Cycle touch interaction: Drag <-> Jam Pad <-> Vector Mosh + Individual Target (Text vs Media) & Action (Move / Scale / Rotate)
+      // Cycle touch interaction: Drag <-> Jam Pad <-> Vector Mosh + Deployable Target (Text vs Media) & Reset
       const touchModeLabel = document.getElementById('touchModeLabel');
       const diamondToggleBtn = document.getElementById('dragJamToggleBtn');
       const diamondIcon = document.getElementById('dragJamIcon');
@@ -5370,7 +5370,7 @@ RAW SIGNAL</textarea>
 
       const MODES = {
         drag: {
-          icon: '👆', text: 'DRAG', label: '👆 Drag',
+          icon: '👆', text: 'DRAG', label: 'Tap screen to write • Drag to move/pinch',
           cls: 'mode-drag'
         },
         jam: {
@@ -5386,35 +5386,24 @@ RAW SIGNAL</textarea>
 
       function updateDragUI() {
         const isMedia = state.interaction.target === 'media';
-        const act = state.interaction.dragAction || 'move';
-        const actColor = isMedia ? 'cyber-yellow' : 'cyber-cyan';
 
         if (dragTargetIcon) dragTargetIcon.textContent = isMedia ? '🎬' : '🔤';
         if (dragTargetLabel) dragTargetLabel.textContent = isMedia ? 'MEDIA' : 'TEXT';
         if (dragTargetBtn) {
           dragTargetBtn.className = isMedia
-            ? 'tap-btn h-9 px-2.5 rounded-xl bg-cyber-yellow/15 border border-cyber-yellow text-cyber-yellow font-black text-[9px] flex flex-col items-center justify-center leading-none shadow-[0_0_10px_rgba(255,230,0,0.25)] active:scale-90 transition shrink-0'
-            : 'tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex flex-col items-center justify-center leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0';
+            ? 'tap-btn h-9 px-2.5 rounded-xl bg-cyber-yellow/15 border border-cyber-yellow text-cyber-yellow font-black text-[9px] flex items-center gap-1 leading-none shadow-[0_0_10px_rgba(255,230,0,0.25)] active:scale-90 transition shrink-0'
+            : 'tap-btn h-9 px-2.5 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan text-cyber-cyan font-black text-[9px] flex items-center gap-1 leading-none shadow-[0_0_10px_rgba(0,255,204,0.25)] active:scale-90 transition shrink-0';
         }
 
         if (dragTargetTextBtn && dragTargetMediaBtn) {
           if (isMedia) {
-            dragTargetMediaBtn.className = 'tap-btn px-2 py-0.5 rounded-full bg-cyber-yellow/25 border border-cyber-yellow text-cyber-yellow font-black transition active:scale-95 flex items-center gap-1';
-            dragTargetTextBtn.className = 'tap-btn px-2 py-0.5 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1';
+            dragTargetMediaBtn.className = 'tap-btn px-2.5 py-1 rounded-full bg-cyber-yellow/25 border border-cyber-yellow text-cyber-yellow font-black transition active:scale-95 flex items-center gap-1';
+            dragTargetTextBtn.className = 'tap-btn px-2.5 py-1 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1';
           } else {
-            dragTargetTextBtn.className = 'tap-btn px-2 py-0.5 rounded-full bg-cyber-cyan/25 border border-cyber-cyan text-cyber-cyan font-black transition active:scale-95 flex items-center gap-1';
-            dragTargetMediaBtn.className = 'tap-btn px-2 py-0.5 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1';
+            dragTargetTextBtn.className = 'tap-btn px-2.5 py-1 rounded-full bg-cyber-cyan/25 border border-cyber-cyan text-cyber-cyan font-black transition active:scale-95 flex items-center gap-1';
+            dragTargetMediaBtn.className = 'tap-btn px-2.5 py-1 rounded-full text-slate-400 border border-transparent hover:text-white font-black transition active:scale-95 flex items-center gap-1';
           }
         }
-
-        document.querySelectorAll('.drag-act-btn').forEach(btn => {
-          const isCur = btn.dataset.dragact === act;
-          if (isCur) {
-            btn.className = `drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-${actColor}/20 border border-${actColor} text-${actColor} font-bold transition active:scale-95`;
-          } else {
-            btn.className = 'drag-act-btn tap-btn px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 font-bold transition active:scale-95';
-          }
-        });
       }
 
       function applyMode() {
@@ -5426,18 +5415,17 @@ RAW SIGNAL</textarea>
         if (diamondIcon) diamondIcon.textContent = m.icon;
         if (diamondText) diamondText.textContent = m.text;
 
-        if (dragTransformBar) {
-          if (state.interaction.mode === 'drag') dragTransformBar.classList.remove('hidden');
-          else dragTransformBar.classList.add('hidden');
+        if (state.interaction.mode !== 'drag' && dragTransformBar) {
+          dragTransformBar.classList.add('hidden');
         }
 
         updateDragUI();
 
         if (touchModeLabel) {
           if (state.interaction.mode === 'drag') {
-            const tName = state.interaction.target === 'media' ? 'MEDIA' : 'TEXT';
-            const aName = (state.interaction.dragAction || 'move').toUpperCase();
-            touchModeLabel.textContent = `👆 Drag [${tName}]: ${aName} (2-Finger Pinch/Rotate)`;
+            touchModeLabel.textContent = currentModuleKey === 'text'
+              ? 'Tap screen to write • Drag to move/pinch'
+              : `👆 Drag [${state.interaction.target === 'media' ? 'MEDIA' : 'TEXT'}]: Move & Pinch`;
           } else {
             touchModeLabel.textContent = m.label;
           }
@@ -5456,7 +5444,7 @@ RAW SIGNAL</textarea>
         }
         applyMode();
         if (!silent) {
-          showGestureToast(targetKey === 'media' ? '🎯 DRAG TARGET: MEDIA (PAN / ZOOM / ROTATE)' : '🎯 DRAG TARGET: TEXT (MOVE / SCALE / ROTATE)');
+          showGestureToast(targetKey === 'media' ? '🎯 DRAG: MEDIA' : '🎯 DRAG: TEXT');
         }
       }
       window.setDragTarget = setDragTarget;
@@ -5468,24 +5456,32 @@ RAW SIGNAL</textarea>
           state.interaction.mode = 'drag';
         }
         applyMode();
-        if (!silent) {
-          const tName = state.interaction.target === 'media' ? 'MEDIA' : 'TEXT';
-          showGestureToast(`${tName}: ${actKey.toUpperCase()}`);
-        }
       }
       window.setDragAction = setDragAction;
 
       if (dragTargetBtn) {
-        dragTargetBtn.addEventListener('click', () => {
-          const next = state.interaction.target === 'media' ? 'text' : 'media';
-          setDragTarget(next);
+        dragTargetBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (state.interaction.mode !== 'drag') {
+            state.interaction.mode = 'drag';
+            applyMode();
+          }
+          if (dragTransformBar) {
+            dragTransformBar.classList.toggle('hidden');
+          }
         });
       }
       if (dragTargetTextBtn) {
-        dragTargetTextBtn.addEventListener('click', () => setDragTarget('text'));
+        dragTargetTextBtn.addEventListener('click', () => {
+          setDragTarget('text');
+          if (dragTransformBar) dragTransformBar.classList.add('hidden');
+        });
       }
       if (dragTargetMediaBtn) {
-        dragTargetMediaBtn.addEventListener('click', () => setDragTarget('media'));
+        dragTargetMediaBtn.addEventListener('click', () => {
+          setDragTarget('media');
+          if (dragTransformBar) dragTransformBar.classList.add('hidden');
+        });
       }
       document.querySelectorAll('.drag-act-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -5517,6 +5513,7 @@ RAW SIGNAL</textarea>
             setSliderValue('textRotateRange', 0);
             showGestureToast('↺ TEXT TRANSFORM RESET');
           }
+          if (dragTransformBar) dragTransformBar.classList.add('hidden');
         });
       }
 
@@ -5982,12 +5979,19 @@ RAW SIGNAL</textarea>
         }
       });
 
-      // Show/hide top text quick input capsule
+      // Show/hide Tap-to-Write button & close on-screen editor when switching modules
       const textCapsule = document.getElementById('textQuickInputBox');
-      if (textCapsule) {
-        if (modKey === 'text') textCapsule.classList.remove('hidden');
-        else textCapsule.classList.add('hidden');
+      if (textCapsule) textCapsule.classList.add('hidden');
+      const tapWriteBtn = document.getElementById('tapToWriteBtn');
+      if (tapWriteBtn) {
+        if (modKey === 'text') {
+          tapWriteBtn.classList.remove('invisible', 'pointer-events-none');
+        } else {
+          tapWriteBtn.classList.add('invisible', 'pointer-events-none');
+        }
       }
+      const dragBar = document.getElementById('dragTransformBar');
+      if (dragBar) dragBar.classList.add('hidden');
 
       // Update side wings button groups
       const allWings = [
@@ -6007,6 +6011,8 @@ RAW SIGNAL</textarea>
         window.setDragTarget('media', true);
       } else if (modKey === 'text' && window.setDragTarget) {
         window.setDragTarget('text', true);
+      } else if (window.applyTouchMode) {
+        window.applyTouchMode();
       }
 
       closeSidePopovers();
@@ -7455,11 +7461,56 @@ RAW SIGNAL</textarea>
       // Set initial module state: TEXT
       selectModule(currentModuleKey);
 
-      // Text Input & Quick Capsule Synchronization
+      // Text Input & On-Screen Direct Editor Synchronization
       const textInput = document.getElementById('textInput');
       const topTextInput = document.getElementById('topTextInput');
+      const textQuickInputBox = document.getElementById('textQuickInputBox');
+      const tapToWriteBtn = document.getElementById('tapToWriteBtn');
+      const canvasTapWriteHint = document.getElementById('canvasTapWriteHint');
       const clearTopTextBtn = document.getElementById('clearTopTextBtn');
+      const doneTopTextBtn = document.getElementById('doneTopTextBtn');
       let typingTimer = null;
+
+      function openOnScreenTextEditor() {
+        if (!textQuickInputBox || !topTextInput) return;
+        textQuickInputBox.classList.remove('hidden');
+        if (canvasTapWriteHint) canvasTapWriteHint.classList.add('opacity-0');
+        topTextInput.value = state.type.text;
+        topTextInput.focus();
+        try {
+          const len = topTextInput.value.length;
+          topTextInput.setSelectionRange(len, len);
+        } catch (err) {}
+      }
+      window.openOnScreenTextEditor = openOnScreenTextEditor;
+
+      function closeOnScreenTextEditor() {
+        if (!textQuickInputBox) return;
+        textQuickInputBox.classList.add('hidden');
+        if (canvasTapWriteHint) canvasTapWriteHint.classList.remove('opacity-0');
+        if (topTextInput) topTextInput.blur();
+        state.isTyping = false;
+        document.body.classList.remove('keyboard-open');
+      }
+      window.closeOnScreenTextEditor = closeOnScreenTextEditor;
+
+      if (tapToWriteBtn) {
+        tapToWriteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (textQuickInputBox && !textQuickInputBox.classList.contains('hidden')) {
+            closeOnScreenTextEditor();
+          } else {
+            openOnScreenTextEditor();
+          }
+        });
+      }
+
+      if (doneTopTextBtn) {
+        doneTopTextBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeOnScreenTextEditor();
+        });
+      }
 
       if (textInput) {
         textInput.addEventListener('input', (e) => {
@@ -7484,6 +7535,19 @@ RAW SIGNAL</textarea>
         topTextInput.addEventListener('blur', () => {
           state.isTyping = false;
           document.body.classList.remove('keyboard-open');
+          // Delay slightly so Clear/Done clicks inside the box register cleanly before hiding
+          setTimeout(() => {
+            if (document.activeElement !== topTextInput && textQuickInputBox) {
+              textQuickInputBox.classList.add('hidden');
+              if (canvasTapWriteHint) canvasTapWriteHint.classList.remove('opacity-0');
+            }
+          }, 160);
+        });
+        topTextInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            closeOnScreenTextEditor();
+          }
         });
         topTextInput.addEventListener('input', (e) => {
           state.type.text = e.target.value;
@@ -7493,10 +7557,14 @@ RAW SIGNAL</textarea>
           typingTimer = setTimeout(() => { state.isTyping = false; }, 220);
         });
         if (clearTopTextBtn) {
-          clearTopTextBtn.addEventListener('click', () => {
+          clearTopTextBtn.addEventListener('mousedown', (e) => e.preventDefault());
+          clearTopTextBtn.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+          clearTopTextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             topTextInput.value = '';
             if (textInput) textInput.value = '';
             state.type.text = '';
+            topTextInput.focus();
           });
         }
       }
