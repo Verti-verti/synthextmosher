@@ -485,77 +485,31 @@
 
   <!-- ==================== FLOATING TOP BAR & MODULAR PIPELINE ==================== -->
   <header id="topBar" class="absolute top-0 inset-x-0 z-30 pointer-events-none p-1.5 sm:p-2 flex flex-col items-center gap-1.5">
-    <!-- Top row: Clean Hold + Module Selector + CHAOS Button (Green Circle Position) -->
-    <div class="w-full max-w-md pointer-events-auto flex items-center justify-between gap-2 px-1">
-      <div class="flex items-center gap-1.5 shrink-0">
+    <!-- Top row: Clean Hold + Centered Module Selector + CHAOS Button -->
+    <div class="w-full max-w-md pointer-events-auto grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 px-1">
+      <div class="flex items-center gap-1.5 justify-start shrink-0">
         <button id="holdCleanBtn" type="button" class="tap-btn px-2 py-1.5 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-cyan/20 active:text-cyber-cyan border border-white/15 text-[10px] text-slate-300 font-bold transition shadow-lg shrink-0" title="Hold to preview clean unmoshed frame">
           👁️ Clean
         </button>
-        <button id="topTintBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-lime/20 border border-cyber-lime/50 text-[10px] text-cyber-lime font-bold transition shadow-lg flex items-center gap-1.5 shrink-0" title="Change Color Tint across all modules">
-          <span id="topTintIndicator" class="w-2.5 h-2.5 rounded-full inline-block bg-cyber-lime border border-white/40 shadow-[0_0_6px_rgba(57,255,20,0.6)]"></span>
-          <span>🎨 Tint</span>
+        <button id="topTintBtn" type="button" class="tap-btn w-8 h-8 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-lime/20 border border-cyber-lime/50 text-xs transition shadow-lg flex items-center justify-center relative shrink-0" title="Change Color Tint across all modules">
+          <span>🎨</span>
+          <span id="topTintIndicator" class="w-2 h-2 rounded-full absolute -top-0.5 -right-0.5 bg-cyber-lime border border-white/50 shadow-[0_0_6px_rgba(57,255,20,0.6)]"></span>
         </button>
       </div>
 
-      <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[155px] py-1.5 px-5 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition" title="Open Module Pipeline Flow">
+      <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[145px] py-1.5 px-4 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition mx-auto" title="Open Module Pipeline Flow">
         <span id="activeModuleIcon">🔤</span>
         <span id="activeModuleLabel" class="truncate font-black">TEXT</span>
         <span class="text-[9px] text-slate-400">▾</span>
       </button>
 
-      <!-- Original CHAOS Button in Top-Right Green Circle Position (Triggers 8 Multi-Effect Combinations of >=3 FX) -->
-      <button id="topChaosBtn" type="button" class="tap-btn px-3 py-1.5 rounded-xl bg-cyber-pink/20 backdrop-blur-md border-2 border-cyber-pink text-white text-[10px] font-black tracking-wider flex items-center gap-1 shadow-[0_0_14px_rgba(255,0,85,0.45)] active:scale-90 transition hover:bg-cyber-pink hover:text-black shrink-0" title="Chaos: Random Aesthetic Combination of 3+ Effects">
-        <span>🎲</span>
-        <span>CHAOS</span>
-      </button>
+      <div class="flex items-center justify-end shrink-0">
+        <button id="topChaosBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-cyber-pink/20 backdrop-blur-md border-2 border-cyber-pink text-white text-[10px] font-black tracking-wider flex items-center gap-1 shadow-[0_0_14px_rgba(255,0,85,0.45)] active:scale-90 transition hover:bg-cyber-pink hover:text-black shrink-0" title="Chaos: Random Aesthetic Combination of 3+ Effects">
+          <span>🎲</span>
+          <span>CHAOS</span>
+        </button>
+      </div>
     </div>
-
-    <!-- Floating Interactive Module Flow Modal (Opens when moduleSelectorBtn is clicked) -->
-    <div id="moduleFlowModal" class="hidden fixed top-16 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 max-w-sm w-full z-50 pointer-events-auto bg-black/95 backdrop-blur-2xl border border-cyber-cyan/50 rounded-2xl p-3.5 shadow-2xl space-y-2.5">
-      <div class="flex items-center justify-between border-b border-white/10 pb-2">
-        <div class="flex items-center gap-1.5">
-          <span class="text-xs">⚡</span>
-          <span class="font-black text-[11px] text-white tracking-wider">PIPELINE ROUTING</span>
-        </div>
-        <button id="closeModuleFlowBtn" type="button" class="text-slate-400 hover:text-white text-xs px-1">✕</button>
-      </div>
-
-      <!-- Exact 2-Column S-Curve Routing Flow from Reference Diagram -->
-      <div class="grid grid-cols-2 gap-x-4 gap-y-2 relative py-2 px-1">
-        <!-- Column 1: Text -> Media -> Pixel Sorting -->
-        <div class="flex flex-col items-center gap-2 z-10">
-          <button type="button" data-module="text" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
-            <span>🔤</span><span>Text</span>
-          </button>
-          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
-          <button type="button" data-module="photo" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
-            <span>🎬</span><span>media</span>
-          </button>
-          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
-          <button type="button" data-module="sort" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
-            <span>🌊</span><span>pixel sorting</span>
-          </button>
-        </div>
-
-        <!-- Column 2: CRT -> Mosh -> Heatmap - Wire -> Vibe -->
-        <div class="flex flex-col items-center gap-2 z-10">
-          <button type="button" data-module="fx" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
-            <span>📡</span><span>crt</span>
-          </button>
-          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
-          <button type="button" data-module="mosh" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
-            <span>📼</span><span>Mosh</span>
-          </button>
-          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
-          <button type="button" data-module="glitch" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
-            <span>🌀</span><span class="truncate">heatmap - wire...</span>
-          </button>
-          <span class="text-cyber-cyan/60 text-[10px] -my-1">↓</span>
-          <button type="button" data-module="vibe" class="pipeline-node-btn chamfer-node-btn w-full py-1.5 px-2 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
-            <span>⛩️</span><span>vibe</span>
-          </button>
-        </div>
-      </div>
 
       <!-- Quick Step Navigation -->
       <div class="flex items-center justify-between border-t border-white/10 pt-2 text-[10px]">
@@ -2423,7 +2377,7 @@ RAW SIGNAL</textarea>
           active: false,
           direction: 'horizontal', // 'horizontal' | 'vertical'
           tear: 45,                // Comb Tear line-lock jitter (0 - 100%)
-          pos: 0.50,               // Division split position (0.0 - 1.0)
+          pos: 50,               // Division split position (0.0 - 1.0)
           ghost: 40                // RF Multipath Cable Ghost Reflection (0 - 100%)
         }
       },
@@ -4926,6 +4880,12 @@ RAW SIGNAL</textarea>
       return syncNoiseCanvas;
     }
 
+    // Helper: Pure arithmetic diagonal triangle wave in [-1, +1] (100% NaN-safe, 0% float domain error)
+    function getTriWave(angle) {
+      const norm = ((angle / (Math.PI * 2)) % 1 + 1) % 1;
+      return norm < 0.5 ? (norm * 4 - 1) : (3 - norm * 4);
+    }
+
     // ==================== SYSTEM 1: SYNC SUPPRESSION (DIAGONAL RASTER & CHROMA INVERSION) ====================
     function applySyncSuppression(targetCtx, sync, tick) {
       if (!sync || !sync.active) return;
@@ -4968,18 +4928,18 @@ RAW SIGNAL</textarea>
         for (let y = 0; y < HEIGHT; y += sh) {
           const normY = y / HEIGHT;
 
-          // LESS SINUSOIDAL, MORE DIAGONAL S-WAVE:
-          // Triangle wave / linear diagonal slant ramp:
-          const triWave = Math.asin(Math.sin(normY * Math.PI * 2 * 1.5 + phase)) / (Math.PI * 0.5);
+          // LESS SINUSOIDAL, MORE DIAGONAL S-WAVE (Pure arithmetic, 100% NaN-safe):
+          const triWave = getTriWave(normY * Math.PI * 2 * 1.5 + phase);
           const w1 = triWave * 0.78 + Math.sin(normY * Math.PI * 2 * 1.5 + phase) * 0.22;
-          const triWave2 = Math.asin(Math.sin(normY * Math.PI * 2 * 3.5 - phase * 1.2)) / (Math.PI * 0.5);
+          const triWave2 = getTriWave(normY * Math.PI * 2 * 3.5 - phase * 1.2);
           const w2 = triWave2 * 0.20;
 
           const rawShift = Math.round((w1 + w2) * maxWaveAmp);
           let shiftX = rawShift % WIDTH;
           if (shiftX < 0) shiftX += WIDTH;
+          shiftX = Math.floor(shiftX);
 
-          if (shiftX > 0) {
+          if (shiftX > 0 && shiftX < WIDTH) {
             const rightPart = WIDTH - shiftX;
             targetCtx.drawImage(srcCanvas, 0, y, rightPart, sh, shiftX, y, rightPart, sh);
             targetCtx.drawImage(srcCanvas, rightPart, y, shiftX, sh, 0, y, shiftX, sh);
@@ -4987,18 +4947,18 @@ RAW SIGNAL</textarea>
             targetCtx.drawImage(srcCanvas, 0, y, WIDTH, sh, 0, y, WIDTH, sh);
           }
 
-          // Video Polarity & Chroma Phase Inversion Bands
+          // Video Polarity & Chroma Phase Inversion Bands (Safe direct composite)
           if (waveLevel > 0.08 || isInvert) {
             const carrier = Math.sin(normY * Math.PI * 2 * 3.0 - phase * 1.15) +
                             Math.cos(normY * Math.PI * 2 * 7.0 + phase * 0.75) * 0.45;
             const thresh = isInvert ? -2.0 : (1.35 - waveLevel * 0.55);
             if (carrier > thresh) {
-              targetCtx.save();
               targetCtx.globalCompositeOperation = 'difference';
               targetCtx.globalAlpha = isInvert ? 0.35 : Math.min(0.28, 0.08 + waveLevel * 0.20);
               targetCtx.fillStyle = isInvert ? '#ffffff' : (((y / sh) | 0) % 4 < 2 ? '#e040fb' : primaryToothColor);
               targetCtx.fillRect(0, y, WIDTH, sh);
-              targetCtx.restore();
+              targetCtx.globalCompositeOperation = 'source-over';
+              targetCtx.globalAlpha = 1.0;
             }
           }
         }
@@ -5008,20 +4968,18 @@ RAW SIGNAL</textarea>
         const vbiY = Math.round((sync.pos || 0.35) * HEIGHT) - (vbiH >> 1);
 
         const drawVbiBar = (yPos) => {
+          targetCtx.globalCompositeOperation = 'source-over';
           targetCtx.fillStyle = 'rgba(6, 2, 16, 0.25)';
           targetCtx.fillRect(0, yPos, WIDTH, vbiH);
 
-          targetCtx.save();
           targetCtx.globalAlpha = 0.60;
           targetCtx.fillStyle = hasCustomColor ? color : '#b829ff';
           targetCtx.fillRect(0, yPos, WIDTH, 2);
           targetCtx.fillRect(0, yPos + vbiH - 2, WIDTH, 2);
-          targetCtx.restore();
 
           const dashY = yPos + (vbiH >> 1) - 1;
           const dashStep = 48;
           const dashShift = Math.round(((tick || 0) * 14) % dashStep);
-          targetCtx.save();
           targetCtx.globalAlpha = 0.55;
           for (let dx = -dashStep + dashShift; dx < WIDTH; dx += dashStep) {
             targetCtx.fillStyle = '#ffffff';
@@ -5029,7 +4987,7 @@ RAW SIGNAL</textarea>
             targetCtx.fillStyle = '#00f5d4';
             targetCtx.fillRect(dx + 20, dashY, 6, 2);
           }
-          targetCtx.restore();
+          targetCtx.globalAlpha = 1.0;
         };
 
         drawVbiBar(vbiY);
@@ -5043,16 +5001,17 @@ RAW SIGNAL</textarea>
 
         for (let x = 0; x < WIDTH; x += sw) {
           const normX = x / WIDTH;
-          const triWave = Math.asin(Math.sin(normX * Math.PI * 2 * 1.5 + phase)) / (Math.PI * 0.5);
+          const triWave = getTriWave(normX * Math.PI * 2 * 1.5 + phase);
           const w1 = triWave * 0.78 + Math.sin(normX * Math.PI * 2 * 1.5 + phase) * 0.22;
-          const triWave2 = Math.asin(Math.sin(normX * Math.PI * 2 * 3.5 - phase * 1.2)) / (Math.PI * 0.5);
+          const triWave2 = getTriWave(normX * Math.PI * 2 * 3.5 - phase * 1.2);
           const w2 = triWave2 * 0.20;
 
           const rawShift = Math.round((w1 + w2) * maxWaveAmp);
           let shiftY = rawShift % HEIGHT;
           if (shiftY < 0) shiftY += HEIGHT;
+          shiftY = Math.floor(shiftY);
 
-          if (shiftY > 0) {
+          if (shiftY > 0 && shiftY < HEIGHT) {
             const bottomPart = HEIGHT - shiftY;
             targetCtx.drawImage(srcCanvas, x, 0, sw, bottomPart, x, shiftY, sw, bottomPart);
             targetCtx.drawImage(srcCanvas, x, bottomPart, sw, shiftY, x, 0, sw, shiftY);
@@ -5064,12 +5023,12 @@ RAW SIGNAL</textarea>
             const carrier = Math.sin(normX * Math.PI * 2 * 3.0 - phase * 1.15);
             const thresh = isInvert ? -2.0 : (1.35 - waveLevel * 0.55);
             if (carrier > thresh) {
-              targetCtx.save();
               targetCtx.globalCompositeOperation = 'difference';
               targetCtx.globalAlpha = isInvert ? 0.35 : Math.min(0.28, 0.08 + waveLevel * 0.20);
               targetCtx.fillStyle = isInvert ? '#ffffff' : (((x / sw) | 0) % 4 < 2 ? '#e040fb' : primaryToothColor);
               targetCtx.fillRect(x, 0, sw, HEIGHT);
-              targetCtx.restore();
+              targetCtx.globalCompositeOperation = 'source-over';
+              targetCtx.globalAlpha = 1.0;
             }
           }
         }
@@ -5078,13 +5037,12 @@ RAW SIGNAL</textarea>
         const vbiX = Math.round((sync.pos || 0.35) * WIDTH) - (vbiW >> 1);
         targetCtx.fillStyle = 'rgba(6, 2, 16, 0.25)';
         targetCtx.fillRect(vbiX, 0, vbiW, HEIGHT);
-        targetCtx.save();
         targetCtx.globalAlpha = 0.55;
         targetCtx.fillStyle = '#ffffff';
         for (let dy = 0; dy < HEIGHT; dy += 48) {
           targetCtx.fillRect(vbiX + (vbiW >> 1) - 1, dy, 2, 16);
         }
-        targetCtx.restore();
+        targetCtx.globalAlpha = 1.0;
       }
 
       targetCtx.restore();
@@ -5098,7 +5056,10 @@ RAW SIGNAL</textarea>
       if (!tearOpt || !tearOpt.active) return;
 
       const tearLevel = Math.min(100, Math.max(0, tearOpt.tear !== undefined ? tearOpt.tear : 45)) / 100;
-      const divPos = Math.min(100, Math.max(0, tearOpt.pos !== undefined ? tearOpt.pos : 50)) / 100;
+      // Accept either 0..100 or 0.0..1.0 cleanly:
+      const divPos = tearOpt.pos !== undefined
+        ? (tearOpt.pos > 1 ? Math.min(100, Math.max(0, tearOpt.pos)) / 100 : Math.min(1, Math.max(0, tearOpt.pos)))
+        : 0.50;
       const ghostAmt = Math.min(100, Math.max(0, tearOpt.ghost !== undefined ? tearOpt.ghost : 40)) / 100;
       const direction = tearOpt.direction || 'horizontal';
 
@@ -5120,27 +5081,28 @@ RAW SIGNAL</textarea>
       if (direction === 'horizontal') {
         const sh = 3;
         const seamY = Math.round(divPos * HEIGHT);
-        const splitShift = Math.round(tearLevel * 24);
+        const splitShift = Math.round(tearLevel * 28);
 
-        // 1. Scanline Comb Tearing & Division Split
+        // 1. Scanline Comb Tearing & Division Split (Top and bottom shear in opposite directions)
         for (let y = 0; y < HEIGHT; y += sh) {
           const rawJit = Math.sin(y * 0.73 + (tick || 0) * 8.3) * Math.cos(y * 0.31 - (tick || 0) * 4.7);
           let hJitter = 0;
           if (tearLevel > 0) {
-            hJitter = Math.round(rawJit * tearLevel * 22);
-            if (Math.abs(rawJit) > 0.74) {
-              hJitter += Math.sign(rawJit) * Math.round(tearLevel * 14);
+            hJitter = Math.round(rawJit * tearLevel * 24);
+            if (Math.abs(rawJit) > 0.72) {
+              hJitter += Math.sign(rawJit) * Math.round(tearLevel * 16);
             }
           }
 
-          // Split division shear: top and bottom shift in opposite directions across seam
+          // Seam division shear: top and bottom shift in opposite directions across seam
           const isAboveSeam = y < seamY;
           const seamOffset = isAboveSeam ? -splitShift : splitShift;
           const totalShift = (hJitter + seamOffset) % WIDTH;
           let shiftX = totalShift;
           if (shiftX < 0) shiftX += WIDTH;
+          shiftX = Math.floor(shiftX);
 
-          if (shiftX > 0) {
+          if (shiftX > 0 && shiftX < WIDTH) {
             const rightPart = WIDTH - shiftX;
             targetCtx.drawImage(srcCanvas, 0, y, rightPart, sh, shiftX, y, rightPart, sh);
             targetCtx.drawImage(srcCanvas, rightPart, y, shiftX, sh, 0, y, shiftX, sh);
@@ -5151,66 +5113,66 @@ RAW SIGNAL</textarea>
 
         // 2. RF Multipath Cable Ghost Reflection (Luminous horizontal echo with phase delay)
         if (ghostAmt > 0.05) {
-          const ghostShift = Math.round(12 + ghostAmt * 28);
+          const ghostShift = Math.round(12 + ghostAmt * 32);
           const copyW = WIDTH - ghostShift;
           if (copyW > 0) {
             targetCtx.save();
-            targetCtx.globalAlpha = Math.min(0.40, ghostAmt * 0.38);
+            targetCtx.globalAlpha = Math.min(0.45, ghostAmt * 0.42);
             targetCtx.globalCompositeOperation = 'screen';
             targetCtx.drawImage(srcCanvas, 0, 0, copyW, HEIGHT, ghostShift, 0, copyW, HEIGHT);
             targetCtx.restore();
           }
         }
 
-        // 3. Division Split Seam Accent (high-contrast seam with dashed sync pulse & sawtooth teeth)
-        const seamH = 8;
-        const seamTop = Math.max(0, seamY - (seamH >> 1));
+        // 3. Prominent Co-Axial Cable Division Bar (Tactile visual moving at seamY across the whole screen)
+        const cableH = 26;
+        const cableTop = Math.max(0, Math.min(HEIGHT - cableH, seamY - (cableH >> 1)));
 
-        // Dark division line
-        targetCtx.fillStyle = 'rgba(4, 2, 10, 0.55)';
-        targetCtx.fillRect(0, seamTop, WIDTH, seamH);
+        // Deep rubbery cable jacket core
+        targetCtx.fillStyle = 'rgba(8, 5, 14, 0.92)';
+        targetCtx.fillRect(0, cableTop, WIDTH, cableH);
 
-        // Glowing cyan seam borders
-        targetCtx.save();
-        targetCtx.globalAlpha = 0.70;
+        // Coaxial highlight grooves
+        targetCtx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+        targetCtx.fillRect(0, cableTop + 4, WIDTH, 1.5);
+        targetCtx.fillRect(0, cableTop + cableH - 6, WIDTH, 1.5);
+
+        // High-contrast glowing neon cyan rail borders
         targetCtx.fillStyle = '#00ffcc';
-        targetCtx.fillRect(0, seamTop, WIDTH, 1.5);
-        targetCtx.fillRect(0, seamTop + seamH - 1.5, WIDTH, 1.5);
-        targetCtx.restore();
+        targetCtx.fillRect(0, cableTop, WIDTH, 2);
+        targetCtx.fillRect(0, cableTop + cableH - 2, WIDTH, 2);
 
-        // White sync pulse dashes
+        // White travelling sync pulse ticks
         const dashStep = 44;
-        const dashShift = Math.round(((tick || 0) * 12) % dashStep);
-        targetCtx.save();
-        targetCtx.globalAlpha = 0.65;
+        const dashShift = Math.round(((tick || 0) * 14) % dashStep);
         targetCtx.fillStyle = '#ffffff';
         for (let dx = -dashStep + dashShift; dx < WIDTH; dx += dashStep) {
-          targetCtx.fillRect(dx, seamTop + 2, 18, 3);
+          targetCtx.fillRect(dx, cableTop + (cableH >> 1) - 2, 22, 4);
         }
-        targetCtx.restore();
 
-        // Serrated decoder burst saw teeth along the division
-        targetCtx.save();
-        targetCtx.globalAlpha = 0.40;
-        targetCtx.fillStyle = '#ff0055';
-        for (let x = 0; x < WIDTH; x += 10) {
-          if (((x / 10) | 0) % 2 === 0) {
-            targetCtx.fillRect(x, seamTop + seamH, 6, 5);
+        // Serrated comb tear teeth along top and bottom edges of the cable
+        if (tearLevel > 0.05) {
+          const teethH = Math.round(tearLevel * 14);
+          targetCtx.fillStyle = '#ff0055';
+          for (let x = 0; x < WIDTH; x += 12) {
+            if (((x / 12) | 0) % 2 === 0) {
+              targetCtx.fillRect(x, cableTop - teethH, 6, teethH);
+              targetCtx.fillRect(x + 6, cableTop + cableH, 6, teethH);
+            }
           }
         }
-        targetCtx.restore();
 
       } else {
         // Vertical mode for Cable Wave & Tear
         const sw = 3;
         const seamX = Math.round(divPos * WIDTH);
-        const splitShift = Math.round(tearLevel * 24);
+        const splitShift = Math.round(tearLevel * 28);
 
         for (let x = 0; x < WIDTH; x += sw) {
           const rawJit = Math.sin(x * 0.73 + (tick || 0) * 8.3) * Math.cos(x * 0.31 - (tick || 0) * 4.7);
           let vJitter = 0;
           if (tearLevel > 0) {
-            vJitter = Math.round(rawJit * tearLevel * 22);
+            vJitter = Math.round(rawJit * tearLevel * 24);
           }
 
           const isLeftSeam = x < seamX;
@@ -5218,8 +5180,9 @@ RAW SIGNAL</textarea>
           const totalShift = (vJitter + seamOffset) % HEIGHT;
           let shiftY = totalShift;
           if (shiftY < 0) shiftY += HEIGHT;
+          shiftY = Math.floor(shiftY);
 
-          if (shiftY > 0) {
+          if (shiftY > 0 && shiftY < HEIGHT) {
             const bottomPart = HEIGHT - shiftY;
             targetCtx.drawImage(srcCanvas, x, 0, sw, bottomPart, x, shiftY, sw, bottomPart);
             targetCtx.drawImage(srcCanvas, x, bottomPart, sw, shiftY, x, 0, sw, shiftY);
@@ -5229,31 +5192,38 @@ RAW SIGNAL</textarea>
         }
 
         if (ghostAmt > 0.05) {
-          const ghostShift = Math.round(12 + ghostAmt * 28);
+          const ghostShift = Math.round(12 + ghostAmt * 32);
           const copyH = HEIGHT - ghostShift;
           if (copyH > 0) {
             targetCtx.save();
-            targetCtx.globalAlpha = Math.min(0.40, ghostAmt * 0.38);
+            targetCtx.globalAlpha = Math.min(0.45, ghostAmt * 0.42);
             targetCtx.globalCompositeOperation = 'screen';
             targetCtx.drawImage(srcCanvas, 0, 0, WIDTH, copyH, 0, ghostShift, WIDTH, copyH);
             targetCtx.restore();
           }
         }
 
-        const seamW = 8;
-        const seamLeft = Math.max(0, seamX - (seamW >> 1));
-        targetCtx.fillStyle = 'rgba(4, 2, 10, 0.55)';
-        targetCtx.fillRect(seamLeft, 0, seamW, HEIGHT);
-        targetCtx.save();
-        targetCtx.globalAlpha = 0.70;
+        const cableW = 26;
+        const cableLeft = Math.max(0, Math.min(WIDTH - cableW, seamX - (cableW >> 1)));
+
+        targetCtx.fillStyle = 'rgba(8, 5, 14, 0.92)';
+        targetCtx.fillRect(cableLeft, 0, cableW, HEIGHT);
+
         targetCtx.fillStyle = '#00ffcc';
-        targetCtx.fillRect(seamLeft, 0, 1.5, HEIGHT);
-        targetCtx.fillRect(seamLeft + seamW - 1.5, 0, 1.5, HEIGHT);
-        targetCtx.restore();
+        targetCtx.fillRect(cableLeft, 0, 2, HEIGHT);
+        targetCtx.fillRect(cableLeft + cableW - 2, 0, 2, HEIGHT);
+
+        const dashStep = 44;
+        const dashShift = Math.round(((tick || 0) * 14) % dashStep);
+        targetCtx.fillStyle = '#ffffff';
+        for (let dy = 0; dy < HEIGHT; dy += 48) {
+          targetCtx.fillRect(cableLeft + (cableW >> 1) - 2, dy, 4, 22);
+        }
       }
 
       targetCtx.restore();
     }
+
     function render() {
       // Step kinetic motion
       state.mosh.tick += (state.mosh.speed * 0.05);
@@ -5349,10 +5319,18 @@ RAW SIGNAL</textarea>
         applyAnalogAndCrt(cleanCompositeCtx, state.fx);
       }
       if (state.fx.sync && state.fx.sync.active && !state.isTyping) {
-        applySyncSuppression(cleanCompositeCtx, state.fx.sync, state.mosh.tick);
+        try {
+          applySyncSuppression(cleanCompositeCtx, state.fx.sync, state.mosh.tick);
+        } catch (e) {
+          console.error('applySyncSuppression error:', e);
+        }
       }
       if (state.fx.cableTear && state.fx.cableTear.active && !state.isTyping) {
-        applyCableWaveAndTear(cleanCompositeCtx, state.fx.cableTear, state.mosh.tick);
+        try {
+          applyCableWaveAndTear(cleanCompositeCtx, state.fx.cableTear, state.mosh.tick);
+        } catch (e) {
+          console.error('applyCableWaveAndTear error:', e);
+        }
       }
 
       // 4. PIPELINE STEP 5: Datamosh Engine (CRT -> Mosh)
@@ -10213,7 +10191,7 @@ RAW SIGNAL</textarea>
 
       // Cable Wave & Tear bindings
       bind('cableTearRange', state.fx.cableTear, 'tear', 'cableTearLabel', '%');
-      bind('cablePosRange', state.fx.cableTear, 'pos', 'cablePosLabel', '%', 0.01);
+      bind('cablePosRange', state.fx.cableTear, 'pos', 'cablePosLabel', '%');
       bind('cableGhostRange', state.fx.cableTear, 'ghost', 'cableGhostLabel', '%');
 
       const cableActiveChk = document.getElementById('cableTearActiveCheck');
