@@ -487,9 +487,15 @@
   <header id="topBar" class="absolute top-0 inset-x-0 z-30 pointer-events-none p-1.5 sm:p-2 flex flex-col items-center gap-1.5">
     <!-- Top row: Clean Hold + Module Selector + CHAOS Button (Green Circle Position) -->
     <div class="w-full max-w-md pointer-events-auto flex items-center justify-between gap-2 px-1">
-      <button id="holdCleanBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-cyan/20 active:text-cyber-cyan border border-white/15 text-[10px] text-slate-300 font-bold transition shadow-lg shrink-0" title="Hold to preview clean unmoshed frame">
-        👁️ Clean
-      </button>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="holdCleanBtn" type="button" class="tap-btn px-2 py-1.5 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-cyan/20 active:text-cyber-cyan border border-white/15 text-[10px] text-slate-300 font-bold transition shadow-lg shrink-0" title="Hold to preview clean unmoshed frame">
+          👁️ Clean
+        </button>
+        <button id="topTintBtn" type="button" class="tap-btn px-2.5 py-1.5 rounded-xl bg-black/85 backdrop-blur-md active:bg-cyber-lime/20 border border-cyber-lime/50 text-[10px] text-cyber-lime font-bold transition shadow-lg flex items-center gap-1.5 shrink-0" title="Change Color Tint across all modules">
+          <span id="topTintIndicator" class="w-2.5 h-2.5 rounded-full inline-block bg-cyber-lime border border-white/40 shadow-[0_0_6px_rgba(57,255,20,0.6)]"></span>
+          <span>🎨 Tint</span>
+        </button>
+      </div>
 
       <button id="moduleSelectorBtn" type="button" class="tap-btn min-w-[155px] py-1.5 px-5 chamfer-node-btn bg-black/90 backdrop-blur-md border-2 border-cyber-cyan text-cyber-cyan text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,255,204,0.35)] active:scale-95 transition" title="Open Module Pipeline Flow">
         <span id="activeModuleIcon">🔤</span>
@@ -1365,7 +1371,21 @@ RAW SIGNAL</textarea>
         </div>
 
         <!-- Depth Mask, Edge Detection, Saturation, Lightness & Gamma -->
-        <div class="grid grid-cols-3 gap-2 pt-1 border-t border-cyber-border/60">
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-cyber-border/60">
+          <label class="flex items-center space-x-1.5 text-[10px] text-slate-300 cursor-pointer">
+            <input type="checkbox" id="photoDepthInvertCheck" class="accent-cyber-cyan">
+            <span class="font-bold text-cyber-cyan">Invert Depth Mask</span>
+          </label>
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>3D Depth ASCII</span>
+              <span id="photoAsciiDepthScaleLabel" class="text-cyber-cyan">75%</span>
+            </div>
+            <input type="range" id="photoAsciiDepthScaleRange" min="0" max="100" value="75">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-1">
           <div class="space-y-0.5">
             <div class="flex justify-between text-[10px] text-slate-400">
               <span>🎭 Depth Thresh</span>
@@ -1482,12 +1502,22 @@ RAW SIGNAL</textarea>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[10px] text-slate-400 mb-0.5">CRITERION</label>
-            <select id="sortCriterionSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
-              <option value="brightness">Luminance (Bright)</option>
-              <option value="red">Red Channel Highs</option>
-              <option value="blue">Blue Highs</option>
-              <option value="saturation">Color Saturation</option>
+            <select id="sortCriterionSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none font-bold">
+              <option value="lights">☀️ Lights / Highlights</option>
+              <option value="shadows">🌑 Shadows / Darks</option>
+              <option value="depth">🎭 3D Depth Pass</option>
+              <option value="red">🔴 Red Channel</option>
+              <option value="green">🟢 Green Channel</option>
+              <option value="blue">🔵 Blue Channel</option>
+              <option value="brightness">✨ Luminance (Bright)</option>
+              <option value="saturation">🌈 Color Saturation</option>
             </select>
+            <div class="pt-1.5 flex items-center">
+              <label class="flex items-center space-x-1.5 text-[9.5px] text-slate-300 cursor-pointer">
+                <input type="checkbox" id="sortInvertMaskCheck" class="accent-cyber-cyan">
+                <span>Invert Mask Range</span>
+              </label>
+            </div>
           </div>
 
           <div class="space-y-0.5">
@@ -1570,7 +1600,8 @@ RAW SIGNAL</textarea>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] text-slate-400 mb-0.5">TRIGGER MASK</label>
-              <select id="hwTriggerSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
+              <select id="hwTriggerSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none font-bold">
+                <option value="depth">🎭 3D Depth Pass</option>
                 <option value="bright">☀️ Bright Highlights (Luma Highs)</option>
                 <option value="contrast">⚡ High Contrast / Edges</option>
                 <option value="dark">🌑 Dark Shadows (Luma Lows)</option>
@@ -1737,10 +1768,10 @@ RAW SIGNAL</textarea>
 
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
-                <span>Macroblock Grid</span>
+                <span>Macroblock Size</span>
                 <span id="pframeBlockLabel" class="text-cyber-cyan">16px</span>
               </div>
-              <input type="range" id="pframeBlockRange" min="8" max="32" step="8" value="16">
+              <input type="range" id="pframeBlockRange" min="8" max="48" step="8" value="16">
             </div>
           </div>
 
@@ -1798,7 +1829,7 @@ RAW SIGNAL</textarea>
           <div class="grid grid-cols-2 gap-3">
             <div class="space-y-0.5">
               <div class="flex justify-between text-[10px] text-slate-400">
-                <span>Random Blocks</span>
+                <span>Random Glitch Blocks</span>
                 <span id="moshBlockLabel" class="text-cyber-pink">18</span>
               </div>
               <input type="range" id="moshBlockRange" min="0" max="100" value="18">
@@ -1972,13 +2003,15 @@ RAW SIGNAL</textarea>
           </div>
         </div>
 
-        <!-- Sync Suppression & Roll Engine -->
+        <!-- 1. Sync Suppression Engine -->
         <div class="space-y-1.5 pt-1.5 border-t border-cyber-border/60">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold text-cyber-yellow uppercase tracking-wider">⚡ SYNC SUPPRESSION &amp; ROLL</span>
+            <span class="text-[10px] font-bold text-cyber-yellow uppercase tracking-wider flex items-center gap-1">
+              <span>⚡</span> SYNC SUPPRESSION (DIAGONAL RASTER)
+            </span>
             <label class="flex items-center space-x-1 text-[10px] text-slate-300">
               <input type="checkbox" id="syncActiveCheck" class="accent-cyber-yellow">
-              <span>Sync Drop</span>
+              <span>Enable</span>
             </label>
           </div>
           <div class="grid grid-cols-2 gap-2">
@@ -1987,7 +2020,6 @@ RAW SIGNAL</textarea>
               <select id="syncDirectionSelect" class="w-full bg-cyber-black border border-cyber-border rounded px-2 py-1 text-slate-100 text-[10px] outline-none">
                 <option value="horizontal">Horizontal (V-Roll / Blanking)</option>
                 <option value="vertical">Vertical (H-Roll / Drift)</option>
-                <option value="diagonal">Diagonal (45° S-Tear)</option>
               </select>
             </div>
             <div>
@@ -1998,32 +2030,61 @@ RAW SIGNAL</textarea>
           <div class="grid grid-cols-3 gap-2">
             <div class="space-y-0.5">
               <div class="flex justify-between text-[9px] text-slate-400">
-                <span>Band Width</span>
-                <span id="syncWidthLabel" class="text-cyber-yellow">18%</span>
+                <span>S-Wave Amp</span>
+                <span id="syncWidthLabel" class="text-cyber-yellow">14%</span>
               </div>
-              <input type="range" id="syncWidthRange" min="2" max="60" value="18">
+              <input type="range" id="syncWidthRange" min="2" max="60" value="14">
             </div>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[9px] text-slate-400">
                 <span>Roll Speed</span>
-                <span id="syncSpeedLabel" class="text-cyber-yellow">2.4x</span>
+                <span id="syncSpeedLabel" class="text-cyber-yellow">2.0x</span>
               </div>
-              <input type="range" id="syncSpeedRange" min="-100" max="100" value="24">
+              <input type="range" id="syncSpeedRange" min="-100" max="100" value="20">
             </div>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[9px] text-slate-400">
-                <span>Noise Hash</span>
-                <span id="syncNoiseLabel" class="text-cyber-yellow">65%</span>
+                <span>Chroma Inv</span>
+                <span id="syncNoiseLabel" class="text-cyber-yellow">35%</span>
               </div>
-              <input type="range" id="syncNoiseRange" min="0" max="100" value="65">
+              <input type="range" id="syncNoiseRange" min="0" max="100" value="35">
             </div>
           </div>
-          <div class="space-y-0.5">
-            <div class="flex justify-between text-[9px] text-slate-400">
-              <span>Edge Tear / Loss of Sync Jitter</span>
-              <span id="syncTearLabel" class="text-cyber-yellow">45%</span>
+        </div>
+
+        <!-- 2. Cable Wave & Tear Engine -->
+        <div class="space-y-1.5 pt-1.5 border-t border-cyber-border/60">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-cyber-cyan uppercase tracking-wider flex items-center gap-1">
+              <span>📻</span> CABLE WAVE &amp; TEAR
+            </span>
+            <label class="flex items-center space-x-1 text-[10px] text-slate-300">
+              <input type="checkbox" id="cableTearActiveCheck" class="accent-cyber-cyan">
+              <span>Enable</span>
+            </label>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] text-slate-400">
+                <span>Comb Tear</span>
+                <span id="cableTearLabel" class="text-cyber-cyan">45%</span>
+              </div>
+              <input type="range" id="cableTearRange" min="0" max="100" value="45">
             </div>
-            <input type="range" id="syncTearRange" min="0" max="100" value="45">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] text-slate-400">
+                <span>Division Pos</span>
+                <span id="cablePosLabel" class="text-cyber-yellow">50%</span>
+              </div>
+              <input type="range" id="cablePosRange" min="0" max="100" value="50">
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] text-slate-400">
+                <span>RF Ghost Echo</span>
+                <span id="cableGhostLabel" class="text-cyber-pink">40%</span>
+              </div>
+              <input type="range" id="cableGhostRange" min="0" max="100" value="40">
+            </div>
           </div>
         </div>
       </div>
@@ -2264,6 +2325,8 @@ RAW SIGNAL</textarea>
         gamma: 1.0,          // Gamma midtone lift (0.5 to 2.5, default 1.0)
         edgeDetect: 0,       // Sobel / gradient edge detection (0 to 100%)
         depthThreshold: 0,   // Luma depth mask / threshold cutout (0 to 95%)
+        depthInvert: false,  // Invert depth mask (lights vs shadows, near vs far)
+        depthAsciiScale: 75, // 3D ASCII glyph size reactivity to depth (0 to 100%)
         scale: 1.0,          // Zoom / scale (0.3 to 3.5, default 1.0)
         rotation: 0,         // Rotation angle in degrees (-180 to +180, default 0)
         panX: 0,             // Pan X offset (-400 to +400, default 0)
@@ -2277,7 +2340,8 @@ RAW SIGNAL</textarea>
       sort: {
         active: true,
         direction: 'vertical', // 'vertical', 'horizontal', 'diagonal'
-        criterion: 'brightness',
+        criterion: 'lights',   // 'lights', 'shadows', 'depth', 'red', 'green', 'blue', 'brightness', 'saturation'
+        invertMask: false,     // Invert sort selection mask
         thresholdLow: 20,
         thresholdHigh: 100,
         maxLength: 55,         // 15 - 600px (Subtle default so text & media stay clean and readable)
@@ -2318,12 +2382,13 @@ RAW SIGNAL</textarea>
         // P-Frame Codec Vector Engine (Reference Style)
         vectorMoshActive: false,
         pframeMode: 'melt', // 'melt' | 'shear' | 'decay'
-        blockSize: 16,
+        blockSize: 16,      // Unified block size across all mosh systems
         vectorForce: 28,
         persistence: 65,
         chromaBleed: 12,
         freezeIFrame: false,
         videoCoupling: 60,
+        depthReactive: true, // 3D depth-weighted mosh displacement
         touchVx: 0,
         touchVy: 0,
         touchX: 360,
@@ -2343,16 +2408,23 @@ RAW SIGNAL</textarea>
         bgColor1: '#04020a',
         bgColor2: '#ff0055',
         bgAccent: '#00ffcc',
-        // Sync Suppression & Roll
+        // 1. Sync Suppression (Diagonal Raster Skew, Rolling Blanking, Chroma Inversion)
         sync: {
           active: false,
           direction: 'horizontal', // 'horizontal' | 'vertical' | 'diagonal'
-          width: 18,               // 2 - 60%
-          speed: 24,               // -100 to +100 (faster roll default)
-          pos: 0.35,               // 0.0 - 1.0
+          width: 14,               // S-Wave amplitude (2 - 60%)
+          speed: 20,               // Roll speed (-100 to +100)
+          pos: 0.35,               // Rolling position
           color: '#000000',        // bar color
-          noise: 65,               // 0 - 100%
-          tear: 45                 // 0 - 100%
+          noise: 35                // Chroma inversion level (0 - 100%)
+        },
+        // 2. Cable Wave & Tear (Line-Lock Comb Tear, Screen Division Seam, RF Multipath Ghost Echo)
+        cableTear: {
+          active: false,
+          direction: 'horizontal', // 'horizontal' | 'vertical'
+          tear: 45,                // Comb Tear line-lock jitter (0 - 100%)
+          pos: 0.50,               // Division split position (0.0 - 1.0)
+          ghost: 40                // RF Multipath Cable Ghost Reflection (0 - 100%)
         }
       },
 
@@ -2428,6 +2500,67 @@ RAW SIGNAL</textarea>
     const photoSourceCanvas = document.createElement('canvas');
     photoSourceCanvas.width = WIDTH; photoSourceCanvas.height = HEIGHT;
     const photoSourceCtx = photoSourceCanvas.getContext('2d', { willReadFrequently: true });
+
+    // Global 3D Depth Map Buffer (0.0 to 1.0 normalized depth for every pixel across all passes)
+    const depthBuffer = new Float32Array(WIDTH * HEIGHT);
+
+    function updateDepthBuffer() {
+      if (state.photo.active && state.photo.loaded) {
+        const srcImgData = photoSourceCtx.getImageData(0, 0, WIDTH, HEIGHT);
+        const srcData = srcImgData.data;
+        const w = WIDTH;
+        const h = HEIGHT;
+        const depthInvert = !!state.photo.depthInvert;
+        const edgeAmt = (state.photo.edgeDetect || 0) / 100;
+        const gamma = state.photo.gamma || 1.0;
+        const invGamma = gamma !== 1.0 ? (1.0 / gamma) : 1.0;
+
+        for (let y = 0; y < h; y++) {
+          const rowOff = y * w * 4;
+          const nextRowOff = (y < h - 1 ? (y + 1) : y) * w * 4;
+          const bufRow = y * w;
+          for (let x = 0; x < w; x++) {
+            const idx = rowOff + (x << 2);
+            const a = srcData[idx + 3];
+            if (a < 8) {
+              depthBuffer[bufRow + x] = depthInvert ? 1.0 : 0.0;
+              continue;
+            }
+
+            let r = srcData[idx];
+            let g = srcData[idx + 1];
+            let b = srcData[idx + 2];
+
+            let edgeNorm = 0;
+            if (edgeAmt > 0) {
+              const rIdx = rowOff + ((x < w - 1 ? x + 1 : x) << 2);
+              const dIdx = nextRowOff + (x << 2);
+              const gx = Math.abs(r - srcData[rIdx]) + Math.abs(g - srcData[rIdx + 1]) + Math.abs(b - srcData[rIdx + 2]);
+              const gy = Math.abs(r - srcData[dIdx]) + Math.abs(g - srcData[dIdx + 1]) + Math.abs(b - srcData[dIdx + 2]);
+              edgeNorm = Math.min(1.0, ((gx + gy) / 380) * (0.65 + edgeAmt * 1.85));
+            }
+
+            if (invGamma !== 1.0) {
+              r = Math.pow(r / 255, invGamma) * 255;
+              g = Math.pow(g / 255, invGamma) * 255;
+              b = Math.pow(b / 255, invGamma) * 255;
+            }
+
+            const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            let d = Math.min(1.0, lum + edgeNorm * 0.55);
+            if (depthInvert) d = 1.0 - d;
+            depthBuffer[bufRow + x] = d;
+          }
+        }
+      } else {
+        const tData = textCtx.getImageData(0, 0, WIDTH, HEIGHT).data;
+        const depthInvert = !!state.photo.depthInvert;
+        for (let i = 0; i < WIDTH * HEIGHT; i++) {
+          const alpha = tData[(i << 2) + 3] / 255;
+          depthBuffer[i] = depthInvert ? (1.0 - alpha) : alpha;
+        }
+      }
+    }
 
 
     // ASCII Character Ramps
@@ -3000,7 +3133,8 @@ RAW SIGNAL</textarea>
 
             const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
             // Effective depth combines luminance and detected edges so strong edges survive depth masking
-            const depthVal = Math.min(1.0, lum + edgeNorm * 0.55);
+            let depthVal = Math.min(1.0, lum + edgeNorm * 0.55);
+            if (pState.depthInvert) depthVal = 1.0 - depthVal;
 
             // 1. Apply Luma Depth Mask Threshold (keys out background below threshold)
             let outAlpha = a;
@@ -3045,16 +3179,17 @@ RAW SIGNAL</textarea>
         }
       }
 
-      // ASCII generation
+      // ASCII generation with 3D Depth-Responsive Dynamic Glyph Scaling
       const cSize = Math.max(6, Math.min(32, pState.cellSize || 12));
       const cols = Math.floor(WIDTH / cSize);
       const rows = Math.floor(HEIGHT / cSize);
+      const depthAsciiScale = (pState.depthAsciiScale !== undefined ? pState.depthAsciiScale : 75) / 100;
+      const depthInvert = !!pState.depthInvert;
 
       const ramp = CHAR_RAMPS[pState.charSet] || CHAR_RAMPS.blocks;
       const rampLen = ramp.length;
       const contrast = pState.contrast || 1.2;
 
-      pCtx.font = `900 ${Math.floor(cSize * 1.15)}px 'Space Mono', monospace`;
       pCtx.textAlign = 'center';
       pCtx.textBaseline = 'middle';
 
@@ -3084,6 +3219,22 @@ RAW SIGNAL</textarea>
             lum = Math.pow(Math.max(0, Math.min(1, lum)), 1 / gamma);
           }
           lum = Math.min(1, Math.max(0, lum));
+
+          // Sample 3D depth value for dynamic character scaling
+          let dVal = (depthBuffer && depthBuffer.length) ? depthBuffer[py * WIDTH + px] : lum;
+          if (depthInvert) dVal = 1.0 - dVal;
+
+          let charSize;
+          if (depthAsciiScale > 0) {
+            // Dynamic scale: 0.48x (far/deep) up to 1.50x (near/foreground)
+            const scaleFac = 0.48 + dVal * 1.02;
+            const effScale = 1.0 + (scaleFac - 1.0) * depthAsciiScale;
+            charSize = Math.max(5, Math.round(cSize * effScale * 1.15));
+          } else {
+            charSize = Math.max(6, Math.floor(cSize * 1.15));
+          }
+
+          pCtx.font = `900 ${charSize}px 'Space Mono', monospace`;
 
           const charIdx = Math.floor(lum * (rampLen - 1));
           const char = ramp[charIdx];
@@ -3991,26 +4142,19 @@ RAW SIGNAL</textarea>
       const img = targetCtx.getImageData(0, 0, WIDTH, HEIGHT);
       const data32 = new Uint32Array(img.data.buffer);
 
-      // Read Foreground Content Masks (Text + Media) so Pixel Sorting NEVER floats in empty background space!
-      const hasTextMask = state.type.active !== false && state.type.text && state.type.text.trim().length > 0 && (!state.photo.active || state.photo.blend !== 'photoOnly');
-      const hasMediaMask = state.photo.active && state.photo.loaded;
-      const textData32 = hasTextMask ? new Uint32Array(textCtx.getImageData(0, 0, WIDTH, HEIGHT).data.buffer) : null;
-      const photoData32 = hasMediaMask ? new Uint32Array(photoCtx.getImageData(0, 0, WIDTH, HEIGHT).data.buffer) : null;
+      const criterion = opt.criterion || 'lights'; // 'lights', 'shadows', 'depth', 'red', 'green', 'blue', 'brightness', 'saturation'
+      const invertMask = !!opt.invertMask;
+      const low = Math.max(0.01, (opt.thresholdLow !== undefined ? opt.thresholdLow : 20) / 100);
+      const high = Math.min(1.0, (opt.thresholdHigh !== undefined ? opt.thresholdHigh : 100) / 100);
 
-      const low = Math.max(0.04, (opt.thresholdLow || 0) / 100);
-      const rawHigh = (opt.thresholdHigh !== undefined ? opt.thresholdHigh : 100) / 100;
-      const high = rawHigh >= 0.88 ? 1.01 : Math.max(low + 0.05, rawHigh);
-
-      // Subtle contour-hugging default length (55px) so text & media stay readable and organic
       const maxSpan = Math.min(Math.max(15, opt.maxLength !== undefined ? opt.maxLength : 55), sortMaxLen);
       const lineThick = Math.max(1, Math.min(16, Math.round(opt.thickness !== undefined ? opt.thickness : 2)));
       const spreadPct = Math.max(0.05, Math.min(1.0, (opt.spread !== undefined ? opt.spread : 28) / 100));
       const flowSpeed = opt.speed !== undefined ? opt.speed : 0.7;
       const sortOpacity = Math.max(0.15, Math.min(1.0, (opt.opacity !== undefined ? opt.opacity : 92) / 100));
-      const baseMaxAlpha = Math.round(235 * sortOpacity);
+      const baseMaxAlpha = Math.round(255 * sortOpacity);
       const rgbShiftNorm = Math.max(0, Math.min(1.0, (opt.rgbShift || 0) / 100));
 
-      // Jam Finger Distortion Mask linkage (when Jam style is sortDrip or hybridVortex)
       const jamBurst = state.interaction.jamSortBurst || 0;
       const jamActive = jamBurst > 0.02 && (state.interaction.jamStyle === 'sortDrip' || state.interaction.jamStyle === 'hybridVortex');
       const jamX = state.mosh.touchX !== undefined ? state.mosh.touchX : (WIDTH / 2);
@@ -4018,321 +4162,301 @@ RAW SIGNAL</textarea>
       const jamRad = Math.max(60, Math.min(500, state.interaction.jamRadius || 220));
       const jamRadSq = jamRad * jamRad;
 
-      // Advance streak animation phase according to Flow Speed
       opt.phase = (opt.phase || 0) + flowSpeed * 0.04;
       const phase = opt.phase;
 
-      const getMetric = (pixel) => {
-        const r = pixel & 0xff;
-        const g = (pixel >> 8) & 0xff;
-        const b = (pixel >> 16) & 0xff;
+      function getMetric(p, idx) {
+        const r = p & 0xff;
+        const g = (p >> 8) & 0xff;
+        const b = (p >> 16) & 0xff;
 
-        if (opt.criterion === 'brightness') return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        if (opt.criterion === 'red') return r / 255;
-        if (opt.criterion === 'blue') return b / 255;
-        if (opt.criterion === 'saturation') {
+        if (criterion === 'lights') {
+          return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        } else if (criterion === 'shadows') {
+          return 1.0 - (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        } else if (criterion === 'depth') {
+          return (depthBuffer && depthBuffer.length) ? depthBuffer[idx] : ((0.299 * r + 0.587 * g + 0.114 * b) / 255);
+        } else if (criterion === 'red') {
+          return r / 255;
+        } else if (criterion === 'green') {
+          return g / 255;
+        } else if (criterion === 'blue') {
+          return b / 255;
+        } else if (criterion === 'saturation') {
           const max = Math.max(r, g, b), min = Math.min(r, g, b);
           return max === 0 ? 0 : (max - min) / max;
         }
-        return (r + g + b) / (255 * 3);
-      };
+        return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      }
 
-      // Helper: checks if pixel index belongs to actual Foreground Content (Text glyph or Media mask)
-      const isForegroundContour = (idx, metricVal) => {
-        if (textData32) {
-          const tAlpha = (textData32[idx] >>> 24) & 0xff;
-          if (tAlpha > 32) return true;
-        }
-        if (photoData32) {
-          const pAlpha = (photoData32[idx] >>> 24) & 0xff;
-          if (pAlpha > 36 && metricVal >= low && metricVal <= high) return true;
-        }
-        return false;
-      };
+      function isQualifying(val, p) {
+        const a = (p >>> 24) & 0xff;
+        if (a < 18) return false;
 
-      // Direction is strictly determined ONLY by the Pixel Sorting mode (never overridden by Jam mode)
+        let ok = false;
+        if (criterion === 'lights') {
+          ok = (val >= low && val <= high);
+        } else if (criterion === 'shadows') {
+          ok = (val >= (1.0 - high) && val <= (1.0 - low * 0.2));
+        } else if (criterion === 'depth') {
+          ok = (val >= low && val <= high);
+        } else {
+          ok = (val >= low && val <= high);
+        }
+
+        return invertMask ? !ok : ok;
+      }
+
       const isVertical = opt.direction === 'vertical';
+      const isHorizontal = opt.direction === 'horizontal';
 
       if (isVertical) {
-        // Compute soft, organic contour-following wave envelope across columns
-        for (let x = 0; x < WIDTH; x++) {
+        for (let x = 0; x < WIDTH; x += lineThick) {
           const bandIdx = (x / lineThick) | 0;
-          const rawH1 = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
-          const hash1 = rawH1 - Math.floor(rawH1);
-          const rawH2 = Math.sin(bandIdx * 269.5 + 183.3) * 28461.7123;
-          const hash2 = rawH2 - Math.floor(rawH2);
+          const rawH = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
+          const hash = rawH - Math.floor(rawH);
+          const contourWave = Math.sin(x * 0.045 + phase * 0.8) * 0.5 + 0.5;
+          const gate = hash * 0.65 + contourWave * 0.35;
 
-          // Smooth organic contour wave + band modulation so adjacent drips flow together gracefully
-          const contourWave = Math.sin(x * 0.045 + phase * 0.7) * 0.5 + 0.5;
-          const patMod = Math.sin(bandIdx * 0.55 - phase * 0.45) * 0.5 + 0.5;
-          const gateVal = hash1 * 0.58 + patMod * 0.22 + contourWave * 0.20;
-
-          if (!jamMaskOnly && gateVal <= spreadPct) {
-            const animPulse = 0.65 + 0.35 * Math.sin(bandIdx * 2.4 + phase * 1.25);
-            const softEdge = Math.min(1.0, Math.max(0.2, (spreadPct - gateVal) / Math.max(0.08, spreadPct * 0.45)));
-            sortDripFactors[x] = (0.28 + 0.72 * hash2) * animPulse * softEdge;
-          } else {
-            sortDripFactors[x] = 0;
-          }
-        }
-
-        for (let x = 0; x < WIDTH; x++) {
-          let colDripFactor = sortDripFactors[x];
           const dxJam = x - jamX;
-          const colInJamX = jamActive && (dxJam * dxJam < jamRadSq);
+          const inJamCol = jamActive && (dxJam * dxJam < jamRadSq);
 
-          if (colDripFactor <= 0.01 && !colInJamX) continue;
-
-          const bandIdx = (x / lineThick) | 0;
-          const lineFlowOffset = Math.sin(bandIdx * 1.85 - phase * 1.4) * 0.11;
+          if (!jamMaskOnly && gate > spreadPct && !inJamCol) continue;
 
           let y = 0;
           while (y < HEIGHT) {
             const idx = y * WIDTH + x;
             const p = data32[idx];
-            const val = getMetric(p);
+            const m = getMetric(p, idx);
 
-            // Check Jam finger mask weight at (x, y)
-            let localJamWeight = 0;
-            if (colInJamX) {
+            let jamWeight = 0;
+            if (inJamCol) {
               const dyJam = y - jamY;
               const distSq = dxJam * dxJam + dyJam * dyJam;
               if (distSq < jamRadSq) {
-                const distNorm = Math.sqrt(distSq) / jamRad;
-                localJamWeight = Math.pow(1.0 - distNorm, 1.35) * jamBurst;
+                jamWeight = (1.0 - Math.sqrt(distSq) / jamRad) * jamBurst;
               }
             }
 
-            const effectiveFactor = Math.max(colDripFactor, localJamWeight * 1.65);
-            if (effectiveFactor <= 0.015) {
-              y++;
-              continue;
-            }
-
-            // Strictly require Foreground Contour (Text glyph or Media mask) or active Jam finger touch
-            if (isForegroundContour(idx, val) || (localJamWeight > 0.15 && val >= low * 0.6)) {
+            if (isQualifying(m, p) || jamWeight > 0.15) {
               const startY = y;
-              let gLen = 0;
-              let gapCount = 0;
-              let glyphEndY = startY;
-              const maxGlyphScan = Math.min(HEIGHT, startY + 200);
+              let endY = startY;
 
-              while (y < maxGlyphScan) {
-                const curIdx = y * WIDTH + x;
+              while (endY < HEIGHT && (endY - startY) < maxSpan) {
+                const curIdx = endY * WIDTH + x;
                 const curP = data32[curIdx];
-                const curVal = getMetric(curP);
-                if (isForegroundContour(curIdx, curVal) || (localJamWeight > 0.25 && curVal >= low * 0.6 && y - startY < 75)) {
-                  gapCount = 0;
-                  glyphEndY = y;
-                  if (gLen < 120) {
-                    sortVals[gLen] = curVal;
-                    sortPixels[gLen] = curP;
-                    sortIndices[gLen] = gLen;
-                    gLen++;
-                  }
+                const curM = getMetric(curP, curIdx);
+                if (isQualifying(curM, curP) || jamWeight > 0.15) {
+                  endY++;
                 } else {
-                  gapCount++;
-                  // Capture 3px of soft contour glow at trailing edge of the letter/mask
-                  if (gapCount <= 3 && gLen < 124) {
-                    sortVals[gLen] = curVal;
-                    sortPixels[gLen] = curP;
-                    sortIndices[gLen] = gLen;
-                    gLen++;
-                  }
-                  if (gapCount > 4) break;
+                  break;
                 }
-                y++;
               }
 
-              if (gLen > 2) {
-                const sub = sortIndices.subarray(0, gLen);
+              const segLen = endY - startY;
+              if (segLen >= 3) {
+                for (let k = 0; k < segLen; k++) {
+                  const py = startY + k;
+                  const curIdx = py * WIDTH + x;
+                  const pixel = data32[curIdx];
+                  sortVals[k] = getMetric(pixel, curIdx);
+                  sortPixels[k] = pixel;
+                  sortIndices[k] = k;
+                }
+
+                const sub = sortIndices.subarray(0, segLen);
                 sub.sort((a, b) => sortVals[a] - sortVals[b]);
 
-                const spanBoost = localJamWeight > 0.05 ? (maxSpan + jamRad * 0.72 * localJamWeight) : maxSpan;
-                const dripTailLimit = Math.max(6, Math.min(480, (spanBoost * effectiveFactor) | 0));
+                for (let k = 0; k < segLen; k++) {
+                  const py = startY + k;
+                  const sIdx = sub[k];
+                  let sortedP = sortPixels[sIdx];
 
-                const glyphH = Math.max(1, glyphEndY - startY);
-                // Anchor streak smoothly inside the lower 30% contour of the glyph/mask
-                const borderAnchor = Math.min(12, Math.max(3, (glyphH * 0.30) | 0));
-                const streakStartY = Math.max(startY, glyphEndY - borderAnchor);
-                const shaftEndY = Math.min(HEIGHT - 1, glyphEndY + dripTailLimit);
-                const shaftSpan = Math.max(1, shaftEndY - streakStartY);
-                const lastIdx = gLen - 1;
-                let prevSorted = sortPixels[sub[lastIdx]];
-
-                for (let dy = streakStartY; dy <= shaftEndY; dy++) {
-                  const destIdx = dy * WIDTH + x;
-                  const destP = data32[destIdx];
-
-                  const prog = (dy - streakStartY) / shaftSpan; // 0.0 at contour -> 1.0 at drip tip
-                  let sampleT = (1.0 - prog * 0.85) + lineFlowOffset * prog;
-                  if (sampleT > 0.999) sampleT = 0.999;
-                  else if (sampleT < 0.0) sampleT = 0.0;
-
-                  const palIdx = sub[(sampleT * lastIdx) | 0];
-                  let rawSorted = sortPixels[palIdx];
                   if (rgbShiftNorm > 0.02) {
-                    const tR = Math.min(0.999, Math.max(0.0, sampleT - rgbShiftNorm * 0.24));
-                    const tB = Math.min(0.999, Math.max(0.0, sampleT + rgbShiftNorm * 0.24));
-                    const pR = sortPixels[sub[(tR * lastIdx) | 0]];
-                    const pB = sortPixels[sub[(tB * lastIdx) | 0]];
-                    rawSorted = (pR & 0xff) | (rawSorted & 0xff00) | (pB & 0xff0000) | 0xff000000;
+                    const tR = Math.min(segLen - 1, Math.max(0, k - Math.round(rgbShiftNorm * 4)));
+                    const tB = Math.min(segLen - 1, Math.max(0, k + Math.round(rgbShiftNorm * 4)));
+                    const pR = sortPixels[sub[tR]];
+                    const pB = sortPixels[sub[tB]];
+                    sortedP = (pR & 0xff) | (sortedP & 0xff00) | (pB & 0xff0000) | 0xff000000;
                   }
-                  // Soft silk low-pass filter along the drip so color transitions are never harsh or jagged
-                  const silkyPixel = blendPixel32(rawSorted, prevSorted, 175);
-                  prevSorted = silkyPixel;
 
-                  // Smooth organic root emergence + quadratic tail feathering scaled by sortOpacity
-                  let alpha256 = baseMaxAlpha;
-                  if (prog < 0.16) {
-                    alpha256 = ((prog / 0.16) * baseMaxAlpha) | 0;
-                  } else if (prog > 0.55) {
-                    const tailT = (1.0 - prog) / 0.45;
-                    alpha256 = (tailT * tailT * baseMaxAlpha) | 0;
+                  const prog = k / (segLen - 1 || 1);
+                  let edgeAlpha = 1.0;
+                  if (prog < 0.12) edgeAlpha = prog / 0.12;
+                  else if (prog > 0.88) edgeAlpha = (1.0 - prog) / 0.12;
+                  const alpha = Math.round(baseMaxAlpha * edgeAlpha);
+
+                  for (let lt = 0; lt < lineThick; lt++) {
+                    const wx = x + lt;
+                    if (wx >= WIDTH) break;
+                    const destIdx = py * WIDTH + wx;
+                    data32[destIdx] = blendPixel32(sortedP, data32[destIdx], alpha);
                   }
-                  data32[destIdx] = blendPixel32(silkyPixel, destP, alpha256);
                 }
 
-                y = Math.max(y, shaftEndY + 1);
+                y = endY;
+              } else {
+                y++;
               }
             } else {
               y++;
             }
           }
         }
-      } else {
-        // Horizontal Tear / Diagonal Slant with soft organic contour-following streaks
-        const isDiag = opt.direction === 'diagonal';
-        for (let y = 0; y < HEIGHT; y++) {
+      } else if (isHorizontal) {
+        for (let y = 0; y < HEIGHT; y += lineThick) {
           const bandIdx = (y / lineThick) | 0;
-          const rawH1 = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
-          const hash1 = rawH1 - Math.floor(rawH1);
-          const rawH2 = Math.sin(bandIdx * 269.5 + 183.3) * 28461.7123;
-          const hash2 = rawH2 - Math.floor(rawH2);
-
-          const contourWave = Math.sin(y * 0.045 + phase * 0.7) * 0.5 + 0.5;
-          const patMod = Math.sin(bandIdx * 0.55 - phase * 0.45) * 0.5 + 0.5;
-          const gateVal = hash1 * 0.58 + patMod * 0.22 + contourWave * 0.20;
+          const rawH = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
+          const hash = rawH - Math.floor(rawH);
+          const contourWave = Math.sin(y * 0.045 + phase * 0.8) * 0.5 + 0.5;
+          const gate = hash * 0.65 + contourWave * 0.35;
 
           const dyJam = y - jamY;
-          const rowInJamY = jamActive && (dyJam * dyJam < jamRadSq);
-          if ((jamMaskOnly || gateVal > spreadPct) && !rowInJamY) continue;
+          const inJamRow = jamActive && (dyJam * dyJam < jamRadSq);
 
-          const animPulse = 0.65 + 0.35 * Math.sin(bandIdx * 2.4 + phase * 1.25);
-          const softEdge = (!jamMaskOnly && gateVal <= spreadPct)
-            ? Math.min(1.0, Math.max(0.2, (spreadPct - gateVal) / Math.max(0.08, spreadPct * 0.45)))
-            : 0;
-          const rowDripFactor = (0.28 + 0.72 * hash2) * animPulse * softEdge;
-          const lineFlowOffset = Math.sin(bandIdx * 1.85 - phase * 1.4) * 0.11;
+          if (!jamMaskOnly && gate > spreadPct && !inJamRow) continue;
 
           let x = 0;
           while (x < WIDTH) {
-            const px = isDiag ? (x + y) % WIDTH : x;
-            const idx = y * WIDTH + px;
+            const idx = y * WIDTH + x;
             const p = data32[idx];
-            const val = getMetric(p);
+            const m = getMetric(p, idx);
 
-            let localJamWeight = 0;
-            if (rowInJamY) {
-              const dxJam = px - jamX;
+            let jamWeight = 0;
+            if (inJamRow) {
+              const dxJam = x - jamX;
               const distSq = dxJam * dxJam + dyJam * dyJam;
               if (distSq < jamRadSq) {
-                const distNorm = Math.sqrt(distSq) / jamRad;
-                localJamWeight = Math.pow(1.0 - distNorm, 1.35) * jamBurst;
+                jamWeight = (1.0 - Math.sqrt(distSq) / jamRad) * jamBurst;
               }
             }
 
-            const effectiveFactor = Math.max(rowDripFactor, localJamWeight * 1.65);
-            if (effectiveFactor <= 0.015) {
-              x++;
-              continue;
-            }
-
-            if (isForegroundContour(idx, val) || (localJamWeight > 0.15 && val >= low * 0.6)) {
+            if (isQualifying(m, p) || jamWeight > 0.15) {
               const startX = x;
-              let gLen = 0;
-              let gapCount = 0;
-              let glyphEndX = startX;
-              const maxGlyphScan = Math.min(WIDTH, startX + 200);
+              let endX = startX;
 
-              while (x < maxGlyphScan) {
-                const curPx = isDiag ? (x + y) % WIDTH : x;
-                const curIdx = y * WIDTH + curPx;
+              while (endX < WIDTH && (endX - startX) < maxSpan) {
+                const curIdx = y * WIDTH + endX;
                 const curP = data32[curIdx];
-                const curVal = getMetric(curP);
-                if (isForegroundContour(curIdx, curVal) || (localJamWeight > 0.25 && curVal >= low * 0.6 && x - startX < 75)) {
-                  gapCount = 0;
-                  glyphEndX = x;
-                  if (gLen < 120) {
-                    sortVals[gLen] = curVal;
-                    sortPixels[gLen] = curP;
-                    sortIndices[gLen] = gLen;
-                    gLen++;
-                  }
+                const curM = getMetric(curP, curIdx);
+                if (isQualifying(curM, curP) || jamWeight > 0.15) {
+                  endX++;
                 } else {
-                  gapCount++;
-                  if (gapCount <= 3 && gLen < 124) {
-                    sortVals[gLen] = curVal;
-                    sortPixels[gLen] = curP;
-                    sortIndices[gLen] = gLen;
-                    gLen++;
-                  }
-                  if (gapCount > 4) break;
+                  break;
                 }
-                x++;
               }
 
-              if (gLen > 2) {
-                const sub = sortIndices.subarray(0, gLen);
+              const segLen = endX - startX;
+              if (segLen >= 3) {
+                for (let k = 0; k < segLen; k++) {
+                  const px = startX + k;
+                  const curIdx = y * WIDTH + px;
+                  const pixel = data32[curIdx];
+                  sortVals[k] = getMetric(pixel, curIdx);
+                  sortPixels[k] = pixel;
+                  sortIndices[k] = k;
+                }
+
+                const sub = sortIndices.subarray(0, segLen);
                 sub.sort((a, b) => sortVals[a] - sortVals[b]);
 
-                const spanBoost = localJamWeight > 0.05 ? (maxSpan + jamRad * 0.72 * localJamWeight) : maxSpan;
-                const dripTailLimit = Math.max(6, Math.min(480, (spanBoost * effectiveFactor) | 0));
+                for (let k = 0; k < segLen; k++) {
+                  const px = startX + k;
+                  const sIdx = sub[k];
+                  let sortedP = sortPixels[sIdx];
 
-                const glyphW = Math.max(1, glyphEndX - startX);
-                const borderAnchor = Math.min(12, Math.max(3, (glyphW * 0.30) | 0));
-                const streakStartX = Math.max(startX, glyphEndX - borderAnchor);
-                const shaftEndX = Math.min(WIDTH - 1, glyphEndX + dripTailLimit);
-                const shaftSpan = Math.max(1, shaftEndX - streakStartX);
-                const lastIdx = gLen - 1;
-                let prevSorted = sortPixels[sub[lastIdx]];
-
-                for (let dx = streakStartX; dx <= shaftEndX; dx++) {
-                  const writeX = isDiag ? (dx + y) % WIDTH : dx;
-                  const destIdx = y * WIDTH + writeX;
-                  const destP = data32[destIdx];
-
-                  const prog = (dx - streakStartX) / shaftSpan;
-                  let sampleT = (1.0 - prog * 0.85) + lineFlowOffset * prog;
-                  if (sampleT > 0.999) sampleT = 0.999;
-                  else if (sampleT < 0.0) sampleT = 0.0;
-
-                  const palIdx = sub[(sampleT * lastIdx) | 0];
-                  let rawSorted = sortPixels[palIdx];
                   if (rgbShiftNorm > 0.02) {
-                    const tR = Math.min(0.999, Math.max(0.0, sampleT - rgbShiftNorm * 0.24));
-                    const tB = Math.min(0.999, Math.max(0.0, sampleT + rgbShiftNorm * 0.24));
-                    const pR = sortPixels[sub[(tR * lastIdx) | 0]];
-                    const pB = sortPixels[sub[(tB * lastIdx) | 0]];
-                    rawSorted = (pR & 0xff) | (rawSorted & 0xff00) | (pB & 0xff0000) | 0xff000000;
+                    const tR = Math.min(segLen - 1, Math.max(0, k - Math.round(rgbShiftNorm * 4)));
+                    const tB = Math.min(segLen - 1, Math.max(0, k + Math.round(rgbShiftNorm * 4)));
+                    const pR = sortPixels[sub[tR]];
+                    const pB = sortPixels[sub[tB]];
+                    sortedP = (pR & 0xff) | (sortedP & 0xff00) | (pB & 0xff0000) | 0xff000000;
                   }
-                  const silkyPixel = blendPixel32(rawSorted, prevSorted, 175);
-                  prevSorted = silkyPixel;
 
-                  let alpha256 = baseMaxAlpha;
-                  if (prog < 0.16) {
-                    alpha256 = ((prog / 0.16) * baseMaxAlpha) | 0;
-                  } else if (prog > 0.55) {
-                    const tailT = (1.0 - prog) / 0.45;
-                    alpha256 = (tailT * tailT * baseMaxAlpha) | 0;
+                  const prog = k / (segLen - 1 || 1);
+                  let edgeAlpha = 1.0;
+                  if (prog < 0.12) edgeAlpha = prog / 0.12;
+                  else if (prog > 0.88) edgeAlpha = (1.0 - prog) / 0.12;
+                  const alpha = Math.round(baseMaxAlpha * edgeAlpha);
+
+                  for (let lt = 0; lt < lineThick; lt++) {
+                    const wy = y + lt;
+                    if (wy >= HEIGHT) break;
+                    const destIdx = wy * WIDTH + px;
+                    data32[destIdx] = blendPixel32(sortedP, data32[destIdx], alpha);
                   }
-                  data32[destIdx] = blendPixel32(silkyPixel, destP, alpha256);
                 }
 
-                x = Math.max(x, shaftEndX + 1);
+                x = endX;
+              } else {
+                x++;
               }
             } else {
               x++;
+            }
+          }
+        }
+      } else {
+        // Diagonal Slant
+        for (let d = -HEIGHT; d < WIDTH; d += lineThick) {
+          const bandIdx = (Math.abs(d) / lineThick) | 0;
+          const rawH = Math.sin(bandIdx * 127.1 + 311.7) * 43758.5453;
+          const hash = rawH - Math.floor(rawH);
+          const gate = hash * 0.70 + (Math.sin(d * 0.035 + phase * 0.8) * 0.5 + 0.5) * 0.30;
+          if (!jamMaskOnly && gate > spreadPct) continue;
+
+          let step = 0;
+          while (step < HEIGHT) {
+            const y = step;
+            const x = d + y;
+            if (x < 0 || x >= WIDTH) { step++; continue; }
+
+            const idx = y * WIDTH + x;
+            const p = data32[idx];
+            const m = getMetric(p, idx);
+
+            if (isQualifying(m, p)) {
+              const startStep = step;
+              let endStep = startStep;
+              while (endStep < HEIGHT && (endStep - startStep) < maxSpan) {
+                const cy = endStep;
+                const cx = d + cy;
+                if (cx < 0 || cx >= WIDTH) break;
+                const cIdx = cy * WIDTH + cx;
+                if (isQualifying(getMetric(data32[cIdx], cIdx), data32[cIdx])) {
+                  endStep++;
+                } else {
+                  break;
+                }
+              }
+
+              const segLen = endStep - startStep;
+              if (segLen >= 3) {
+                for (let k = 0; k < segLen; k++) {
+                  const cy = startStep + k;
+                  const cx = d + cy;
+                  const cIdx = cy * WIDTH + cx;
+                  sortVals[k] = getMetric(data32[cIdx], cIdx);
+                  sortPixels[k] = data32[cIdx];
+                  sortIndices[k] = k;
+                }
+
+                const sub = sortIndices.subarray(0, segLen);
+                sub.sort((a, b) => sortVals[a] - sortVals[b]);
+
+                for (let k = 0; k < segLen; k++) {
+                  const cy = startStep + k;
+                  const cx = d + cy;
+                  const cIdx = cy * WIDTH + cx;
+                  const sortedP = sortPixels[sub[k]];
+                  data32[cIdx] = blendPixel32(sortedP, data32[cIdx], baseMaxAlpha);
+                }
+                step = endStep;
+              } else {
+                step++;
+              }
+            } else {
+              step++;
             }
           }
         }
@@ -4457,6 +4581,7 @@ RAW SIGNAL</textarea>
       const isDark = trigger === 'dark';
       const isContrast = trigger === 'contrast';
       const isGlobal = trigger === 'global';
+      const isDepth = trigger === 'depth';
 
       const lowBound = Math.max(0, thresh - feather);
       const highBound = thresh;
@@ -4478,6 +4603,8 @@ RAW SIGNAL</textarea>
           let diff = 0;
           if (isGlobal) {
             metric = 1.0;
+          } else if (isDepth) {
+            metric = (depthBuffer && depthBuffer.length) ? depthBuffer[idx] : (luma / 255.0);
           } else if (isBright) {
             metric = luma / 255.0;
           } else if (isDark) {
@@ -4577,7 +4704,7 @@ RAW SIGNAL</textarea>
 
       // 2. Macroblock video codec displacement
       if (mosh.macroblocks > 0) {
-        const blockSize = 32;
+        const blockSize = mosh.blockSize || 16;
         const count = Math.floor((mosh.macroblocks / 100) * 16);
         for (let i = 0; i < count; i++) {
           const bx = Math.floor(Math.random() * (WIDTH / blockSize)) * blockSize;
@@ -4799,24 +4926,23 @@ RAW SIGNAL</textarea>
       return syncNoiseCanvas;
     }
 
+    // ==================== SYSTEM 1: SYNC SUPPRESSION (DIAGONAL RASTER & CHROMA INVERSION) ====================
     function applySyncSuppression(targetCtx, sync, tick) {
       if (!sync || !sync.active) return;
 
-      // 1. Step rolling phase & vertical blanking position (Faster 1990s Cable Roll Speed)
-      const spd = (sync.speed !== undefined ? sync.speed : 24) * 0.0055;
-      sync.pos = ((sync.pos || 0) + spd) % 1;
-      if (sync.pos < 0) sync.pos += 1;
+      const spd = (sync.speed !== undefined ? sync.speed : 20) * 0.0050;
+      if (Math.abs(sync.speed) > 0.01) {
+        sync.pos = ((sync.pos || 0) + spd) % 1;
+        if (sync.pos < 0) sync.pos += 1;
+      }
 
       const direction = sync.direction || 'horizontal';
-      const widthPct = Math.min(60, Math.max(2, sync.width || 18)) / 100;
+      const widthPct = Math.min(60, Math.max(2, sync.width || 14)) / 100;
       const color = sync.color || '#000000';
       const isInvert = (color === 'invert' || color === '#difference');
       const hasCustomColor = (color && color !== '#000000' && !isInvert);
-      // sync.noise now controls 1990s SSAVI Chroma Inversion & Sine-Wave Scramble Intensity (NO gray static noise!)
-      const waveLevel = Math.min(100, Math.max(0, sync.noise !== undefined ? sync.noise : 65)) / 100;
-      const tearLevel = Math.min(100, Math.max(0, sync.tear !== undefined ? sync.tear : 45)) / 100;
+      const waveLevel = Math.min(100, Math.max(0, sync.noise !== undefined ? sync.noise : 35)) / 100;
 
-      // Snapshot clean source canvas so circular scanline wrapping never overwrites itself mid-scan
       let srcCanvas = targetCtx.canvas;
       if (typeof document !== 'undefined' && targetCtx.canvas) {
         if (!syncScratchCanvas) {
@@ -4830,44 +4956,29 @@ RAW SIGNAL</textarea>
         srcCanvas = syncScratchCanvas;
       }
 
-      const phase = sync.pos * Math.PI * 2 + (tick || 0) * 0.28;
+      const phase = (sync.pos || 0) * Math.PI * 2 + (tick || 0) * 0.28;
       const primaryToothColor = hasCustomColor ? color : '#ff1e56';
-      const secondaryToothColor = hasCustomColor ? color : '#ff6a00';
-      const tertiaryToothColor = '#b829ff';
 
       targetCtx.save();
 
       if (direction === 'horizontal') {
-        // ==================== 1990s HORIZONTAL SINE-WAVE CABLE SCRAMBLER ====================
-        const sh = 4; // 4px scanline strip for crisp 60fps analog raster feel
-        const maxWaveAmp = Math.round(WIDTH * (0.09 + widthPct * 0.52 + waveLevel * 0.16));
-        const ribbonW = Math.max(18, Math.round(WIDTH * (0.035 + widthPct * 0.16)));
-        const syncTipW = Math.max(3, Math.round(ribbonW * 0.22));
-        const anchorX = Math.round(WIDTH * 0.46);
+        const sh = 4;
+        const maxWaveAmp = Math.round(WIDTH * (0.015 + widthPct * 0.055 + waveLevel * 0.02));
 
         for (let y = 0; y < HEIGHT; y += sh) {
           const normY = y / HEIGHT;
-          // Multi-harmonic 1990s SSAVI sine-wave horizontal sync displacement
-          const w1 = Math.sin(normY * Math.PI * 2 * 2.0 + phase);
-          const w2 = Math.sin(normY * Math.PI * 2 * 5.0 - phase * 1.35) * 0.34;
-          const w3 = Math.cos(normY * Math.PI * 2 * 11.0 + phase * 2.2) * (0.10 + tearLevel * 0.25);
 
-          // High-frequency horizontal line-lock tear jitter
-          let hJitter = 0;
-          if (tearLevel > 0) {
-            const rawJit = Math.sin(y * 0.63 + (tick || 0) * 8.7) * Math.cos(y * 0.29 - (tick || 0) * 4.3);
-            hJitter = rawJit * (tearLevel * 54);
-            // Extra sharp horizontal comb tear spikes on steep wave slopes
-            if (Math.abs(rawJit) > 0.72) {
-              hJitter += (rawJit > 0 ? 1 : -1) * tearLevel * 42;
-            }
-          }
+          // LESS SINUSOIDAL, MORE DIAGONAL S-WAVE:
+          // Triangle wave / linear diagonal slant ramp:
+          const triWave = Math.asin(Math.sin(normY * Math.PI * 2 * 1.5 + phase)) / (Math.PI * 0.5);
+          const w1 = triWave * 0.78 + Math.sin(normY * Math.PI * 2 * 1.5 + phase) * 0.22;
+          const triWave2 = Math.asin(Math.sin(normY * Math.PI * 2 * 3.5 - phase * 1.2)) / (Math.PI * 0.5);
+          const w2 = triWave2 * 0.20;
 
-          const rawShift = Math.round((w1 + w2 + w3) * maxWaveAmp + hJitter);
+          const rawShift = Math.round((w1 + w2) * maxWaveAmp);
           let shiftX = rawShift % WIDTH;
           if (shiftX < 0) shiftX += WIDTH;
 
-          // 1. Circularly wrap scanline strip (preserves 100% of media & text!)
           if (shiftX > 0) {
             const rightPart = WIDTH - shiftX;
             targetCtx.drawImage(srcCanvas, 0, y, rightPart, sh, shiftX, y, rightPart, sh);
@@ -4876,114 +4987,68 @@ RAW SIGNAL</textarea>
             targetCtx.drawImage(srcCanvas, 0, y, WIDTH, sh, 0, y, WIDTH, sh);
           }
 
-          // 2. 1990s SSAVI Video Polarity & Chroma Phase Inversion Bands (keeps all media detail!)
-          if (waveLevel > 0 || isInvert) {
+          // Video Polarity & Chroma Phase Inversion Bands
+          if (waveLevel > 0.08 || isInvert) {
             const carrier = Math.sin(normY * Math.PI * 2 * 3.0 - phase * 1.15) +
                             Math.cos(normY * Math.PI * 2 * 7.0 + phase * 0.75) * 0.45;
-            const thresh = isInvert ? -2.0 : (1.12 - waveLevel * 0.92);
-            if (carrier > thresh || (waveLevel > 0.45 && Math.abs(w1) > (1.08 - waveLevel * 0.55))) {
+            const thresh = isInvert ? -2.0 : (1.35 - waveLevel * 0.55);
+            if (carrier > thresh) {
               targetCtx.save();
               targetCtx.globalCompositeOperation = 'difference';
-              const bandIdx = ((y / sh) | 0);
-              if (isInvert) {
-                targetCtx.globalAlpha = 0.88;
-                targetCtx.fillStyle = '#ffffff';
-              } else if (carrier > thresh + 0.32) {
-                // Classic 1990s inverted cable magenta/crimson/amber solarization
-                targetCtx.globalAlpha = Math.min(0.86, 0.32 + waveLevel * 0.52);
-                targetCtx.fillStyle = (bandIdx % 6 < 3) ? '#e040fb' : '#ff2a55';
-              } else {
-                targetCtx.globalAlpha = Math.min(0.75, 0.24 + waveLevel * 0.44);
-                targetCtx.fillStyle = hasCustomColor ? color : '#ff7700';
-              }
+              targetCtx.globalAlpha = isInvert ? 0.35 : Math.min(0.28, 0.08 + waveLevel * 0.20);
+              targetCtx.fillStyle = isInvert ? '#ffffff' : (((y / sh) | 0) % 4 < 2 ? '#e040fb' : primaryToothColor);
               targetCtx.fillRect(0, y, WIDTH, sh);
               targetCtx.restore();
             }
           }
-
-          // 3. Snaking S-Curve Horizontal Blanking Interval (HBI) Ribbon + Sawtooth Colorburst Teeth
-          const seamX = (anchorX + shiftX) % WIDTH;
-          const ribX = seamX - (ribbonW >> 1);
-
-          // Front & Back Porch dark analog blanking slot
-          targetCtx.fillStyle = 'rgba(8, 3, 18, 0.78)';
-          targetCtx.fillRect(ribX, y, ribbonW, sh);
-          if (ribX < 0) targetCtx.fillRect(ribX + WIDTH, y, ribbonW, sh);
-          if (ribX + ribbonW > WIDTH) targetCtx.fillRect(ribX - WIDTH, y, ribbonW, sh);
-
-          // High-voltage white/cyan Sync Tip stripe inside the S-curve ribbon
-          const tipX = seamX - (syncTipW >> 1);
-          targetCtx.fillStyle = '#f4ffff';
-          targetCtx.fillRect(tipX, y, syncTipW, sh);
-
-          // Serrated Red/Orange/Magenta Sawtooth Colorburst Fringe on trailing edge of S-curve
-          const rowIndex = (y / sh) | 0;
-          const sawMod = rowIndex % 3;
-          const toothBase = 14 + Math.round((widthPct * 85 + tearLevel * 65) * (0.35 + 0.65 * Math.abs(Math.sin(y * 0.19 + phase * 2.0))));
-          const toothLen = (sawMod === 0) ? toothBase : ((sawMod === 1) ? Math.round(toothBase * 0.58) : Math.round(toothBase * 0.25));
-          const toothStartX = (ribX + ribbonW) % WIDTH;
-
-          targetCtx.fillStyle = (sawMod === 0) ? primaryToothColor : ((sawMod === 1) ? secondaryToothColor : tertiaryToothColor);
-          targetCtx.fillRect(toothStartX, y, toothLen, sh);
-          if (toothStartX + toothLen > WIDTH) {
-            targetCtx.fillRect(toothStartX - WIDTH, y, toothLen, sh);
-          }
-
-          // Crisp white/cyan sawtooth step highlight on leading edge of every 3rd scanline tooth
-          if (sawMod === 0) {
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.fillRect(toothStartX, y, Math.min(8, Math.max(3, toothLen >> 2)), Math.max(2, sh - 1));
-          }
         }
 
-        // 4. Rolling V-Blanking Interval (VBI) Bar with VITS & Closed-Caption Sync Dashes (Zero Gray Noise!)
-        const vbiH = Math.max(16, Math.round(HEIGHT * (0.018 + widthPct * 0.08)));
-        const vbiY = Math.round(sync.pos * HEIGHT) - (vbiH >> 1);
+        // Rolling Vertical Blanking Interval (VBI) Bar
+        const vbiH = Math.max(14, Math.round(HEIGHT * (0.015 + widthPct * 0.05)));
+        const vbiY = Math.round((sync.pos || 0.35) * HEIGHT) - (vbiH >> 1);
 
         const drawVbiBar = (yPos) => {
-          // Sleek dark VBI hammerhead slot (translucent so underlying media still shines through)
-          targetCtx.fillStyle = 'rgba(6, 2, 16, 0.82)';
+          targetCtx.fillStyle = 'rgba(6, 2, 16, 0.25)';
           targetCtx.fillRect(0, yPos, WIDTH, vbiH);
 
-          // Glowing purple/magenta top & bottom equalizing lines
+          targetCtx.save();
+          targetCtx.globalAlpha = 0.60;
           targetCtx.fillStyle = hasCustomColor ? color : '#b829ff';
           targetCtx.fillRect(0, yPos, WIDTH, 2);
           targetCtx.fillRect(0, yPos + vbiH - 2, WIDTH, 2);
+          targetCtx.restore();
 
-          // VITS (Vertical Interval Test Signal) white & cyan sync pulse dashes across center
-          const dashY = yPos + (vbiH >> 1) - 2;
+          const dashY = yPos + (vbiH >> 1) - 1;
           const dashStep = 48;
           const dashShift = Math.round(((tick || 0) * 14) % dashStep);
+          targetCtx.save();
+          targetCtx.globalAlpha = 0.55;
           for (let dx = -dashStep + dashShift; dx < WIDTH; dx += dashStep) {
             targetCtx.fillStyle = '#ffffff';
-            targetCtx.fillRect(dx, dashY, 22, 3);
+            targetCtx.fillRect(dx, dashY, 16, 2);
             targetCtx.fillStyle = '#00f5d4';
-            targetCtx.fillRect(dx + 26, dashY, 8, 3);
+            targetCtx.fillRect(dx + 20, dashY, 6, 2);
           }
+          targetCtx.restore();
         };
 
         drawVbiBar(vbiY);
         if (vbiY < 0) drawVbiBar(vbiY + HEIGHT);
         if (vbiY + vbiH > HEIGHT) drawVbiBar(vbiY - HEIGHT);
 
-      } else if (direction === 'vertical') {
-        // ==================== 1990s VERTICAL SINE-WAVE CABLE SCRAMBLER ====================
+      } else {
+        // Vertical Diagonal Raster Skew
         const sw = 4;
-        const maxWaveAmp = Math.round(HEIGHT * (0.08 + widthPct * 0.45 + waveLevel * 0.14));
-        const ribbonH = Math.max(18, Math.round(HEIGHT * (0.03 + widthPct * 0.14)));
-        const syncTipH = Math.max(3, Math.round(ribbonH * 0.22));
-        const anchorY = Math.round(HEIGHT * 0.48);
+        const maxWaveAmp = Math.round(HEIGHT * (0.015 + widthPct * 0.055 + waveLevel * 0.02));
 
         for (let x = 0; x < WIDTH; x += sw) {
           const normX = x / WIDTH;
-          const w1 = Math.sin(normX * Math.PI * 2 * 2.0 + phase);
-          const w2 = Math.sin(normX * Math.PI * 2 * 5.0 - phase * 1.35) * 0.34;
-          let vJitter = 0;
-          if (tearLevel > 0) {
-            vJitter = Math.sin(x * 0.61 + (tick || 0) * 8.1) * (tearLevel * 48);
-          }
+          const triWave = Math.asin(Math.sin(normX * Math.PI * 2 * 1.5 + phase)) / (Math.PI * 0.5);
+          const w1 = triWave * 0.78 + Math.sin(normX * Math.PI * 2 * 1.5 + phase) * 0.22;
+          const triWave2 = Math.asin(Math.sin(normX * Math.PI * 2 * 3.5 - phase * 1.2)) / (Math.PI * 0.5);
+          const w2 = triWave2 * 0.20;
 
-          const rawShift = Math.round((w1 + w2) * maxWaveAmp + vJitter);
+          const rawShift = Math.round((w1 + w2) * maxWaveAmp);
           let shiftY = rawShift % HEIGHT;
           if (shiftY < 0) shiftY += HEIGHT;
 
@@ -4995,105 +5060,200 @@ RAW SIGNAL</textarea>
             targetCtx.drawImage(srcCanvas, x, 0, sw, HEIGHT, x, 0, sw, HEIGHT);
           }
 
-          if (waveLevel > 0 || isInvert) {
+          if (waveLevel > 0.08 || isInvert) {
             const carrier = Math.sin(normX * Math.PI * 2 * 3.0 - phase * 1.15);
-            const thresh = isInvert ? -2.0 : (0.85 - waveLevel * 0.75);
+            const thresh = isInvert ? -2.0 : (1.35 - waveLevel * 0.55);
             if (carrier > thresh) {
               targetCtx.save();
               targetCtx.globalCompositeOperation = 'difference';
-              targetCtx.globalAlpha = isInvert ? 0.88 : Math.min(0.84, 0.30 + waveLevel * 0.50);
+              targetCtx.globalAlpha = isInvert ? 0.35 : Math.min(0.28, 0.08 + waveLevel * 0.20);
               targetCtx.fillStyle = isInvert ? '#ffffff' : (((x / sw) | 0) % 4 < 2 ? '#e040fb' : primaryToothColor);
               targetCtx.fillRect(x, 0, sw, HEIGHT);
               targetCtx.restore();
             }
           }
-
-          const seamY = (anchorY + shiftY) % HEIGHT;
-          const ribY = seamY - (ribbonH >> 1);
-          targetCtx.fillStyle = 'rgba(8, 3, 18, 0.78)';
-          targetCtx.fillRect(x, ribY, sw, ribbonH);
-
-          targetCtx.fillStyle = '#f4ffff';
-          targetCtx.fillRect(x, seamY - (syncTipH >> 1), sw, syncTipH);
-
-          const colIndex = (x / sw) | 0;
-          const sawMod = colIndex % 3;
-          const toothBase = 16 + Math.round((widthPct * 80 + tearLevel * 60) * Math.abs(Math.sin(x * 0.17 + phase)));
-          const toothLen = (sawMod === 0) ? toothBase : Math.round(toothBase * 0.45);
-          targetCtx.fillStyle = (sawMod === 0) ? primaryToothColor : secondaryToothColor;
-          targetCtx.fillRect(x, (ribY + ribbonH) % HEIGHT, sw, toothLen);
         }
 
-        const vbiW = Math.max(16, Math.round(WIDTH * (0.02 + widthPct * 0.08)));
-        const vbiX = Math.round(sync.pos * WIDTH) - (vbiW >> 1);
-        targetCtx.fillStyle = 'rgba(6, 2, 16, 0.82)';
+        const vbiW = Math.max(14, Math.round(WIDTH * (0.015 + widthPct * 0.05)));
+        const vbiX = Math.round((sync.pos || 0.35) * WIDTH) - (vbiW >> 1);
+        targetCtx.fillStyle = 'rgba(6, 2, 16, 0.25)';
         targetCtx.fillRect(vbiX, 0, vbiW, HEIGHT);
+        targetCtx.save();
+        targetCtx.globalAlpha = 0.55;
         targetCtx.fillStyle = '#ffffff';
         for (let dy = 0; dy < HEIGHT; dy += 48) {
-          targetCtx.fillRect(vbiX + (vbiW >> 1) - 1, dy, 3, 22);
+          targetCtx.fillRect(vbiX + (vbiW >> 1) - 1, dy, 2, 16);
         }
-
-      } else if (direction === 'diagonal') {
-        // ==================== 1990s DIAGONAL 45° SINE-WAVE CABLE SCRAMBLER ====================
-        const sh = 6;
-        const maxWaveAmp = Math.round(WIDTH * (0.06 + widthPct * 0.35));
-        for (let y = 0; y < HEIGHT; y += sh) {
-          const normY = y / HEIGHT;
-          const shift = Math.round(Math.sin(normY * Math.PI * 2 * 2.5 + phase) * maxWaveAmp);
-          let sx = shift % WIDTH;
-          if (sx < 0) sx += WIDTH;
-          if (sx > 0) {
-            const rightPart = WIDTH - sx;
-            targetCtx.drawImage(srcCanvas, 0, y, rightPart, sh, sx, y, rightPart, sh);
-            targetCtx.drawImage(srcCanvas, rightPart, y, sx, sh, 0, y, sx, sh);
-          }
-        }
-
-        const diagLen = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT);
-        const ribbonW = Math.max(20, Math.round(diagLen * (0.025 + widthPct * 0.12)));
-
-        targetCtx.save();
-        targetCtx.translate(WIDTH / 2, HEIGHT / 2);
-        targetCtx.rotate(Math.PI / 4);
-        targetCtx.translate(-diagLen / 2, -diagLen / 2);
-
-        const step = 6;
-        const anchorX = Math.round(diagLen * sync.pos);
-        for (let dy = 0; dy < diagLen; dy += step) {
-          const normD = dy / diagLen;
-          const waveX = Math.round(Math.sin(normD * Math.PI * 2 * 2.5 + phase) * (45 + widthPct * 160));
-          const curX = (anchorX + waveX + Math.round(diagLen)) % Math.round(diagLen);
-
-          if (waveLevel > 0 || isInvert) {
-            const carrier = Math.sin(normD * Math.PI * 2 * 4.0 - phase);
-            if (carrier > (0.9 - waveLevel * 0.75) || isInvert) {
-              targetCtx.save();
-              targetCtx.globalCompositeOperation = 'difference';
-              targetCtx.globalAlpha = isInvert ? 0.85 : Math.min(0.80, 0.28 + waveLevel * 0.48);
-              targetCtx.fillStyle = isInvert ? '#ffffff' : '#e040fb';
-              targetCtx.fillRect(0, dy, diagLen, step);
-              targetCtx.restore();
-            }
-          }
-
-          targetCtx.fillStyle = 'rgba(8, 3, 18, 0.78)';
-          targetCtx.fillRect(curX - (ribbonW >> 1), dy, ribbonW, step);
-          targetCtx.fillStyle = '#ffffff';
-          targetCtx.fillRect(curX - 2, dy, 4, step);
-
-          const toothLen = (((dy / step) | 0) % 2 === 0) ? Math.round(20 + tearLevel * 55 + widthPct * 60) : 10;
-          targetCtx.fillStyle = primaryToothColor;
-          targetCtx.fillRect(curX + (ribbonW >> 1), dy, toothLen, step);
-        }
-
         targetCtx.restore();
       }
 
       targetCtx.restore();
     }
-  </script>
 
-  <script>
+    // ==================== SYSTEM 2: CABLE WAVE & TEAR (COMB TEAR, DIVISION SEAM, RF GHOST) ====================
+    let tearScratchCanvas = null;
+    let tearScratchCtx = null;
+
+    function applyCableWaveAndTear(targetCtx, tearOpt, tick) {
+      if (!tearOpt || !tearOpt.active) return;
+
+      const tearLevel = Math.min(100, Math.max(0, tearOpt.tear !== undefined ? tearOpt.tear : 45)) / 100;
+      const divPos = Math.min(100, Math.max(0, tearOpt.pos !== undefined ? tearOpt.pos : 50)) / 100;
+      const ghostAmt = Math.min(100, Math.max(0, tearOpt.ghost !== undefined ? tearOpt.ghost : 40)) / 100;
+      const direction = tearOpt.direction || 'horizontal';
+
+      let srcCanvas = targetCtx.canvas;
+      if (typeof document !== 'undefined' && targetCtx.canvas) {
+        if (!tearScratchCanvas) {
+          tearScratchCanvas = document.createElement('canvas');
+          tearScratchCanvas.width = WIDTH;
+          tearScratchCanvas.height = HEIGHT;
+          tearScratchCtx = tearScratchCanvas.getContext('2d');
+        }
+        tearScratchCtx.clearRect(0, 0, WIDTH, HEIGHT);
+        tearScratchCtx.drawImage(targetCtx.canvas, 0, 0);
+        srcCanvas = tearScratchCanvas;
+      }
+
+      targetCtx.save();
+
+      if (direction === 'horizontal') {
+        const sh = 3;
+        const seamY = Math.round(divPos * HEIGHT);
+        const splitShift = Math.round(tearLevel * 24);
+
+        // 1. Scanline Comb Tearing & Division Split
+        for (let y = 0; y < HEIGHT; y += sh) {
+          const rawJit = Math.sin(y * 0.73 + (tick || 0) * 8.3) * Math.cos(y * 0.31 - (tick || 0) * 4.7);
+          let hJitter = 0;
+          if (tearLevel > 0) {
+            hJitter = Math.round(rawJit * tearLevel * 22);
+            if (Math.abs(rawJit) > 0.74) {
+              hJitter += Math.sign(rawJit) * Math.round(tearLevel * 14);
+            }
+          }
+
+          // Split division shear: top and bottom shift in opposite directions across seam
+          const isAboveSeam = y < seamY;
+          const seamOffset = isAboveSeam ? -splitShift : splitShift;
+          const totalShift = (hJitter + seamOffset) % WIDTH;
+          let shiftX = totalShift;
+          if (shiftX < 0) shiftX += WIDTH;
+
+          if (shiftX > 0) {
+            const rightPart = WIDTH - shiftX;
+            targetCtx.drawImage(srcCanvas, 0, y, rightPart, sh, shiftX, y, rightPart, sh);
+            targetCtx.drawImage(srcCanvas, rightPart, y, shiftX, sh, 0, y, shiftX, sh);
+          } else {
+            targetCtx.drawImage(srcCanvas, 0, y, WIDTH, sh, 0, y, WIDTH, sh);
+          }
+        }
+
+        // 2. RF Multipath Cable Ghost Reflection (Luminous horizontal echo with phase delay)
+        if (ghostAmt > 0.05) {
+          const ghostShift = Math.round(12 + ghostAmt * 28);
+          const copyW = WIDTH - ghostShift;
+          if (copyW > 0) {
+            targetCtx.save();
+            targetCtx.globalAlpha = Math.min(0.40, ghostAmt * 0.38);
+            targetCtx.globalCompositeOperation = 'screen';
+            targetCtx.drawImage(srcCanvas, 0, 0, copyW, HEIGHT, ghostShift, 0, copyW, HEIGHT);
+            targetCtx.restore();
+          }
+        }
+
+        // 3. Division Split Seam Accent (high-contrast seam with dashed sync pulse & sawtooth teeth)
+        const seamH = 8;
+        const seamTop = Math.max(0, seamY - (seamH >> 1));
+
+        // Dark division line
+        targetCtx.fillStyle = 'rgba(4, 2, 10, 0.55)';
+        targetCtx.fillRect(0, seamTop, WIDTH, seamH);
+
+        // Glowing cyan seam borders
+        targetCtx.save();
+        targetCtx.globalAlpha = 0.70;
+        targetCtx.fillStyle = '#00ffcc';
+        targetCtx.fillRect(0, seamTop, WIDTH, 1.5);
+        targetCtx.fillRect(0, seamTop + seamH - 1.5, WIDTH, 1.5);
+        targetCtx.restore();
+
+        // White sync pulse dashes
+        const dashStep = 44;
+        const dashShift = Math.round(((tick || 0) * 12) % dashStep);
+        targetCtx.save();
+        targetCtx.globalAlpha = 0.65;
+        targetCtx.fillStyle = '#ffffff';
+        for (let dx = -dashStep + dashShift; dx < WIDTH; dx += dashStep) {
+          targetCtx.fillRect(dx, seamTop + 2, 18, 3);
+        }
+        targetCtx.restore();
+
+        // Serrated decoder burst saw teeth along the division
+        targetCtx.save();
+        targetCtx.globalAlpha = 0.40;
+        targetCtx.fillStyle = '#ff0055';
+        for (let x = 0; x < WIDTH; x += 10) {
+          if (((x / 10) | 0) % 2 === 0) {
+            targetCtx.fillRect(x, seamTop + seamH, 6, 5);
+          }
+        }
+        targetCtx.restore();
+
+      } else {
+        // Vertical mode for Cable Wave & Tear
+        const sw = 3;
+        const seamX = Math.round(divPos * WIDTH);
+        const splitShift = Math.round(tearLevel * 24);
+
+        for (let x = 0; x < WIDTH; x += sw) {
+          const rawJit = Math.sin(x * 0.73 + (tick || 0) * 8.3) * Math.cos(x * 0.31 - (tick || 0) * 4.7);
+          let vJitter = 0;
+          if (tearLevel > 0) {
+            vJitter = Math.round(rawJit * tearLevel * 22);
+          }
+
+          const isLeftSeam = x < seamX;
+          const seamOffset = isLeftSeam ? -splitShift : splitShift;
+          const totalShift = (vJitter + seamOffset) % HEIGHT;
+          let shiftY = totalShift;
+          if (shiftY < 0) shiftY += HEIGHT;
+
+          if (shiftY > 0) {
+            const bottomPart = HEIGHT - shiftY;
+            targetCtx.drawImage(srcCanvas, x, 0, sw, bottomPart, x, shiftY, sw, bottomPart);
+            targetCtx.drawImage(srcCanvas, x, bottomPart, sw, shiftY, x, 0, sw, shiftY);
+          } else {
+            targetCtx.drawImage(srcCanvas, x, 0, sw, HEIGHT, x, 0, sw, HEIGHT);
+          }
+        }
+
+        if (ghostAmt > 0.05) {
+          const ghostShift = Math.round(12 + ghostAmt * 28);
+          const copyH = HEIGHT - ghostShift;
+          if (copyH > 0) {
+            targetCtx.save();
+            targetCtx.globalAlpha = Math.min(0.40, ghostAmt * 0.38);
+            targetCtx.globalCompositeOperation = 'screen';
+            targetCtx.drawImage(srcCanvas, 0, 0, WIDTH, copyH, 0, ghostShift, WIDTH, copyH);
+            targetCtx.restore();
+          }
+        }
+
+        const seamW = 8;
+        const seamLeft = Math.max(0, seamX - (seamW >> 1));
+        targetCtx.fillStyle = 'rgba(4, 2, 10, 0.55)';
+        targetCtx.fillRect(seamLeft, 0, seamW, HEIGHT);
+        targetCtx.save();
+        targetCtx.globalAlpha = 0.70;
+        targetCtx.fillStyle = '#00ffcc';
+        targetCtx.fillRect(seamLeft, 0, 1.5, HEIGHT);
+        targetCtx.fillRect(seamLeft + seamW - 1.5, 0, 1.5, HEIGHT);
+        targetCtx.restore();
+      }
+
+      targetCtx.restore();
+    }
     function render() {
       // Step kinetic motion
       state.mosh.tick += (state.mosh.speed * 0.05);
@@ -5115,6 +5275,7 @@ RAW SIGNAL</textarea>
       if (state.photo.active && state.photo.loaded) {
         renderAsciiPhoto(photoCanvas, state.photo, state.mosh.tick);
       }
+      updateDepthBuffer();
 
       cleanCompositeCtx.clearRect(0, 0, WIDTH, HEIGHT);
       cleanCompositeCtx.drawImage(bgCanvas, 0, 0);
@@ -5189,6 +5350,9 @@ RAW SIGNAL</textarea>
       }
       if (state.fx.sync && state.fx.sync.active && !state.isTyping) {
         applySyncSuppression(cleanCompositeCtx, state.fx.sync, state.mosh.tick);
+      }
+      if (state.fx.cableTear && state.fx.cableTear.active && !state.isTyping) {
+        applyCableWaveAndTear(cleanCompositeCtx, state.fx.cableTear, state.mosh.tick);
       }
 
       // 4. PIPELINE STEP 5: Datamosh Engine (CRT -> Mosh)
@@ -6369,11 +6533,11 @@ RAW SIGNAL</textarea>
             ]
           },
           ascii: {
-            name: 'ASCII & OPACITY',
+            name: 'ASCII & 3D DEPTH',
             icon: '🔠',
             knobs: [
               { id: 'asciiCellSizeRange', label: 'CELL SIZE', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
-              { id: 'photoEdgeRange', label: 'EDGE DETECT', unit: '%', format: (v) => v + '%', color: '#ff0055' },
+              { id: 'photoAsciiDepthScaleRange', label: '3D DEPTH', unit: '%', format: (v) => v + '%', color: '#00ffcc' },
               { id: 'photoOpacityRange', label: 'OPACITY', unit: '%', format: (v) => v + '%', color: '#ffe600' }
             ]
           }
@@ -6474,7 +6638,7 @@ RAW SIGNAL</textarea>
             knobs: [
               { id: 'moshSmearRange', label: 'SMEAR', unit: '%', format: (v) => v + '%', color: '#ff0055' },
               { id: 'moshSliceRange', label: 'SLICE SHEAR', unit: 'px', format: (v) => v + 'px', color: '#ff0055' },
-              { id: 'moshBlockRange', label: 'BLOCKS', unit: '', format: (v) => v, color: '#ff0055' }
+              { id: 'moshBlockRange', label: 'GLITCH DENSITY', unit: '%', format: (v) => v + '%', color: '#ff0055' }
             ]
           },
           grid: {
@@ -6586,9 +6750,9 @@ RAW SIGNAL</textarea>
             name: 'CABLE WAVE & TEAR',
             icon: '📻',
             knobs: [
-              { id: 'syncTearRange', label: 'COMB TEAR', unit: 'px', format: (v) => v + 'px', color: '#00ffcc' },
-              { id: 'syncNoiseRange', label: 'CHROMA INV', unit: '%', format: (v) => v + '%', color: '#ff0055' },
-              { id: 'syncWidthRange', label: 'S-WAVE AMP', unit: '%', format: (v) => v + '%', color: '#ffe600' }
+              { id: 'cableTearRange', label: 'COMB TEAR', unit: '%', format: (v) => v + '%', color: '#00ffcc' },
+              { id: 'cablePosRange', label: 'DIV POS', unit: '%', format: (v) => v + '%', color: '#ffe600' },
+              { id: 'cableGhostRange', label: 'RF GHOST', unit: '%', format: (v) => v + '%', color: '#ff0055' }
             ]
           }
         }
@@ -6851,12 +7015,16 @@ RAW SIGNAL</textarea>
         const hwActive = document.getElementById('heatWireActiveCheck');
         if (hwActive) hwActive.checked = true;
       } else if (currentModuleKey === 'fx' || currentModuleKey === 'vibe') {
-        if (subKey === 'sync' || subKey === 'syncTear') {
+        if (subKey === 'sync') {
           state.fx.sync.active = true;
           const syncChk = document.getElementById('syncActiveCheck');
           if (syncChk) syncChk.checked = true;
           const sideSyncBtn = document.getElementById('sideSyncToggleBtn');
           if (sideSyncBtn) sideSyncBtn.classList.add('active');
+        } else if (subKey === 'syncTear') {
+          state.fx.cableTear.active = true;
+          const tearChk = document.getElementById('cableTearActiveCheck');
+          if (tearChk) tearChk.checked = true;
         }
       }
 
@@ -6870,8 +7038,11 @@ RAW SIGNAL</textarea>
       if (currentModuleKey === 'photo') return !!(state.photo.active && state.photo.loaded);
       if (currentModuleKey === 'sort') return !!state.sort.active;
       if (currentModuleKey === 'fx') {
-        if (currentSubEngineKey === 'sync' || currentSubEngineKey === 'syncTear') {
+        if (currentSubEngineKey === 'sync') {
           return !!(state.fx.sync && state.fx.sync.active);
+        }
+        if (currentSubEngineKey === 'syncTear') {
+          return !!(state.fx.cableTear && state.fx.cableTear.active);
         }
         return !!state.fx.active;
       }
@@ -6990,9 +7161,16 @@ RAW SIGNAL</textarea>
         state.sort.active = next;
         showGestureToast(next ? '🌊 PIXEL SORT: ON' : '🌊 PIXEL SORT: OFF');
       } else if (currentModuleKey === 'fx') {
-        if (currentSubEngineKey === 'sync' || currentSubEngineKey === 'syncTear') {
+        if (currentSubEngineKey === 'sync') {
           state.fx.sync.active = next;
-          showGestureToast(next ? '⚡ CABLE SYNC: ON' : '⚡ CABLE SYNC: OFF');
+          const chk = document.getElementById('syncActiveCheck');
+          if (chk) chk.checked = next;
+          showGestureToast(next ? '⚡ SYNC SUPPRESSION: ON' : '⚡ SYNC SUPPRESSION: OFF');
+        } else if (currentSubEngineKey === 'syncTear') {
+          state.fx.cableTear.active = next;
+          const chk = document.getElementById('cableTearActiveCheck');
+          if (chk) chk.checked = next;
+          showGestureToast(next ? '📻 CABLE WAVE & TEAR: ON' : '📻 CABLE WAVE & TEAR: OFF');
         } else {
           state.fx.active = next;
           showGestureToast(next ? '📺 CRT FX: ON' : '📺 CRT FX: OFF');
@@ -7847,6 +8025,10 @@ RAW SIGNAL</textarea>
                     </div>
                     <input type="range" id="popSortSpdRange" min="0" max="30" value="${Math.round((state.sort.speed !== undefined ? state.sort.speed : 0.7) * 10)}" class="w-full accent-cyber-pink">
                   </div>
+                  <div class="flex items-center justify-between pt-1 border-t border-white/10">
+                    <span class="text-[9px] text-slate-300 font-bold">Invert Target Mask</span>
+                    <input type="checkbox" id="popSortInvertChk" ${state.sort.invertMask ? 'checked' : ''} class="accent-cyber-cyan cursor-pointer">
+                  </div>
                 </div>
               </div>
             `;
@@ -7884,6 +8066,15 @@ RAW SIGNAL</textarea>
               });
             }
 
+            const popSortInv = container.querySelector('#popSortInvertChk');
+            if (popSortInv) {
+              popSortInv.addEventListener('change', (e) => {
+                state.sort.invertMask = e.target.checked;
+                const chk = document.getElementById('sortInvertMaskCheck');
+                if (chk) chk.checked = e.target.checked;
+              });
+            }
+
             const spdRange = container.querySelector('#popSortSpdRange');
             const spdVal = container.querySelector('#popSortSpdVal');
             if (spdRange) {
@@ -7900,9 +8091,13 @@ RAW SIGNAL</textarea>
       if (sideSortCritBtn) {
         sideSortCritBtn.addEventListener('click', () => {
           const crits = [
+            { key: 'lights', label: 'LIGHTS' },
+            { key: 'shadows', label: 'SHADOW' },
+            { key: 'depth', label: 'DEPTH' },
+            { key: 'red', label: 'RED CH' },
+            { key: 'green', label: 'GRN CH' },
+            { key: 'blue', label: 'BLU CH' },
             { key: 'brightness', label: 'LUMA' },
-            { key: 'red', label: 'RED' },
-            { key: 'blue', label: 'BLUE' },
             { key: 'saturation', label: 'SAT' }
           ];
           const curIdx = crits.findIndex(c => c.key === state.sort.criterion);
@@ -7912,7 +8107,7 @@ RAW SIGNAL</textarea>
           if (sel) sel.value = next.key;
           const lbl = document.getElementById('sideSortCritLabel');
           if (lbl) lbl.textContent = next.label;
-          showGestureToast(`CRIT: ${next.label}`);
+          showGestureToast(`SORT: ${next.label}`);
         });
       }
 
@@ -8034,9 +8229,122 @@ RAW SIGNAL</textarea>
         });
       }
 
+      function openTintPopover() {
+        openRightPopover('BACKDROP & COLOR TINT', (container) => {
+          container.innerHTML = `
+            <div class="space-y-2.5">
+              <div>
+                <span class="block text-[9px] text-slate-400 font-bold mb-1">1-TAP COLOR TINTS (GLOBAL)</span>
+                <div class="grid grid-cols-2 gap-1.5">
+                  ${[
+                    { key: 'cyberGradient', name: '💜 Cyber Neon', c1: '#04020a', c2: '#ff0055', ca: '#00ffcc' },
+                    { key: 'acidLime', name: '🧪 Acid Vapor', c1: '#020803', c2: '#00ff66', ca: '#ffe600' },
+                    { key: 'bloodMagma', name: '🌋 Blood Magma', c1: '#0c0205', c2: '#ff2200', ca: '#ffaa00' },
+                    { key: 'iceCold', name: '🧊 Ice Cold', c1: '#01050c', c2: '#00aaff', ca: '#ffffff' },
+                    { key: 'deepVoid', name: '🖤 OLED Void', c1: '#000000', c2: '#0a0a0f', ca: '#ffffff' },
+                    { key: 'monochrome', name: '🤍 Concrete Mono', c1: '#0a0a0a', c2: '#2a2a2a', ca: '#888888' }
+                  ].map(b => `
+                    <button type="button" data-bgpreset="${b.key}" data-c1="${b.c1}" data-c2="${b.c2}" data-ca="${b.ca}" class="pop-bg-btn py-1.5 px-2 rounded text-[10px] font-bold border ${!state.fx.customBg && state.fx.bgMode === b.key ? 'bg-cyber-lime/20 border-cyber-lime text-cyber-lime' : 'bg-white/5 border-white/10 text-slate-300'} transition active:scale-95 text-left">${b.name}</button>
+                  `).join('')}
+                </div>
+              </div>
+              <div class="pt-2 border-t border-white/10 space-y-1.5">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] text-slate-400 font-bold">CUSTOM GRADIENT TINT</span>
+                  <button type="button" id="popResetBgBtn" class="text-[9px] text-cyber-lime hover:underline font-bold">↺ Reset</button>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <span class="block text-[8px] text-slate-400 mb-0.5">Top / Void</span>
+                    <input type="color" id="popBgCol1" value="${state.fx.bgColor1}" class="w-full h-7 rounded bg-transparent border border-cyber-border cursor-pointer">
+                  </div>
+                  <div>
+                    <span class="block text-[8px] text-slate-400 mb-0.5">Bottom / Glow</span>
+                    <input type="color" id="popBgCol2" value="${state.fx.bgColor2}" class="w-full h-7 rounded bg-transparent border border-cyber-border cursor-pointer">
+                  </div>
+                  <div>
+                    <span class="block text-[8px] text-slate-400 mb-0.5">Accent Line</span>
+                    <input type="color" id="popBgAccent" value="${state.fx.bgAccent}" class="w-full h-7 rounded bg-transparent border border-cyber-border cursor-pointer">
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          const updateTintIndicator = (col) => {
+            const ind = document.getElementById('topTintIndicator');
+            if (ind) {
+              ind.style.backgroundColor = col;
+              ind.style.boxShadow = `0 0 8px ${col}`;
+            }
+          };
+
+          container.querySelectorAll('.pop-bg-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              state.fx.bgMode = btn.dataset.bgpreset;
+              state.fx.bgColor1 = btn.dataset.c1;
+              state.fx.bgColor2 = btn.dataset.c2;
+              state.fx.bgAccent = btn.dataset.ca;
+              state.fx.customBg = true;
+              updateTintIndicator(btn.dataset.c2);
+              const sel = document.getElementById('bgModeSelect');
+              if (sel) sel.value = btn.dataset.bgpreset;
+              closeSidePopovers();
+              showGestureToast(`TINT: ${btn.textContent.trim()}`);
+            });
+          });
+
+          const c1 = container.querySelector('#popBgCol1');
+          const c2 = container.querySelector('#popBgCol2');
+          const ca = container.querySelector('#popBgAccent');
+          const rBtn = container.querySelector('#popResetBgBtn');
+
+          c1.addEventListener('input', (e) => {
+            state.fx.bgColor1 = e.target.value;
+            state.fx.customBg = true;
+            const d = document.getElementById('bgColor1Input');
+            if (d) d.value = e.target.value;
+          });
+          c2.addEventListener('input', (e) => {
+            state.fx.bgColor2 = e.target.value;
+            state.fx.customBg = true;
+            updateTintIndicator(e.target.value);
+            const d = document.getElementById('bgColor2Input');
+            if (d) d.value = e.target.value;
+          });
+          ca.addEventListener('input', (e) => {
+            state.fx.bgAccent = e.target.value;
+            state.fx.customBg = true;
+            const d = document.getElementById('bgAccentInput');
+            if (d) d.value = e.target.value;
+          });
+          if (rBtn) {
+            rBtn.addEventListener('click', () => {
+              state.fx.bgColor1 = '#04020a';
+              state.fx.bgColor2 = '#ff0055';
+              state.fx.bgAccent = '#00ffcc';
+              state.fx.customBg = false;
+              state.fx.bgMode = 'cyberGradient';
+              updateTintIndicator('#ff0055');
+              openTintPopover();
+              showGestureToast('TINT: RESET');
+            });
+          }
+        });
+      }
+
+      // Top Header Tint Button (available in all modules next to Clean)
+      const topTintBtn = document.getElementById('topTintBtn');
+      if (topTintBtn) {
+        topTintBtn.addEventListener('click', openTintPopover);
+      }
+
       const sideCustomBgBtn = document.getElementById('sideCustomBgBtn');
       if (sideCustomBgBtn) {
-        sideCustomBgBtn.addEventListener('click', () => {
+        sideCustomBgBtn.addEventListener('click', openTintPopover);
+      }
+      if (false) {
+        sideCustomBgBtn.addEventListener('dummy', () => {
           openRightPopover('BACKDROP & CUSTOM TINT', (container) => {
             container.innerHTML = `
               <div class="space-y-2">
@@ -8282,11 +8590,24 @@ RAW SIGNAL</textarea>
                 </div>
                 <div class="pt-1 border-t border-white/10 space-y-2">
                   <div>
-                    <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
-                      <span class="text-slate-300 font-bold">DEPTH MASK THRESHOLD</span>
-                      <span id="popMediaThreshVal" class="text-cyber-cyan font-bold">${state.photo.depthThreshold || 0}%</span>
+                    <div class="flex items-center justify-between pb-1 mb-1 border-b border-white/10">
+                      <span class="text-slate-300 font-bold text-[9.5px]">INVERT DEPTH MASK</span>
+                      <input id="popMediaDepthInvertChk" type="checkbox" ${state.photo.depthInvert ? 'checked' : ''} class="accent-cyber-cyan cursor-pointer" />
                     </div>
-                    <input id="popMediaThreshRange" type="range" min="0" max="95" value="${state.photo.depthThreshold || 0}" class="w-full" />
+                    <div>
+                      <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
+                        <span class="text-slate-300 font-bold">DEPTH MASK THRESHOLD</span>
+                        <span id="popMediaThreshVal" class="text-cyber-cyan font-bold">${state.photo.depthThreshold || 0}%</span>
+                      </div>
+                      <input id="popMediaThreshRange" type="range" min="0" max="95" value="${state.photo.depthThreshold || 0}" class="w-full" />
+                    </div>
+                    <div class="pt-1">
+                      <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
+                        <span class="text-slate-300 font-bold">3D ASCII DEPTH SCALE</span>
+                        <span id="popMediaAsciiDepthVal" class="text-cyber-cyan font-bold">${state.photo.depthAsciiScale !== undefined ? state.photo.depthAsciiScale : 75}%</span>
+                      </div>
+                      <input id="popMediaAsciiDepthRange" type="range" min="0" max="100" value="${state.photo.depthAsciiScale !== undefined ? state.photo.depthAsciiScale : 75}" class="w-full" />
+                    </div>
                   </div>
                   <div>
                     <div class="flex justify-between text-[9.5px] font-mono mb-0.5">
@@ -8324,6 +8645,12 @@ RAW SIGNAL</textarea>
               const lv = container.querySelector('#popMediaLightVal');
               if (tr) tr.value = state.photo.depthThreshold || 0;
               if (tv) tv.textContent = (state.photo.depthThreshold || 0) + '%';
+              const dInvertChk = container.querySelector('#popMediaDepthInvertChk');
+              if (dInvertChk) dInvertChk.checked = !!state.photo.depthInvert;
+              const adr = container.querySelector('#popMediaAsciiDepthRange');
+              const adv = container.querySelector('#popMediaAsciiDepthVal');
+              if (adr) adr.value = state.photo.depthAsciiScale !== undefined ? state.photo.depthAsciiScale : 75;
+              if (adv) adv.textContent = (state.photo.depthAsciiScale !== undefined ? state.photo.depthAsciiScale : 75) + '%';
               if (er) er.value = state.photo.edgeDetect || 0;
               if (ev) ev.textContent = (state.photo.edgeDetect || 0) + '%';
               if (sr) sr.value = state.photo.saturation !== undefined ? state.photo.saturation : 100;
@@ -8332,6 +8659,23 @@ RAW SIGNAL</textarea>
               if (lv) lv.textContent = (state.photo.brightness || 115) + '%';
               syncDockedKnobs();
             };
+
+            const dInvertChk = container.querySelector('#popMediaDepthInvertChk');
+            if (dInvertChk) {
+              dInvertChk.addEventListener('change', (e) => {
+                state.photo.depthInvert = e.target.checked;
+                const chk = document.getElementById('photoDepthInvertCheck');
+                if (chk) chk.checked = e.target.checked;
+              });
+            }
+            const adr = container.querySelector('#popMediaAsciiDepthRange');
+            const adv = container.querySelector('#popMediaAsciiDepthVal');
+            if (adr) {
+              adr.addEventListener('input', (e) => {
+                setSliderValue('photoAsciiDepthScaleRange', Number(e.target.value));
+                if (adv) adv.textContent = e.target.value + '%';
+              });
+            }
 
             container.querySelectorAll('.pop-mpreset-btn').forEach(btn => {
               btn.addEventListener('click', () => {
@@ -8453,6 +8797,13 @@ RAW SIGNAL</textarea>
                     🎛️ Cell Size & Contrast Knobs
                   </button>
                 </div>
+                <div class="space-y-0.5 pt-1.5 border-t border-white/10">
+                  <div class="flex justify-between text-[9px] font-mono">
+                    <span class="text-slate-300 font-bold">3D DEPTH GLYPH SCALING</span>
+                    <span id="popAsciiDepthScaleVal" class="text-cyber-cyan font-bold">${state.photo.depthAsciiScale !== undefined ? state.photo.depthAsciiScale : 75}%</span>
+                  </div>
+                  <input id="popAsciiDepthScaleRange" type="range" min="0" max="100" value="${state.photo.depthAsciiScale !== undefined ? state.photo.depthAsciiScale : 75}" class="w-full accent-cyber-cyan" />
+                </div>
               </div>
             `;
 
@@ -8518,6 +8869,14 @@ RAW SIGNAL</textarea>
                 state.photo.invert = e.target.checked;
                 const domInv = document.getElementById('photoInvertCheck');
                 if (domInv) domInv.checked = e.target.checked;
+              });
+            }
+            const adsRange = container.querySelector('#popAsciiDepthScaleRange');
+            const adsVal = container.querySelector('#popAsciiDepthScaleVal');
+            if (adsRange) {
+              adsRange.addEventListener('input', (e) => {
+                setSliderValue('photoAsciiDepthScaleRange', Number(e.target.value));
+                if (adsVal) adsVal.textContent = e.target.value + '%';
               });
             }
 
@@ -8839,7 +9198,18 @@ RAW SIGNAL</textarea>
 
       // Glitch Sort controls
       document.getElementById('sortActiveCheck').addEventListener('change', (e) => state.sort.active = e.target.checked);
-      document.getElementById('sortCriterionSelect').addEventListener('change', (e) => state.sort.criterion = e.target.value);
+      document.getElementById('sortCriterionSelect').addEventListener('change', (e) => {
+        state.sort.criterion = e.target.value;
+        const lbl = document.getElementById('sideSortCritLabel');
+        if (lbl) {
+          const map = { lights: 'LIGHTS', shadows: 'SHADOW', depth: 'DEPTH', red: 'RED CH', green: 'GRN CH', blue: 'BLU CH', brightness: 'LUMA', saturation: 'SAT' };
+          lbl.textContent = map[e.target.value] || e.target.value.toUpperCase();
+        }
+      });
+      const sortInvChk = document.getElementById('sortInvertMaskCheck');
+      if (sortInvChk) {
+        sortInvChk.addEventListener('change', (e) => state.sort.invertMask = e.target.checked);
+      }
       bind('sortLengthRange', state.sort, 'maxLength', 'sortLengthLabel', 'px');
       bind('sortThicknessRange', state.sort, 'thickness', 'sortThicknessLabel', 'px');
       bind('sortSpreadRange', state.sort, 'spread', 'sortSpreadLabel', '%');
@@ -9751,6 +10121,11 @@ RAW SIGNAL</textarea>
       bind('photoBrightnessRange', state.photo, 'brightness', 'photoBrightnessLabel', '%');
       bind('photoGammaRange', state.photo, 'gamma', 'photoGammaLabel', 'x', 0.1);
       bind('photoThresholdRange', state.photo, 'depthThreshold', 'photoThresholdLabel', '%');
+      bind('photoAsciiDepthScaleRange', state.photo, 'depthAsciiScale', 'photoAsciiDepthScaleLabel', '%');
+      const photoDInv = document.getElementById('photoDepthInvertCheck');
+      if (photoDInv) {
+        photoDInv.addEventListener('change', (e) => state.photo.depthInvert = e.target.checked);
+      }
       bind('photoEdgeRange', state.photo, 'edgeDetect', 'photoEdgeLabel', '%');
       bind('photoSaturationRange', state.photo, 'saturation', 'photoSaturationLabel', '%');
       bind('photoScaleRange', state.photo, 'scale', 'photoScaleLabel', 'x', 0.01);
@@ -9835,7 +10210,16 @@ RAW SIGNAL</textarea>
       bind('syncWidthRange', state.fx.sync, 'width', 'syncWidthLabel', '%');
       bind('syncSpeedRange', state.fx.sync, 'speed', 'syncSpeedLabel', 'x', 0.1);
       bind('syncNoiseRange', state.fx.sync, 'noise', 'syncNoiseLabel', '%');
-      bind('syncTearRange', state.fx.sync, 'tear', 'syncTearLabel', '%');
+
+      // Cable Wave & Tear bindings
+      bind('cableTearRange', state.fx.cableTear, 'tear', 'cableTearLabel', '%');
+      bind('cablePosRange', state.fx.cableTear, 'pos', 'cablePosLabel', '%', 0.01);
+      bind('cableGhostRange', state.fx.cableTear, 'ghost', 'cableGhostLabel', '%');
+
+      const cableActiveChk = document.getElementById('cableTearActiveCheck');
+      if (cableActiveChk) {
+        cableActiveChk.addEventListener('change', (e) => state.fx.cableTear.active = e.target.checked);
+      }
 
       // Quick Color Palette Shuffle Button
       const paletteBtn = document.getElementById('paletteBtn');
